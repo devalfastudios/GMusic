@@ -1528,8 +1528,15 @@
     .about-install.show { display: flex; }
 
     /* Гучність */
-    .fp-volume { display: flex; align-items: center; gap: 6px; margin: 0 4px 14px; }
-    .fp-volume .vol-btn { width: 40px; height: 40px; flex-shrink: 0; }
+    .fp-volume { position: absolute; right: 6px; top: 55%; width: 44px; height: 44px; z-index: 5; }
+    .fp-volume .vol-fold { width: 44px; height: 44px; background: rgba(255,255,255,0.10); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+    .vol-panel { position: absolute; right: 0; bottom: 52px; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 4px 4px; width: 44px; border-radius: 22px; background: rgba(0,0,0,0.38); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); transition: opacity .2s ease, transform .25s cubic-bezier(0.2,0.8,0.2,1); transform-origin: bottom center; }
+    .fp-volume:not(.open) .vol-panel { opacity: 0; transform: scale(.85) translateY(12px); pointer-events: none; }
+    .vol-panel .vol-btn { width: 36px; height: 36px; }
+    .vol-vwrap { position: relative; width: 36px; height: 150px; }
+    .vol-vwrap .vol-slider { position: absolute; left: 50%; top: 50%; width: 150px; height: 6px; flex: none; transform: translate(-50%, -50%) rotate(-90deg); }
+    .vol-vwrap .vol-slider::-webkit-slider-thumb { width: 20px; height: 20px; }
+    .vol-vwrap .vol-slider::-moz-range-thumb { width: 20px; height: 20px; }
     .vol-slider {
       -webkit-appearance: none; appearance: none; flex: 1; min-width: 0; height: 4px; border-radius: 2px; outline: none; cursor: pointer;
       background: linear-gradient(to right, var(--md-sys-color-primary) var(--v, 100%), rgba(255,255,255,0.22) var(--v, 100%));
@@ -1539,6 +1546,18 @@
     .player-vol { display: none; align-items: center; gap: 2px; width: 140px; flex-shrink: 0; cursor: default; }
     .player-vol .vol-btn { width: 36px; height: 36px; }
     @media (min-width: 900px) { .player-vol { display: flex; } }
+
+    /* ===== Обрізка треку ===== */
+    .trim-wrap{position:relative;height:104px;border-radius:16px;background:var(--md-sys-color-surface-container-high);overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;cursor:pointer;}
+    .trim-wrap canvas{position:absolute;inset:0;width:100%;height:100%;display:block;}
+    .trim-h{position:absolute;top:0;bottom:0;width:30px;transform:translateX(-50%);cursor:ew-resize;z-index:2;pointer-events:none;}
+    .trim-h::before{content:'';position:absolute;left:50%;top:0;bottom:0;width:3px;margin-left:-1.5px;background:var(--md-sys-color-primary);}
+    .trim-h::after{content:'';position:absolute;left:50%;top:50%;width:14px;height:34px;margin:-17px 0 0 -7px;border-radius:7px;background:var(--md-sys-color-primary);box-shadow:0 2px 8px rgba(0,0,0,.5);}
+    .trim-head{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:#fff;display:none;z-index:1;pointer-events:none;}
+    .trim-loading{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:0 16px;font-size:.88rem;line-height:1.4;color:var(--md-sys-color-on-surface-variant);background:var(--md-sys-color-surface-container-high);z-index:3;}
+    .trim-times{display:flex;justify-content:space-between;font-size:.82rem;color:var(--md-sys-color-on-surface-variant);margin:10px 2px 14px;font-variant-numeric:tabular-nums;}
+    .trim-times b{color:var(--md-sys-color-on-surface);font-weight:500;}
+    .trim-hint{font-size:.78rem;color:var(--md-sys-color-outline);margin-top:12px;text-align:center;}
   </style>
 </head>
 <body>
@@ -1563,6 +1582,7 @@
         </button>
       </nav>
       <div class="sidebar-foot">
+        <button id="sidebarInstall" style="display:none"><span class="material-icons-round">install_mobile</span><span>Встановити застосунок</span></button>
         <button id="sidebarAbout"><span class="material-icons-round">info</span><span>Про програму</span></button>
       </div>
     </aside>
@@ -1672,6 +1692,18 @@
       <!-- SETTINGS VIEW -->
       <div class="view" id="view-settings">
         <div class="section-header"><h2>Налаштування</h2></div>
+        <div class="settings-group" id="installGroup" style="display:none">
+          <div class="settings-item" id="installItem">
+            <div class="settings-item-left">
+              <span class="material-icons-round">install_mobile</span>
+              <div>
+                <div class="settings-item-title">Встановити застосунок</div>
+                <div class="settings-item-sub" id="installSub">Додати GMusic на головний екран</div>
+              </div>
+            </div>
+            <span class="material-icons-round">chevron_right</span>
+          </div>
+        </div>
         <div class="settings-group">
           <div class="settings-item" id="eqToggle">
             <div class="settings-item-left">
@@ -1813,6 +1845,14 @@
           <span class="material-icons-round">share</span>
           Поділитися
         </button>
+        <button id="moreTrim">
+          <span class="material-icons-round">content_cut</span>
+          Обрізати трек
+        </button>
+        <button id="moreDownload">
+          <span class="material-icons-round">download</span>
+          Завантажити на пристрій
+        </button>
         <button id="moreSleep">
           <span class="material-icons-round">bedtime</span>
           Таймер сну
@@ -1846,9 +1886,12 @@
         <button class="icon-btn fp-skip" id="fpNext"><span class="material-icons-round">skip_next</span></button>
         <button class="icon-btn fp-mode" id="fpRepeat"><span class="material-icons-round">repeat</span></button>
       </div>
-      <div class="fp-volume">
-        <button class="icon-btn vol-btn" aria-label="Вимкнути звук"><span class="material-icons-round">volume_up</span></button>
-        <input type="range" class="vol-slider" min="0" max="100" value="100" step="1" aria-label="Гучність" />
+      <div class="fp-volume" id="fpVolume">
+        <div class="vol-panel">
+          <div class="vol-vwrap"><input type="range" class="vol-slider" min="0" max="100" value="100" step="1" aria-label="Гучність" /></div>
+          <button class="icon-btn vol-btn" aria-label="Вимкнути звук"><span class="material-icons-round">volume_up</span></button>
+        </div>
+        <button class="icon-btn vol-fold" id="volFold" aria-label="Гучність"><span class="material-icons-round">volume_up</span></button>
       </div>
       <div class="fp-extra">
         <button class="icon-btn fp-tonal" id="fpSave"><span class="material-icons-round">favorite_border</span></button>
@@ -1915,9 +1958,6 @@
       </div>
 
       <div class="about-note">Вікно плеєра на ПК можна перетягувати за верхню панель; подвійний клік по ній повертає вікно на місце. Доступність джерел залежить від сторонніх сервісів.</div>
-      <div class="modal-actions about-install" id="aboutInstallRow">
-        <button class="btn-confirm" id="aboutInstall" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;"><span class="material-icons-round" style="font-size:20px">install_mobile</span>Встановити застосунок</button>
-      </div>
       <div class="modal-actions" style="margin-top:18px;">
         <button class="btn-confirm" id="aboutClose" style="flex:1;">Закрити</button>
       </div>
@@ -1965,6 +2005,31 @@
         </div>
       </div>
       <div class="tm-list" id="tmList"></div>
+    </div>
+  </div>
+
+  <!-- TRIM MODAL -->
+  <div class="modal-overlay" id="trimModal">
+    <div class="modal">
+      <div class="modal-title">Обрізати трек</div>
+      <div id="trimName" style="text-align:center;font-size:.9rem;opacity:.75;margin:-12px 0 16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
+      <div class="trim-wrap" id="trimWrap">
+        <canvas id="trimCanvas"></canvas>
+        <div class="trim-head" id="trimHead"></div>
+        <div class="trim-h" id="trimHS"></div>
+        <div class="trim-h" id="trimHE"></div>
+        <div class="trim-loading" id="trimLoading">Завантаження аудіо…</div>
+      </div>
+      <div class="trim-times"><span>Початок <b id="trimS">0:00.0</b></span><span id="trimL"></span><span>Кінець <b id="trimE">0:00.0</b></span></div>
+      <div class="chip-row" id="trimFmt">
+        <button class="chip on" data-k="mp3">MP3</button>
+        <button class="chip" data-k="wav">WAV (без стиснення)</button>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" id="trimPlay"></button>
+        <button class="btn-confirm" id="trimSaveBtn"><span class="material-icons-round" style="font-size:20px;vertical-align:-5px">download</span> Зберегти</button>
+      </div>
+      <div class="trim-hint">Потягніть за ближчий край виділення. Торкніться поза модальним вікном, щоб закрити.</div>
     </div>
   </div>
 
@@ -2173,35 +2238,85 @@
       'https://pipedapi.ducks.party',
       'https://pipedapi.darkness.services',
       'https://pipedapi.orangenet.cc',
-      'https://pipedapi.kavin.rocks'
+      'https://pipedapi.kavin.rocks',
+      'https://pipedapi.reallyaweso.me',
+      'https://api.piped.yt',
+      'https://pipedapi.drgns.space',
+      'https://pipedapi.owo.si',
+      'https://pipedapi.r4fo.com'
     ];
+    const INVIDIOUS_INSTANCES = [
+      'https://inv.nadeko.net',
+      'https://yewtu.be',
+      'https://invidious.nerdvpn.de',
+      'https://invidious.privacyredirect.com',
+      'https://iv.melmac.space'
+    ];
+
+    async function fetchJson(url, ms = 6000) {
+      const c = new AbortController(); const t = setTimeout(() => c.abort(), ms);
+      try { const r = await fetch(url, { signal: c.signal }); if (!r.ok) throw new Error(r.status); return await r.json(); }
+      finally { clearTimeout(t); }
+    }
+    // Актуальні списки живих серверів (кеш на 6 годин), статичний список — запасний
+    let liveListsPromise = null;
+    function getLiveLists() {
+      if (liveListsPromise) return liveListsPromise;
+      liveListsPromise = (async () => {
+        try {
+          const c = JSON.parse(localStorage.getItem('gmusic_inst') || 'null');
+          if (c && Date.now() - c.t < 6 * 3600e3) return c;
+        } catch (e) {}
+        const out = { t: Date.now(), piped: [], inv: [] };
+        await Promise.allSettled([
+          fetchJson('https://piped-instances.kavin.rocks/', 5000).then(j => {
+            out.piped = (j || []).filter(x => x && x.api_url).map(x => x.api_url.replace(/\/$/, ''));
+          }),
+          fetchJson('https://api.invidious.io/instances.json?sort_by=health', 5000).then(j => {
+            out.inv = (j || []).filter(x => x[1] && x[1].api && x[1].type === 'https').map(x => x[1].uri.replace(/\/$/, ''));
+          })
+        ]);
+        if (out.piped.length || out.inv.length) { try { localStorage.setItem('gmusic_inst', JSON.stringify(out)); } catch (e) {} }
+        return out;
+      })();
+      return liveListsPromise;
+    }
+    const uniq = a => [...new Set(a)];
+
+    // Перший успішний відповів — решта ігнорується
+    function firstOk(tasks) {
+      return new Promise(resolve => {
+        let left = tasks.length; if (!left) return resolve(null);
+        tasks.forEach(t => t.then(v => { if (v) resolve(v); else if (--left === 0) resolve(null); }, () => { if (--left === 0) resolve(null); }));
+      });
+    }
+    const pipedOne = (base, id) => fetchJson(`${base}/streams/${id}`).then(data => {
+      const audio = (data.audioStreams || []).filter(s => s.url && !s.videoOnly).sort((a, b) => (b.bitrate || 0) - (a.bitrate || 0))[0];
+      if (!audio) return null;
+      console.log('[Piped] OK via', base);
+      return { url: audio.url, title: data.title || '', artist: data.uploader || '', duration: data.duration || 0, art: data.thumbnailUrl || '' };
+    });
+    const invOne = (base, id) => fetchJson(`${base}/api/v1/videos/${id}?local=true&fields=title,author,lengthSeconds,adaptiveFormats`).then(data => {
+      const audio = (data.adaptiveFormats || []).filter(f => f.url && /^audio\//.test(f.type || '')).sort((a, b) => (parseInt(b.bitrate) || 0) - (parseInt(a.bitrate) || 0))[0];
+      if (!audio) return null;
+      const u = audio.url.startsWith('http') ? audio.url : base + audio.url;
+      console.log('[Invidious] OK via', base);
+      return { url: u, title: data.title || '', artist: data.author || '', duration: data.lengthSeconds || 0, art: '' };
+    });
 
     async function getPipedAudioUrl(videoId) {
       if (!videoId) return null;
-      for (const base of PIPED_INSTANCES) {
-        try {
-          const controller = new AbortController();
-          const timeout = setTimeout(() => controller.abort(), 7000);
-          const res = await fetch(`${base}/streams/${videoId}`, { signal: controller.signal });
-          clearTimeout(timeout);
-          if (!res.ok) continue;
-          const data = await res.json();
-          const audio = (data.audioStreams || [])
-            .filter(s => s.url && !s.videoOnly)
-            .sort((a, b) => (b.bitrate || 0) - (a.bitrate || 0))[0];
-          if (audio && audio.url) {
-            console.log('[Piped] OK via', base, audio.quality || audio.bitrate);
-            return {
-              url: audio.url,
-              title: data.title || '',
-              artist: data.uploader || '',
-              duration: data.duration || 0,
-              art: data.thumbnailUrl || ''
-            };
-          }
-        } catch (e) {
-          // next instance
-        }
+      const live = await getLiveLists();
+      const piped = uniq([...(live.piped || []), ...PIPED_INSTANCES]);
+      const inv = uniq([...(live.inv || []), ...INVIDIOUS_INSTANCES]);
+      // Паралельно пачками по 6 серверів: Piped, потім Invidious
+      for (let i = 0; i < piped.length; i += 6) {
+        const r = await firstOk(piped.slice(i, i + 6).map(b => pipedOne(b, videoId)));
+        if (r) return r;
+      }
+      for (let i = 0; i < inv.length; i += 6) {
+        const r = await firstOk(inv.slice(i, i + 6).map(b => invOne(b, videoId)));
+        if (r) return r;
       }
       return null;
     }
@@ -2740,12 +2855,9 @@
       }
       items.push({ icon: 'person', text: 'Усі треки виконавця', fn: () => showArtistTracks(t.artist) });
       if (t.source === 'youtube' && t.streamId) items.push({ icon: 'open_in_new', text: 'Відкрити на YouTube', fn: () => window.open('https://www.youtube.com/watch?v=' + t.streamId, '_blank') });
-      items.push({ icon: 'share', text: 'Поділитися', fn: () => {
-        const text = `${t.title} — ${t.artist}`;
-        if (navigator.share) navigator.share({ title: t.title, text }).catch(() => {});
-        else if (navigator.clipboard) navigator.clipboard.writeText(text).then(() => toast('Скопійовано')).catch(() => toast(text));
-        else toast(text);
-      }});
+      items.push({ icon: 'content_cut', text: 'Обрізати і зберегти', fn: () => openTrim(t) });
+      items.push({ icon: 'download', text: 'Завантажити на пристрій', fn: () => downloadTrack(t) });
+      items.push({ icon: 'share', text: 'Поділитися', fn: () => shareTrack(t) });
       items.push({ icon: 'info', text: 'Про трек', fn: () => toast(`${t.title} · ${t.artist} · ${formatTime(t.duration)}`) });
       if (inLib) items.push({ icon: 'delete', text: 'Видалити з бібліотеки', danger: true, fn: () => animateRemove(id, () => toggleSave(id)) });
       else items.push({ icon: 'favorite_border', text: 'Зберегти в мою музику', fn: () => toggleSave(id) });
@@ -2946,7 +3058,51 @@
       toast(`Додано: ${files.length} трек(ів)`);
     }
 
+    // ===== Поділитися: посилання відкриває плеєр цього застосунку =====
+    const b64e = o => btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(o)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    const b64d = str => JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(str.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0))));
+    function trackShareUrl(t) {
+      if (!t || t.local || !t.source) return '';
+      const o = { s: t.source, i: t.streamId || '', t: t.title, a: t.artist, d: Math.round(t.duration || 0), r: t.art || '' };
+      if (t.source === 'itunes') o.u = t.url;
+      else if (!t.streamId) return '';
+      return location.origin + location.pathname + '#play=' + b64e(o);
+    }
+    function shareTrack(t) {
+      if (!t) return;
+      const text = `${t.title} — ${t.artist}`;
+      const url = trackShareUrl(t);
+      if (navigator.share) navigator.share(url ? { title: t.title, text, url } : { title: t.title, text }).catch(() => {});
+      else if (navigator.clipboard) navigator.clipboard.writeText(url ? `${text}\n${url}` : text).then(() => toast(url ? 'Посилання скопійовано' : 'Скопійовано')).catch(() => toast(text));
+      else toast(text);
+    }
+    function trackFromShare(o) {
+      const pre = { audius: 'audius_', itunes: 'itunes_', jamendo: 'jamendo_', youtube: 'yt_' }[o.s];
+      if (!pre) return null;
+      return { id: pre + (o.i || ('x' + Date.now())), title: o.t || 'Unknown', artist: o.a || '', duration: o.d || 0, art: o.r || '',
+        url: o.s === 'itunes' ? (o.u || '') : '', streamId: o.i || undefined, local: false, source: o.s, preview: o.s === 'itunes' };
+    }
+    function openSharedFromHash() {
+      const m = /^#play=([\w-]+)/.exec(location.hash);
+      if (!m) return;
+      try {
+        const t = trackFromShare(b64d(m[1]));
+        history.replaceState(null, '', location.pathname + location.search);
+        if (!t) return;
+        queue = [t]; currentPlaylistId = null;
+        openFullPlayer();
+        playTrack(t);
+      } catch (e) { console.error('share link', e); }
+    }
+    addEventListener('hashchange', openSharedFromHash);
+
     // ========== PLAYER ==========
+    function failYt() {
+      showYtBox(false);
+      isLoading = false; isPlaying = false;
+      updatePlayerUI();
+      toast('Не вдалося завантажити трек без реклами. Спробуйте пізніше');
+    }
     async function playTrack(track) {
       if (!track) return;
       currentTrack = track;
@@ -2981,7 +3137,7 @@
           src = track.url;
           showYtBox(false);
         } else {
-          // 1) Спочатку пробуємо Piped (без реклами, без ключа)
+          // Piped / Invidious (без реклами, без ключа)
           isLoading = true; updatePlayerUI();
           document.getElementById('playerBar').classList.add('visible');
           try {
@@ -2996,24 +3152,12 @@
               track.url = piped.url; // кешуємо на сесію
               // далі звичайний шлях відтворення нижче
             } else {
-              // 2) Всі інстанси Piped недоступні → старий YouTube iframe
-              if (audio !== ytAudio) audio.pause();
-              audio = ytAudio; ytDuration = track.duration || 0;
-              showYtBox(true);
-              isLoading = true; isPlaying = true;
-              updatePlayerUI();
-              ytLoad(track.streamId);
+              failYt();
               return;
             }
           } catch (e) {
             console.error('Piped error:', e);
-            // fallback на iframe
-            if (audio !== ytAudio) audio.pause();
-            audio = ytAudio; ytDuration = track.duration || 0;
-            showYtBox(true);
-            isLoading = true; isPlaying = true;
-            updatePlayerUI();
-            ytLoad(track.streamId);
+            failYt();
             return;
           }
         }
@@ -3099,6 +3243,7 @@
       if (isPlaying) fpArt.classList.add('playing');
       else fpArt.classList.remove('playing');
       updatePlayerSaveBtn();
+      updateMediaSession();
       document.querySelectorAll('.track-item').forEach(el => {
         el.classList.toggle('playing', el.dataset.id === currentTrack.id);
       });
@@ -3111,6 +3256,270 @@
       btn.style.color = '';
       btn.classList.toggle('saved', saved);
     }
+
+    // ========== MEDIA SESSION (плеєр у шторці / на екрані блокування) ==========
+    let _msArt = null, _msKey = '', _msPosT = 0;
+    function placeholderPng() {
+      if (_msArt !== null) return _msArt;
+      try {
+        const c = document.createElement('canvas'); c.width = c.height = 512;
+        const g = c.getContext('2d');
+        const gr = g.createLinearGradient(0, 0, 512, 512); gr.addColorStop(0, '#3b4a6b'); gr.addColorStop(1, '#1b2033');
+        g.fillStyle = gr; g.fillRect(0, 0, 512, 512);
+        g.fillStyle = '#a8c7fa'; g.beginPath(); g.arc(196, 372, 62, 0, 7); g.fill();
+        g.fillRect(238, 124, 38, 250); g.fillRect(238, 124, 150, 42);
+        _msArt = c.toDataURL('image/png');
+      } catch (e) { _msArt = ''; }
+      return _msArt;
+    }
+    function updateMediaSession() {
+      if (!('mediaSession' in navigator) || !currentTrack || typeof MediaMetadata === 'undefined') return;
+      const t = currentTrack, key = t.id + '|' + (t.art || '') + '|' + t.title;
+      if (_msKey !== key) {
+        _msKey = key;
+        const src = (t.art && /^(https?:|blob:|data:)/.test(t.art)) ? t.art : placeholderPng();
+        try {
+          navigator.mediaSession.metadata = new MediaMetadata({
+            title: t.title, artist: t.artist, album: 'GMusic',
+            artwork: src ? ['96x96', '128x128', '192x192', '256x256', '384x384', '512x512'].map(sz => ({ src, sizes: sz })) : []
+          });
+        } catch (e) {}
+      }
+      navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
+      syncMsPos(true);
+    }
+    function syncMsPos(force) {
+      if (!('mediaSession' in navigator) || !navigator.mediaSession.setPositionState) return;
+      const now = Date.now(); if (!force && now - _msPosT < 1000) return; _msPosT = now;
+      const d = audio.duration, p = audio.currentTime;
+      if (!isFinite(d) || d <= 0) return;
+      try { navigator.mediaSession.setPositionState({ duration: d, position: Math.min(Math.max(0, p || 0), d), playbackRate: 1 }); } catch (e) {}
+    }
+    if ('mediaSession' in navigator) {
+      const set = (a, f) => { try { navigator.mediaSession.setActionHandler(a, f); } catch (e) {} };
+      set('play', () => { if (!isPlaying) togglePlay(); });
+      set('pause', () => { if (isPlaying) togglePlay(); });
+      set('stop', () => { if (isPlaying) togglePlay(); });
+      set('previoustrack', () => prevTrack());
+      set('nexttrack', () => nextTrack());
+      set('seekto', d => { if (audio.duration && d.seekTime != null) { audio.currentTime = d.seekTime; syncMsPos(true); } });
+      [audioCors, audioPlain, ytAudio].forEach(a => ['timeupdate', 'durationchange', 'seeked'].forEach(ev =>
+        a.addEventListener(ev, () => { if (a === audio) syncMsPos(ev !== 'timeupdate'); })));
+    }
+
+    // ========== ЗАВАНТАЖЕННЯ ТА ОБРІЗКА ТРЕКУ ==========
+    async function resolveTrackSrc(t) {
+      if (!t) return '';
+      if (t.source === 'audius' && t.streamId) return getAudiusStreamUrl(t.streamId);
+      if (t.source === 'jamendo' && t.streamId && !t.url) {
+        try { const d = await jamendoFetch('/tracks/', { id: t.streamId }); const r = d.results && d.results[0]; if (r && r.audio) { t.url = r.audio; return r.audio; } } catch (e) {}
+      }
+      if (t.source === 'youtube' && t.streamId && !t.url) {
+        const p = await getPipedAudioUrl(t.streamId).catch(() => null);
+        if (p && p.url) { t.url = p.url; return p.url; }
+        return '';
+      }
+      return t.url || t.blobUrl || '';
+    }
+    const safeName = t => (`${t.artist || ''} - ${t.title || 'track'}`).replace(/[\\/:*?"<>|]+/g, '').replace(/\s+/g, ' ').trim().slice(0, 100) || 'track';
+    function saveBlob(blob, name) {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = name;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 60000);
+    }
+    async function fetchTrackBlob(t) {
+      const src = await resolveTrackSrc(t);
+      if (!src) throw new Error('nosrc');
+      const r = await fetch(src);
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.blob();
+    }
+    function extFromBlob(b) {
+      const m = b.type || '';
+      return /mpeg/.test(m) ? 'mp3' : /mp4|m4a|aac/.test(m) ? 'm4a' : /webm/.test(m) ? 'webm' : /ogg/.test(m) ? 'ogg' : /wav/.test(m) ? 'wav' : 'mp3';
+    }
+    async function downloadTrack(t) {
+      if (!t) return;
+      toast('Готуємо файл…');
+      try {
+        const b = await fetchTrackBlob(t);
+        saveBlob(b, safeName(t) + '.' + extFromBlob(b));
+        toast('Збережено на пристрій');
+      } catch (e) {
+        console.error(e);
+        const src = await resolveTrackSrc(t).catch(() => '');
+        if (src) { window.open(src, '_blank'); toast('Джерело не дозволяє пряме збереження — відкриваю файл'); }
+        else toast('Не вдалося завантажити цей трек');
+      }
+    }
+
+    const TR = { t: null, buf: null, peaks: [], s: 0, e: 0, fmt: 'mp3', ctx: null, node: null, raf: 0, at: 0, busy: false };
+    const trEl = id => document.getElementById(id);
+    const fmtT = x => `${Math.floor(x / 60)}:${(x % 60).toFixed(1).padStart(4, '0')}`;
+    function trimPlayLabel(on) {
+      trEl('trimPlay').innerHTML = `<span class="material-icons-round" style="font-size:20px;vertical-align:-5px">${on ? 'stop' : 'play_arrow'}</span> ${on ? 'Стоп' : 'Прослухати'}`;
+    }
+    function trimLayout() {
+      if (!TR.buf) return;
+      const d = TR.buf.duration;
+      trEl('trimHS').style.left = (TR.s / d * 100) + '%';
+      trEl('trimHE').style.left = (TR.e / d * 100) + '%';
+      trEl('trimS').textContent = fmtT(TR.s);
+      trEl('trimE').textContent = fmtT(TR.e);
+      trEl('trimL').textContent = 'Фрагмент ' + fmtT(TR.e - TR.s);
+    }
+    function trimDraw() {
+      if (!TR.buf) return;
+      const cv = trEl('trimCanvas'), wrap = trEl('trimWrap'), dpr = window.devicePixelRatio || 1;
+      const w = wrap.clientWidth, h = wrap.clientHeight; if (!w) return;
+      cv.width = w * dpr; cv.height = h * dpr;
+      const g = cv.getContext('2d'); g.scale(dpr, dpr);
+      const col = getComputedStyle(document.documentElement).getPropertyValue('--md-sys-color-primary').trim() || '#a8c7fa';
+      const n = TR.peaks.length, bw = w / n, d = TR.buf.duration;
+      for (let i = 0; i < n; i++) {
+        const tm = (i + 0.5) / n * d, on = tm >= TR.s && tm <= TR.e;
+        g.fillStyle = on ? col : 'rgba(255,255,255,0.22)';
+        const ph = Math.max(3, TR.peaks[i] * (h - 20));
+        g.fillRect(i * bw + 0.5, (h - ph) / 2, Math.max(1, bw - 1.5), ph);
+      }
+    }
+    function trimStop() {
+      cancelAnimationFrame(TR.raf);
+      if (TR.node) { try { TR.node.onended = null; TR.node.stop(); } catch (e) {} TR.node = null; }
+      trEl('trimHead').style.display = 'none';
+      trimPlayLabel(false);
+    }
+    function trimTogglePreview() {
+      if (TR.node) { trimStop(); return; }
+      if (!TR.buf || !TR.ctx) return;
+      TR.ctx.resume();
+      const n = TR.ctx.createBufferSource(); n.buffer = TR.buf; n.connect(TR.ctx.destination);
+      n.start(0, TR.s, TR.e - TR.s); TR.node = n; TR.at = TR.ctx.currentTime;
+      n.onended = () => { if (TR.node === n) trimStop(); };
+      trimPlayLabel(true);
+      const head = trEl('trimHead'); head.style.display = 'block';
+      const tick = () => {
+        if (TR.node !== n) return;
+        head.style.left = ((TR.s + TR.ctx.currentTime - TR.at) / TR.buf.duration * 100) + '%';
+        TR.raf = requestAnimationFrame(tick);
+      };
+      tick();
+    }
+    async function openTrim(t) {
+      if (!t) return;
+      if (isPlaying) togglePlay();
+      TR.t = t; TR.buf = null; trimStop();
+      trEl('trimName').textContent = `${t.title} — ${t.artist}`;
+      const ld = trEl('trimLoading'); ld.style.display = 'grid'; ld.textContent = 'Завантаження аудіо…';
+      trEl('trimHS').style.left = '0%'; trEl('trimHE').style.left = '100%';
+      trEl('trimModal').classList.add('open');
+      try {
+        const blob = await fetchTrackBlob(t);
+        if (TR.t !== t) return;
+        const ab = await blob.arrayBuffer();
+        if (!TR.ctx) TR.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const buf = await TR.ctx.decodeAudioData(ab);
+        if (TR.t !== t) return;
+        const ch = buf.getChannelData(0), N = 140, step = Math.max(1, Math.floor(ch.length / N)), pk = []; let mx = 1e-4;
+        for (let i = 0; i < N; i++) {
+          let m = 0; const st = i * step, en = Math.min(ch.length, st + step), inc = Math.max(1, step >> 6);
+          for (let j = st; j < en; j += inc) { const v = Math.abs(ch[j]); if (v > m) m = v; }
+          pk.push(m); if (m > mx) mx = m;
+        }
+        TR.peaks = pk.map(v => v / mx);
+        TR.buf = buf; TR.s = 0; TR.e = buf.duration;
+        ld.style.display = 'none';
+        trimLayout(); trimDraw();
+      } catch (e) {
+        console.error(e);
+        if (TR.t === t) ld.textContent = 'Це джерело не дає доступу до файлу, тому обрізати не вийде. Спробуйте власний файл, Jamendo або Audius.';
+      }
+    }
+    function closeTrim() { trimStop(); TR.t = null; TR.buf = null; trEl('trimModal').classList.remove('open'); }
+
+    function encodeWav(chs, sr) {
+      const n = chs[0].length, nc = chs.length, len = 44 + n * nc * 2, v = new DataView(new ArrayBuffer(len));
+      const w = (o, str) => { for (let i = 0; i < str.length; i++) v.setUint8(o + i, str.charCodeAt(i)); };
+      w(0, 'RIFF'); v.setUint32(4, len - 8, true); w(8, 'WAVEfmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true);
+      v.setUint16(22, nc, true); v.setUint32(24, sr, true); v.setUint32(28, sr * nc * 2, true); v.setUint16(32, nc * 2, true); v.setUint16(34, 16, true);
+      w(36, 'data'); v.setUint32(40, n * nc * 2, true);
+      let o = 44;
+      for (let i = 0; i < n; i++) for (let c = 0; c < nc; c++) { const x = Math.max(-1, Math.min(1, chs[c][i])); v.setInt16(o, x < 0 ? x * 0x8000 : x * 0x7FFF, true); o += 2; }
+      return new Blob([v], { type: 'audio/wav' });
+    }
+    function loadLame() {
+      return new Promise((res, rej) => {
+        if (window.lamejs) return res();
+        const sc = document.createElement('script');
+        sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js';
+        sc.onload = res; sc.onerror = () => rej(new Error('lamejs')); document.head.appendChild(sc);
+      });
+    }
+    async function encodeMp3(chs, sr) {
+      await loadLame();
+      const nc = chs.length, enc = new lamejs.Mp3Encoder(nc, sr, 192);
+      const i16 = a => { const o = new Int16Array(a.length); for (let i = 0; i < a.length; i++) { const x = Math.max(-1, Math.min(1, a[i])); o[i] = x < 0 ? x * 0x8000 : x * 0x7FFF; } return o; };
+      const L = i16(chs[0]), R = nc > 1 ? i16(chs[1]) : null, parts = [], B = 1152;
+      for (let i = 0, k = 0; i < L.length; i += B, k++) {
+        const out = nc > 1 ? enc.encodeBuffer(L.subarray(i, i + B), R.subarray(i, i + B)) : enc.encodeBuffer(L.subarray(i, i + B));
+        if (out.length) parts.push(out);
+        if (k % 150 === 0) await new Promise(r => setTimeout(r));
+      }
+      const end = enc.flush(); if (end.length) parts.push(end);
+      return new Blob(parts, { type: 'audio/mpeg' });
+    }
+    async function trimSave() {
+      if (!TR.buf || TR.busy) return;
+      TR.busy = true; trimStop();
+      const btn = trEl('trimSaveBtn'), old = btn.innerHTML; btn.textContent = 'Обробка…';
+      try {
+        const b = TR.buf, sr = b.sampleRate, a = Math.floor(TR.s * sr), z = Math.min(b.length, Math.ceil(TR.e * sr));
+        const nc = Math.min(2, b.numberOfChannels), fade = Math.min(Math.floor(sr * 0.015), (z - a) >> 1), chs = [];
+        for (let c = 0; c < nc; c++) {
+          const d = b.getChannelData(c).slice(a, z);
+          for (let i = 0; i < fade; i++) { const k = i / fade; d[i] *= k; d[d.length - 1 - i] *= k; }
+          chs.push(d);
+        }
+        let blob = null, ext = 'wav';
+        if (TR.fmt === 'mp3') {
+          try { blob = await encodeMp3(chs, sr); ext = 'mp3'; } catch (e) { console.error(e); toast('MP3-кодек недоступний — зберігаю WAV'); }
+        }
+        if (!blob) blob = encodeWav(chs, sr);
+        saveBlob(blob, safeName(TR.t) + ' (обрізано).' + ext);
+        toast('Збережено на пристрій');
+      } catch (e) { console.error(e); toast('Не вдалося обрізати трек'); }
+      TR.busy = false; btn.innerHTML = old;
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      const wrap = trEl('trimWrap'); let drag = null;
+      const moveTo = e => {
+        if (!TR.buf || !drag) return;
+        const r = wrap.getBoundingClientRect(), d = TR.buf.duration, min = Math.min(0.5, d / 2);
+        const t = Math.min(d, Math.max(0, (e.clientX - r.left) / r.width * d));
+        if (drag === 's') TR.s = Math.min(t, TR.e - min); else TR.e = Math.max(t, TR.s + min);
+        if (TR.node) trimStop();
+        trimLayout(); trimDraw();
+      };
+      wrap.addEventListener('pointerdown', e => {
+        if (!TR.buf) return;
+        const r = wrap.getBoundingClientRect(), t = (e.clientX - r.left) / r.width * TR.buf.duration;
+        drag = Math.abs(t - TR.s) <= Math.abs(t - TR.e) ? 's' : 'e';
+        wrap.setPointerCapture(e.pointerId); moveTo(e);
+      });
+      wrap.addEventListener('pointermove', moveTo);
+      ['pointerup', 'pointercancel'].forEach(ev => wrap.addEventListener(ev, () => { drag = null; }));
+      addEventListener('resize', trimDraw);
+      trimPlayLabel(false);
+      trEl('trimPlay').addEventListener('click', trimTogglePreview);
+      trEl('trimSaveBtn').addEventListener('click', trimSave);
+      trEl('trimModal').addEventListener('click', e => { if (e.target.id === 'trimModal') closeTrim(); });
+      trEl('trimFmt').querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => {
+        TR.fmt = b.dataset.k; trEl('trimFmt').querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x === b));
+      }));
+      trEl('moreTrim').addEventListener('click', () => { trEl('moreMenu').classList.remove('open'); openTrim(currentTrack); });
+      trEl('moreDownload').addEventListener('click', () => { trEl('moreMenu').classList.remove('open'); downloadTrack(currentTrack); });
+    });
 
     // ========== NAV ==========
     const VIEW_ORDER = ['library', 'search', 'settings'];
@@ -3556,15 +3965,7 @@
       });
       document.getElementById('moreShare').addEventListener('click', () => {
         moreMenu.classList.remove('open');
-        if (!currentTrack) return;
-        const text = `${currentTrack.title} — ${currentTrack.artist}`;
-        if (navigator.share) {
-          navigator.share({ title: currentTrack.title, text }).catch(() => {});
-        } else if (navigator.clipboard) {
-          navigator.clipboard.writeText(text).then(() => toast('Скопійовано')).catch(() => toast(text));
-        } else {
-          toast(text);
-        }
+        shareTrack(currentTrack);
       });
       document.getElementById('moreSleep').addEventListener('click', () => {
         moreMenu.classList.remove('open');
@@ -3680,11 +4081,21 @@
       // ===== Гучність: слайдери + кнопка mute =====
       const volSliders = [...document.querySelectorAll('.vol-slider')];
       const volBtns = [...document.querySelectorAll('.vol-btn')];
+      const fpVol = document.getElementById('fpVolume');
+      try { if (localStorage.getItem('gmusic_volopen') === '1') fpVol.classList.add('open'); } catch (e) {}
+      document.getElementById('volFold').addEventListener('click', e => {
+        e.stopPropagation();
+        const o = fpVol.classList.toggle('open');
+        try { localStorage.setItem('gmusic_volopen', o ? '1' : '0'); } catch (e2) {}
+        renderVol();
+      });
       function renderVol() {
         const v = gMuted ? 0 : gVolume;
         const icon = v === 0 ? 'volume_off' : v < 0.5 ? 'volume_down' : 'volume_up';
         volSliders.forEach(sl => { sl.value = Math.round(v * 100); sl.style.setProperty('--v', sl.value + '%'); });
         volBtns.forEach(b => { b.querySelector('.material-icons-round').textContent = icon; });
+        const fold = document.getElementById('volFold');
+        if (fold) fold.querySelector('.material-icons-round').textContent = fpVol.classList.contains('open') ? 'chevron_right' : icon;
       }
       function setVol(v) {
         gVolume = Math.min(1, Math.max(0, v));
@@ -3747,13 +4158,31 @@
 
       // ===== Кнопка "Встановити застосунок" (PWA) =====
       let installEvt = null;
-      const instRow = document.getElementById('aboutInstallRow');
-      addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; instRow.classList.add('show'); });
-      addEventListener('appinstalled', () => { installEvt = null; instRow.classList.remove('show'); toast('GMusic встановлено'); });
-      document.getElementById('aboutInstall').addEventListener('click', async () => {
-        if (!installEvt) return;
-        installEvt.prompt(); await installEvt.userChoice.catch(() => {}); installEvt = null; instRow.classList.remove('show');
-      });
+      const installGroup = document.getElementById('installGroup');
+      const sideInstall = document.getElementById('sidebarInstall');
+      const isStandalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+      const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+      const showInstall = (on) => { installGroup.style.display = on ? '' : 'none'; sideInstall.style.display = on ? '' : 'none'; };
+      const installSub = document.getElementById('installSub');
+      const isWeb = /^https?:$/.test(location.protocol);
+      // Кнопка видна завжди, поки застосунок не встановлено
+      if (!isStandalone) {
+        if (isIOS) installSub.textContent = 'Поділитися → «На початковий екран»';
+        else if (!isWeb) installSub.textContent = 'Відкрийте сайт за посиланням (https), а не як файл';
+        showInstall(true);
+      }
+      addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; installSub.textContent = 'Додати GMusic на головний екран'; showInstall(true); });
+      addEventListener('appinstalled', () => { installEvt = null; showInstall(false); toast('GMusic встановлено'); });
+      const doInstall = async () => {
+        if (installEvt) {
+          installEvt.prompt(); await installEvt.userChoice.catch(() => {}); installEvt = null; return;
+        }
+        if (isIOS) toast('Натисніть «Поділитися» → «На початковий екран»');
+        else if (!isWeb) toast('Встановлення працює лише на сайті за https-адресою, не з локального файлу');
+        else toast('Меню браузера (⋮) → «Встановити застосунок» / «Додати на головний екран»');
+      };
+      document.getElementById('installItem').addEventListener('click', doInstall);
+      sideInstall.addEventListener('click', doInstall);
 
       // ===== Окно "Про програму" =====
       const aboutModal = document.getElementById('aboutModal');
@@ -3866,6 +4295,7 @@
         renderDiscover();
       });
       updateFabVisibility();
+      openSharedFromHash();
     });
   </script>
   <script>
