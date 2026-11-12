@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#1a1a2e" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" type="image/png" href="icon-192.png" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="GMusic" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>GMusic — Безкоштовна музика</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -1439,9 +1445,100 @@
     .search-bar input { min-width: 0; }
     /* YouTube-плеер вместо обложки */
     #ytBox { display: none; width: min(92vw, 440px); aspect-ratio: 16 / 9; border-radius: 18px; overflow: hidden; background: #000; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-    #ytBox iframe { width: 100%; height: 100%; border: 0; display: block; }
+    #ytBox { position: relative; }
+    #ytBox iframe { width: 100%; height: 100%; border: 0; display: block; pointer-events: none; }
+    #ytBox.live iframe { pointer-events: auto; }
+    #ytHint { position: absolute; left: 10px; right: 10px; top: 10px; padding: 8px 12px; border-radius: 12px; font-size: 0.85rem;
+      background: rgba(20,20,30,0.82); color: #fff; display: none; pointer-events: none; z-index: 2; text-align: center; }
+    #ytBox.ad #ytHint { display: block; }
     .fp-art-wrap.yt #fpArt { display: none; }
     .fp-art-wrap.yt #ytBox { display: block; }
+
+    /* ===== ПК: оптимизация интерфейса, плавающий плеер, окно "Про програму" ===== */
+    @media (min-width: 900px) {
+      .app { max-width: none; }
+      .sidebar { width: 232px; padding: 20px 14px; }
+      .sidebar-nav .nav-item { padding: 12px 16px; cursor: pointer; }
+      .sidebar-nav .nav-item:hover:not(.active) { background: rgba(255,255,255,0.06); }
+      .sidebar-foot { margin-top: auto; padding: 0 4px; }
+      .sidebar-foot button {
+        width: 100%; display: flex; align-items: center; gap: 14px;
+        padding: 11px 16px; border: none; border-radius: 28px; background: transparent;
+        color: var(--md-sys-color-on-surface-variant); font: inherit; font-size: 0.9rem; cursor: pointer;
+        transition: background .2s, color .2s;
+      }
+      .sidebar-foot button:hover { background: rgba(255,255,255,0.06); color: var(--md-sys-color-on-surface); }
+      .view { padding: 24px 32px calc(var(--player-height) + 56px); }
+      .view > * { max-width: 1180px; margin-left: auto; margin-right: auto; }
+      .track-item { cursor: pointer; }
+      .track-item:hover { background: rgba(255,255,255,0.06); }
+      .player-bar {
+        left: calc(232px + 24px); right: 24px; bottom: 16px;
+        max-width: 760px; margin: 0 auto;
+      }
+      .player-bar:hover { background: rgba(48, 50, 56, 0.94); }
+      .view::-webkit-scrollbar { width: 10px; }
+      .view::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.14); border-radius: 6px; border: 2px solid transparent; background-clip: content-box; }
+      .view::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.26); background-clip: content-box; }
+      .toast { bottom: calc(var(--player-height) + 40px); }
+
+      /* Плавающее окно плеера */
+      .full-player {
+        inset: auto; left: 0; top: 0;
+        width: 380px; height: min(660px, calc(100vh - 32px));
+        border-radius: 24px;
+        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: 0 24px 64px rgba(0,0,0,0.6), 0 0 0 1px rgba(0,0,0,0.3);
+        transform: scale(0.94) translateY(16px);
+        opacity: 0; pointer-events: none;
+        transition: transform .3s cubic-bezier(0.2, 0.8, 0.2, 1), opacity .2s ease;
+      }
+      .full-player.open { transform: none; opacity: 1; pointer-events: auto; }
+      .full-player.dragging { transition: none; box-shadow: 0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(168,199,250,0.35); }
+      .full-player .fp-content { max-width: none; padding: 10px 22px 20px; }
+      .full-player .fp-header { margin-bottom: 10px; cursor: grab; user-select: none; touch-action: none; }
+      .full-player.dragging .fp-header { cursor: grabbing; }
+      .full-player .fp-header .fp-grip { opacity: .6; font-size: .85rem; display: flex; align-items: center; gap: 6px; }
+      .full-player .fp-art { width: min(250px, 32vh); height: min(250px, 32vh); }
+      .full-player .fp-art-wrap { margin: 4px 0 14px; }
+      #ytBox { width: 100%; max-width: 336px; }
+      .full-player .fp-eq-sheet, .full-player .fp-eq-backdrop { border-radius: 24px; }
+    }
+    @media (max-width: 899px) { .fp-grip-hint, .sidebar-foot { display: none; } }
+
+    /* Окно "Про програму" */
+    .about-modal { max-width: 520px; padding: 28px 26px 22px; }
+    .about-head { display: flex; align-items: center; gap: 16px; margin-bottom: 14px; }
+    .about-head .logo-icon { width: 64px; height: 64px; border-radius: 18px; font-size: 36px; flex-shrink: 0; }
+    .about-name { font-size: 1.6rem; font-weight: 500; letter-spacing: -0.02em; }
+    .about-ver { font-size: .85rem; color: var(--md-sys-color-on-surface-variant); margin-top: 2px; }
+    .about-desc { font-size: .95rem; line-height: 1.5; color: var(--md-sys-color-on-surface-variant); margin-bottom: 18px; }
+    .about-sec { font-size: .72rem; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--md-sys-color-primary); margin: 16px 0 8px; }
+    .about-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .about-chip { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 10px; background: var(--md-sys-color-surface-container-high); font-size: .85rem; }
+    .about-chip .material-icons-round { font-size: 18px; color: var(--md-sys-color-primary); }
+    .about-keys { display: grid; grid-template-columns: auto 1fr; gap: 8px 14px; font-size: .88rem; align-items: center; }
+    .about-keys kbd { font: inherit; font-size: .78rem; padding: 3px 9px; border-radius: 7px; background: var(--md-sys-color-surface-container-highest); border: 1px solid rgba(255,255,255,0.1); justify-self: start; white-space: nowrap; }
+    .about-note { margin-top: 18px; font-size: .78rem; color: var(--md-sys-color-outline); line-height: 1.45; }
+    @media (max-width: 899px) { .about-keys-wrap { display: none; } }
+
+    /* Свайп міні-плеєра (коли музика на паузі) */
+    .player-bar { touch-action: pan-y; }
+    .about-install { display: none; margin-top: 14px; }
+    .about-install.show { display: flex; }
+
+    /* Гучність */
+    .fp-volume { display: flex; align-items: center; gap: 6px; margin: 0 4px 14px; }
+    .fp-volume .vol-btn { width: 40px; height: 40px; flex-shrink: 0; }
+    .vol-slider {
+      -webkit-appearance: none; appearance: none; flex: 1; min-width: 0; height: 4px; border-radius: 2px; outline: none; cursor: pointer;
+      background: linear-gradient(to right, var(--md-sys-color-primary) var(--v, 100%), rgba(255,255,255,0.22) var(--v, 100%));
+    }
+    .vol-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--md-sys-color-primary); border: 0; box-shadow: 0 1px 4px rgba(0,0,0,.4); }
+    .vol-slider::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: var(--md-sys-color-primary); border: 0; }
+    .player-vol { display: none; align-items: center; gap: 2px; width: 140px; flex-shrink: 0; cursor: default; }
+    .player-vol .vol-btn { width: 36px; height: 36px; }
+    @media (min-width: 900px) { .player-vol { display: flex; } }
   </style>
 </head>
 <body>
@@ -1465,6 +1562,9 @@
           <span>Налаштування</span>
         </button>
       </nav>
+      <div class="sidebar-foot">
+        <button id="sidebarAbout"><span class="material-icons-round">info</span><span>Про програму</span></button>
+      </div>
     </aside>
 
     <div class="main">
@@ -1665,6 +1765,10 @@
         <button class="icon-btn play-btn" id="playBtn"><span class="material-icons-round">play_arrow</span><svg class="spin" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" pathLength="100"></circle></svg></button>
         <button class="icon-btn" id="nextBtn"><span class="material-icons-round">skip_next</span></button>
       </div>
+      <div class="player-vol">
+        <button class="icon-btn vol-btn" aria-label="Вимкнути звук"><span class="material-icons-round">volume_up</span></button>
+        <input type="range" class="vol-slider" min="0" max="100" value="100" step="1" aria-label="Гучність" />
+      </div>
     </div>
 
     <nav class="bottom-nav" id="bottomNav">
@@ -1690,7 +1794,7 @@
     <div class="fp-content">
       <div class="fp-header">
         <button class="icon-btn fp-top-btn" id="closeFullPlayer"><span class="material-icons-round">keyboard_arrow_down</span></button>
-        <span style="font-size:0.9rem;opacity:0.7;">Зараз грає</span>
+        <span style="font-size:0.9rem;opacity:0.7;" class="fp-grip"><span class="material-icons-round fp-grip-hint" style="font-size:18px">drag_indicator</span>Зараз грає</span>
         <button class="icon-btn fp-top-btn" id="fpMore"><span class="material-icons-round">more_vert</span></button>
       </div>
 
@@ -1722,7 +1826,7 @@
 
       <div class="fp-art-wrap">
         <img class="fp-art" id="fpArt" src="" alt="" />
-        <div id="ytBox"><div id="ytPlayerDiv"></div></div>
+        <div id="ytBox"><div id="ytPlayerDiv"></div><div id="ytHint">Реклама — торкніться плеєра, щоб пропустити</div></div>
       </div>
       <div class="fp-info">
         <div class="fp-title" id="fpTitle">—</div>
@@ -1742,6 +1846,10 @@
         <button class="icon-btn fp-skip" id="fpNext"><span class="material-icons-round">skip_next</span></button>
         <button class="icon-btn fp-mode" id="fpRepeat"><span class="material-icons-round">repeat</span></button>
       </div>
+      <div class="fp-volume">
+        <button class="icon-btn vol-btn" aria-label="Вимкнути звук"><span class="material-icons-round">volume_up</span></button>
+        <input type="range" class="vol-slider" min="0" max="100" value="100" step="1" aria-label="Гучність" />
+      </div>
       <div class="fp-extra">
         <button class="icon-btn fp-tonal" id="fpSave"><span class="material-icons-round">favorite_border</span></button>
         <button class="icon-btn fp-tonal" id="fpEq"><span class="material-icons-round">equalizer</span></button>
@@ -1759,6 +1867,60 @@
       <div class="fp-eq-title">Еквалайзер</div>
       <div class="eq-sliders" id="fpEqSliders"></div>
       <div class="eq-presets" id="fpEqPresets"></div>
+    </div>
+  </div>
+
+  <!-- ABOUT MODAL -->
+  <div class="modal-overlay" id="aboutModal">
+    <div class="modal about-modal">
+      <div class="about-head">
+        <div class="logo-icon"><span class="material-icons-round">music_note</span></div>
+        <div>
+          <div class="about-name">GMusic</div>
+          <div class="about-ver">Версія 1.0 · веб-застосунок</div>
+        </div>
+      </div>
+      <div class="about-desc">Безкоштовний музичний плеєр без реклами: шукайте треки в кількох джерелах, збирайте плейлисти та слухайте власні файли — все в одному вікні.</div>
+
+      <div class="about-sec">Можливості</div>
+      <div class="about-chips">
+        <span class="about-chip"><span class="material-icons-round">search</span>Пошук із фільтрами</span>
+        <span class="about-chip"><span class="material-icons-round">playlist_play</span>Плейлисти</span>
+        <span class="about-chip"><span class="material-icons-round">upload</span>Власні файли</span>
+        <span class="about-chip"><span class="material-icons-round">equalizer</span>Еквалайзер</span>
+        <span class="about-chip"><span class="material-icons-round">favorite</span>Збережені треки</span>
+        <span class="about-chip"><span class="material-icons-round">palette</span>Теми</span>
+      </div>
+
+      <div class="about-sec">Джерела музики</div>
+      <div class="about-chips">
+        <span class="about-chip">Audius</span>
+        <span class="about-chip">Jamendo</span>
+        <span class="about-chip">iTunes (прев'ю)</span>
+        <span class="about-chip">YouTube (через Piped)</span>
+      </div>
+
+      <div class="about-keys-wrap">
+        <div class="about-sec">Гарячі клавіші (ПК)</div>
+        <div class="about-keys">
+          <kbd>Пробіл</kbd><span>Пауза / відтворення</span>
+          <kbd>Ctrl + ← / →</kbd><span>Попередній / наступний трек</span>
+          <kbd>Ctrl + ↑ / ↓</kbd><span>Гучність ±5%</span>
+          <kbd>M</kbd><span>Вимкнути / увімкнути звук</span>
+          <kbd>← / →</kbd><span>Перемотка ±5 с (у відкритому плеєрі)</span>
+          <kbd>P</kbd><span>Показати / сховати вікно плеєра</span>
+          <kbd>/</kbd><span>Перейти до пошуку</span>
+          <kbd>Esc</kbd><span>Закрити вікно</span>
+        </div>
+      </div>
+
+      <div class="about-note">Вікно плеєра на ПК можна перетягувати за верхню панель; подвійний клік по ній повертає вікно на місце. Доступність джерел залежить від сторонніх сервісів.</div>
+      <div class="modal-actions about-install" id="aboutInstallRow">
+        <button class="btn-confirm" id="aboutInstall" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;"><span class="material-icons-round" style="font-size:20px">install_mobile</span>Встановити застосунок</button>
+      </div>
+      <div class="modal-actions" style="margin-top:18px;">
+        <button class="btn-confirm" id="aboutClose" style="flex:1;">Закрити</button>
+      </div>
     </div>
   </div>
 
@@ -2003,9 +2165,50 @@
       } catch (e) { console.error('YouTube search error:', e); return []; }
     }
 
+    // ========== PIPED (YouTube без реклами, без API-ключа) ==========
+    const PIPED_INSTANCES = [
+      'https://api.piped.private.coffee',
+      'https://pipedapi.adminforge.de',
+      'https://pipedapi.leptons.xyz',
+      'https://pipedapi.ducks.party',
+      'https://pipedapi.darkness.services',
+      'https://pipedapi.orangenet.cc',
+      'https://pipedapi.kavin.rocks'
+    ];
+
+    async function getPipedAudioUrl(videoId) {
+      if (!videoId) return null;
+      for (const base of PIPED_INSTANCES) {
+        try {
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 7000);
+          const res = await fetch(`${base}/streams/${videoId}`, { signal: controller.signal });
+          clearTimeout(timeout);
+          if (!res.ok) continue;
+          const data = await res.json();
+          const audio = (data.audioStreams || [])
+            .filter(s => s.url && !s.videoOnly)
+            .sort((a, b) => (b.bitrate || 0) - (a.bitrate || 0))[0];
+          if (audio && audio.url) {
+            console.log('[Piped] OK via', base, audio.quality || audio.bitrate);
+            return {
+              url: audio.url,
+              title: data.title || '',
+              artist: data.uploader || '',
+              duration: data.duration || 0,
+              art: data.thumbnailUrl || ''
+            };
+          }
+        } catch (e) {
+          // next instance
+        }
+      }
+      return null;
+    }
+
     // Адаптер: ведёт себя как <audio>, чтобы остальной плеер работал без изменений
     const ytAudio = new EventTarget();
-    let ytPlayer = null, ytReady = false, ytPaused = true, ytDuration = 0, ytCurrentId = '', ytTimer = null, ytApiPromise = null;
+    let ytState = -2, ytAd = false, ytPlayer = null, ytReady = false, ytPaused = true, ytDuration = 0, ytCurrentId = '', ytTimer = null, ytApiPromise = null;
     Object.defineProperties(ytAudio, {
       currentTime: {
         get() { try { return ytPlayer && ytReady ? ytPlayer.getCurrentTime() : 0; } catch (e) { return 0; } },
@@ -2032,11 +2235,35 @@
       });
       return ytApiPromise;
     }
+    // Плеєр YouTube неактивний для дотиків — керуємо лише нашими кнопками.
+    // Інтерактивним він стає тільки під час реклами (щоб можна було її пропустити)
+    // або якщо відтворення не стартувало саме (потрібен дотик до плеєра).
+    function detectYtAd() {
+      try {
+        if (!ytPlayer || !ytReady) return false;
+        if (typeof ytPlayer.getAdState === 'function' && ytPlayer.getAdState() === 1) return true;
+        const vd = ytPlayer.getVideoData && ytPlayer.getVideoData();
+        if (vd && vd.video_id && ytCurrentId && vd.video_id !== ytCurrentId) return true;
+        const exp = currentTrack && currentTrack.duration;
+        const d = ytPlayer.getDuration();
+        if (exp > 40 && d > 0 && Math.abs(d - exp) > 6) return true;
+      } catch (e) {}
+      return false;
+    }
+    function updateYtInteractive() {
+      const box = document.getElementById('ytBox');
+      if (!box) return;
+      ytAd = detectYtAd();
+      const stuck = ytState === -1 || ytState === 5 || ytState === -2;
+      box.classList.toggle('ad', ytAd);
+      box.classList.toggle('live', ytAd || stuck);
+    }
     function startYtTimer() {
       clearInterval(ytTimer);
       ytTimer = setInterval(() => {
         if (!ytPlayer || !ytReady) return;
-        try { const d = ytPlayer.getDuration(); if (d > 0) ytDuration = d; } catch (e) {}
+        updateYtInteractive();
+        try { const d = ytPlayer.getDuration(); if (d > 0 && !ytAd) ytDuration = d; } catch (e) {}
         ytEmit('timeupdate');
       }, 500);
     }
@@ -2046,7 +2273,7 @@
       if (!on) clearInterval(ytTimer);
     }
     async function ytLoad(videoId) {
-      ytCurrentId = videoId; ytPaused = false; ytEmit('loadstart');
+      ytCurrentId = videoId; ytPaused = false; ytState = -2; ytAd = false; updateYtInteractive(); ytEmit('loadstart');
       try { await ensureYtApi(); } catch (e) { ytCurrentId = ''; ytEmit('error'); toast('Не вдалося завантажити плеєр YouTube'); return; }
       if (ytPlayer && ytReady) { ytPlayer.loadVideoById(videoId); startYtTimer(); return; }
       if (ytPlayer) return; // ещё создаётся — onReady подхватит ytCurrentId
@@ -2054,16 +2281,16 @@
         width: '100%', height: '100%', videoId,
         playerVars: { playsinline: 1, autoplay: 1, rel: 0, modestbranding: 1, origin: location.origin && location.origin !== 'null' ? location.origin : undefined },
         events: {
-          onReady: () => { ytReady = true; try { ytPlayer.loadVideoById(ytCurrentId); ytPlayer.playVideo(); } catch (e) {} startYtTimer(); },
+          onReady: () => { ytReady = true; applyVolume(); try { ytPlayer.loadVideoById(ytCurrentId); ytPlayer.playVideo(); } catch (e) {} startYtTimer(); },
           onStateChange: (ev) => {
-            const st = ev.data;
-            if (st === 1) { ytPaused = false; try { const d = ytPlayer.getDuration(); if (d > 0) ytDuration = d; } catch (e) {} ytEmit('playing'); ytEmit('play'); }
+            const st = ev.data; ytState = st;
+            if (st === 1) { ytPaused = false; updateYtInteractive(); try { const d = ytPlayer.getDuration(); if (d > 0 && !ytAd) ytDuration = d; } catch (e) {} ytEmit('playing'); ytEmit('play'); }
             else if (st === 2) { ytPaused = true; ytEmit('pause'); }
             else if (st === 3) { ytPaused = false; ytEmit('waiting'); }
             else if (st === 0) { ytPaused = true; ytEmit('ended'); }
           },
           onError: (ev) => {
-            const bad = ytCurrentId; ytCurrentId = ''; ytPaused = true;
+            const bad = ytCurrentId; ytCurrentId = ''; ytPaused = true; ytState = -1; updateYtInteractive();
             ytEmit('error'); ytEmit('pause');
             toast([101, 150, 153].includes(ev.data) ? 'YouTube не дозволяє відтворити це відео тут' : 'Помилка YouTube-плеєра (' + ev.data + ')');
             console.error('YT player error', ev.data, bad);
@@ -2140,6 +2367,15 @@
     const audioPlain = new Audio();
     audioPlain.preload = 'auto';
     let audio = audioCors;
+    // Гучність (спільна для всіх джерел, зберігається)
+    let gVolume = 1, gMuted = false;
+    try { const sv = parseFloat(localStorage.getItem('gmusic_vol')); if (!isNaN(sv)) gVolume = Math.min(1, Math.max(0, sv)); } catch (e) {}
+    function applyVolume() {
+      const v = gMuted ? 0 : gVolume;
+      audioCors.volume = v; audioPlain.volume = v;
+      try { if (ytPlayer && ytReady && ytPlayer.setVolume) ytPlayer.setVolume(Math.round(v * 100)); } catch (e) {}
+    }
+    applyVolume();
     let audioCtx = null;
     let eqFilters = [];
     let sourceNode = null;
@@ -2740,14 +2976,47 @@
         if (currentTrack !== track) return;
       }
       if (track.source === 'youtube' && track.streamId) {
-        if (audio !== ytAudio) audio.pause();
-        audio = ytAudio; ytDuration = track.duration || 0;
-        showYtBox(true);
-        isLoading = true; isPlaying = true;
-        document.getElementById('playerBar').classList.add('visible');
-        updatePlayerUI();
-        ytLoad(track.streamId);
-        return;
+        // Якщо URL вже є (з попереднього успішного Piped) — використовуємо його
+        if (track.url && !track._forceYt) {
+          src = track.url;
+          showYtBox(false);
+        } else {
+          // 1) Спочатку пробуємо Piped (без реклами, без ключа)
+          isLoading = true; updatePlayerUI();
+          document.getElementById('playerBar').classList.add('visible');
+          try {
+            const piped = await getPipedAudioUrl(track.streamId);
+            if (currentTrack !== track) return; // користувач вже перемкнув трек
+            if (piped && piped.url) {
+              // Успіх — граємо як звичайний аудіо-потік
+              showYtBox(false);
+              if (piped.duration && !track.duration) track.duration = piped.duration;
+              if (piped.art && !track.art) track.art = piped.art;
+              src = piped.url;
+              track.url = piped.url; // кешуємо на сесію
+              // далі звичайний шлях відтворення нижче
+            } else {
+              // 2) Всі інстанси Piped недоступні → старий YouTube iframe
+              if (audio !== ytAudio) audio.pause();
+              audio = ytAudio; ytDuration = track.duration || 0;
+              showYtBox(true);
+              isLoading = true; isPlaying = true;
+              updatePlayerUI();
+              ytLoad(track.streamId);
+              return;
+            }
+          } catch (e) {
+            console.error('Piped error:', e);
+            // fallback на iframe
+            if (audio !== ytAudio) audio.pause();
+            audio = ytAudio; ytDuration = track.duration || 0;
+            showYtBox(true);
+            isLoading = true; isPlaying = true;
+            updatePlayerUI();
+            ytLoad(track.streamId);
+            return;
+          }
+        }
       }
       if (!src) {
         toast('Немає посилання на трек');
@@ -3312,7 +3581,7 @@
       });
 
       document.getElementById('playerBar').addEventListener('click', (e) => {
-        if (e.target.closest('.player-controls')) return;
+        if (e.target.closest('.player-controls, .player-vol')) return;
         document.getElementById('fullPlayer').classList.add('open');
       });
       document.getElementById('fpArtist').addEventListener('click', () => {
@@ -3367,7 +3636,7 @@
         a.addEventListener('play', () => { if (a === audio) { isPlaying = true; updatePlayerUI(); } });
         a.addEventListener('pause', () => { if (a === audio) { isPlaying = false; updatePlayerUI(); } });
         a.addEventListener('error', () => {
-          if (a === audio && a === audioCors && currentTrack && (currentTrack.source === 'jamendo' || currentTrack.source === 'freesound') && !currentTrack._plain) {
+          if (a === audio && a === audioCors && currentTrack && (currentTrack.source === 'jamendo' || currentTrack.source === 'freesound' || currentTrack.source === 'youtube') && !currentTrack._plain) {
             currentTrack._plain = true;   // нет CORS → играем без эквалайзера
             playTrack(currentTrack);
             return;
@@ -3408,8 +3677,183 @@
         });
       });
 
-      document.getElementById('aboutItem').addEventListener('click', () => {
-        toast('GMusic v1.0 — безкоштовна музика без реклами');
+      // ===== Гучність: слайдери + кнопка mute =====
+      const volSliders = [...document.querySelectorAll('.vol-slider')];
+      const volBtns = [...document.querySelectorAll('.vol-btn')];
+      function renderVol() {
+        const v = gMuted ? 0 : gVolume;
+        const icon = v === 0 ? 'volume_off' : v < 0.5 ? 'volume_down' : 'volume_up';
+        volSliders.forEach(sl => { sl.value = Math.round(v * 100); sl.style.setProperty('--v', sl.value + '%'); });
+        volBtns.forEach(b => { b.querySelector('.material-icons-round').textContent = icon; });
+      }
+      function setVol(v) {
+        gVolume = Math.min(1, Math.max(0, v));
+        gMuted = false;
+        applyVolume(); renderVol();
+        try { localStorage.setItem('gmusic_vol', String(gVolume)); } catch (e) {}
+      }
+      function toggleMute() {
+        if (gMuted) gMuted = false;
+        else if (gVolume === 0) { setVol(0.5); return; }
+        else gMuted = true;
+        applyVolume(); renderVol();
+      }
+      volSliders.forEach(sl => sl.addEventListener('input', () => setVol(sl.value / 100)));
+      volBtns.forEach(b => b.addEventListener('click', e => { e.stopPropagation(); toggleMute(); }));
+      renderVol();
+
+      // ===== Свайп міні-плеєра вліво/вправо (лише коли музика на паузі) =====
+      (() => {
+        const bar = document.getElementById('playerBar');
+        let st = null, swallow = false;
+        const reset = () => { bar.style.transition = bar.style.transform = bar.style.opacity = ''; };
+        bar.addEventListener('pointerdown', e => {
+          if (e.button > 0 || e.target.closest('.player-vol') || !audio.paused || !bar.classList.contains('visible')) return;
+          st = { x: e.clientX, y: e.clientY, t: performance.now(), dx: 0, on: false, id: e.pointerId };
+        });
+        bar.addEventListener('pointermove', e => {
+          if (!st || e.pointerId !== st.id) return;
+          if (!audio.paused) { st = null; reset(); return; }
+          const dx = e.clientX - st.x, dy = e.clientY - st.y;
+          if (!st.on) {
+            if (Math.abs(dy) > 12 && Math.abs(dy) > Math.abs(dx)) { st = null; return; }
+            if (Math.abs(dx) < 10) return;
+            st.on = true; bar.setPointerCapture(e.pointerId); bar.style.transition = 'none';
+          }
+          st.dx = dx;
+          bar.style.transform = `translateX(${dx}px)`;
+          bar.style.opacity = String(Math.max(0.15, 1 - Math.abs(dx) / (bar.offsetWidth * 0.9)));
+        });
+        const end = () => {
+          if (!st) return;
+          const { dx, on, t } = st; st = null;
+          if (!on) return;
+          swallow = true; setTimeout(() => swallow = false, 60);
+          const w = bar.offsetWidth, v = Math.abs(dx) / Math.max(1, performance.now() - t);
+          bar.style.transition = 'transform .22s cubic-bezier(0.2,0.8,0.2,1), opacity .22s ease';
+          if (Math.abs(dx) > w * 0.3 || (v > 0.6 && Math.abs(dx) > 40)) {
+            bar.style.transform = `translateX(${dx > 0 ? w + 40 : -w - 40}px)`;
+            bar.style.opacity = '0';
+            setTimeout(() => { bar.classList.remove('visible'); reset(); }, 230);
+          } else {
+            bar.style.transform = 'translateX(0)'; bar.style.opacity = '1';
+            setTimeout(reset, 240);
+          }
+        };
+        bar.addEventListener('pointerup', end);
+        bar.addEventListener('pointercancel', end);
+        bar.addEventListener('click', e => { if (swallow) { e.stopImmediatePropagation(); e.preventDefault(); } }, true);
+      })();
+
+      // ===== Кнопка "Встановити застосунок" (PWA) =====
+      let installEvt = null;
+      const instRow = document.getElementById('aboutInstallRow');
+      addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; instRow.classList.add('show'); });
+      addEventListener('appinstalled', () => { installEvt = null; instRow.classList.remove('show'); toast('GMusic встановлено'); });
+      document.getElementById('aboutInstall').addEventListener('click', async () => {
+        if (!installEvt) return;
+        installEvt.prompt(); await installEvt.userChoice.catch(() => {}); installEvt = null; instRow.classList.remove('show');
+      });
+
+      // ===== Окно "Про програму" =====
+      const aboutModal = document.getElementById('aboutModal');
+      const openAbout = () => aboutModal.classList.add('open');
+      const closeAbout = () => aboutModal.classList.remove('open');
+      document.getElementById('aboutItem').addEventListener('click', openAbout);
+      document.getElementById('sidebarAbout').addEventListener('click', openAbout);
+      document.getElementById('aboutClose').addEventListener('click', closeAbout);
+      aboutModal.addEventListener('click', e => { if (e.target === aboutModal) closeAbout(); });
+
+      // ===== ПК: плавающее перетаскиваемое окно плеера =====
+      const desk = window.matchMedia('(min-width: 900px)');
+      const fpEl = document.getElementById('fullPlayer');
+      const fpHead = fpEl.querySelector('.fp-header');
+      const FP_KEY = 'gmusic_fp_pos';
+      let fpPos = null;
+      try { fpPos = JSON.parse(localStorage.getItem(FP_KEY) || 'null'); } catch (e) {}
+
+      function fpClamp(x, y) {
+        const w = fpEl.offsetWidth || 380, h = fpEl.offsetHeight || 600;
+        return [Math.min(Math.max(8, x), Math.max(8, innerWidth - w - 8)),
+                Math.min(Math.max(8, y), Math.max(8, innerHeight - h - 8))];
+      }
+      function fpPlace(x, y) {
+        [x, y] = fpClamp(x, y);
+        fpEl.style.left = x + 'px'; fpEl.style.top = y + 'px';
+        return [x, y];
+      }
+      function fpDefault() {
+        const w = fpEl.offsetWidth || 380, h = fpEl.offsetHeight || 600;
+        return fpPlace(innerWidth - w - 24, innerHeight - h - 24);
+      }
+      function fpApply() {
+        if (!desk.matches) { fpEl.style.left = fpEl.style.top = ''; return; }
+        if (fpPos) fpPlace(fpPos.x, fpPos.y); else fpDefault();
+      }
+      fpApply();
+      desk.addEventListener('change', fpApply);
+      addEventListener('resize', fpApply);
+      new MutationObserver(fpApply).observe(fpEl, { attributes: true, attributeFilter: ['class'] });
+
+      let drag = null;
+      fpHead.addEventListener('pointerdown', e => {
+        if (!desk.matches || e.button !== 0 || e.target.closest('button')) return;
+        drag = { dx: e.clientX - fpEl.offsetLeft, dy: e.clientY - fpEl.offsetTop };
+        fpEl.classList.add('dragging');
+        fpHead.setPointerCapture(e.pointerId);
+      });
+      fpHead.addEventListener('pointermove', e => {
+        if (!drag) return;
+        const [x, y] = fpPlace(e.clientX - drag.dx, e.clientY - drag.dy);
+        fpPos = { x, y };
+      });
+      const endDrag = () => {
+        if (!drag) return;
+        drag = null; fpEl.classList.remove('dragging');
+        try { localStorage.setItem(FP_KEY, JSON.stringify(fpPos)); } catch (e) {}
+      };
+      fpHead.addEventListener('pointerup', endDrag);
+      fpHead.addEventListener('pointercancel', endDrag);
+      fpHead.addEventListener('dblclick', e => {
+        if (e.target.closest('button') || !desk.matches) return;
+        fpPos = null;
+        try { localStorage.removeItem(FP_KEY); } catch (err) {}
+        fpDefault();
+      });
+      // Кнопка закрытия: на ПК это "крестик"
+      const closeIcon = document.querySelector('#closeFullPlayer .material-icons-round');
+      const syncCloseIcon = () => { closeIcon.textContent = desk.matches ? 'close' : 'keyboard_arrow_down'; };
+      syncCloseIcon(); desk.addEventListener('change', syncCloseIcon);
+
+      // ===== Горячие клавиши (ПК) =====
+      document.addEventListener('keydown', e => {
+        if (e.target.closest('input, textarea, select, [contenteditable]') && e.key !== 'Escape') return;
+        if (e.key === 'Escape') {
+          if (aboutModal.classList.contains('open')) { closeAbout(); return; }
+          if (!document.querySelector('.modal-overlay.open') && fpEl.classList.contains('open') && desk.matches)
+            document.getElementById('closeFullPlayer').click();
+          return;
+        }
+        if (!desk.matches || e.altKey || document.querySelector('.modal-overlay.open')) return;
+        const k = e.key;
+        if (k === ' ') { e.preventDefault(); document.getElementById('playBtn').click(); }
+        else if (k === 'ArrowUp' && e.ctrlKey) { e.preventDefault(); setVol((gMuted ? 0 : gVolume) + 0.05); }
+        else if (k === 'ArrowDown' && e.ctrlKey) { e.preventDefault(); setVol((gMuted ? 0 : gVolume) - 0.05); }
+        else if ((k === 'm' || k === 'M' || k === 'ь' || k === 'Ь') && !e.ctrlKey && !e.metaKey) toggleMute();
+        else if (k === 'ArrowRight' && e.ctrlKey) { e.preventDefault(); document.getElementById('nextBtn').click(); }
+        else if (k === 'ArrowLeft' && e.ctrlKey) { e.preventDefault(); document.getElementById('prevBtn').click(); }
+        else if ((k === 'ArrowRight' || k === 'ArrowLeft') && fpEl.classList.contains('open')) {
+          if (audio && audio.duration) { e.preventDefault(); audio.currentTime = Math.max(0, Math.min(audio.duration, audio.currentTime + (k === 'ArrowRight' ? 5 : -5))); }
+        }
+        else if ((k === 'p' || k === 'P' || k === 'з' || k === 'З') && !e.ctrlKey && !e.metaKey) {
+          if (fpEl.classList.contains('open')) document.getElementById('closeFullPlayer').click();
+          else if (document.getElementById('playerBar').classList.contains('visible')) fpEl.classList.add('open');
+        }
+        else if (k === '/') {
+          e.preventDefault();
+          const nav = document.querySelector('.sidebar-nav .nav-item[data-view="search"]');
+          if (nav) nav.click();
+        }
       });
 
       // Initial
@@ -3423,6 +3867,11 @@
       });
       updateFabVisibility();
     });
+  </script>
+  <script>
+    if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+      addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+    }
   </script>
 </body>
 </html>
