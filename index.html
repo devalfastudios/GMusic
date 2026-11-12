@@ -281,6 +281,9 @@
     .fp-tonal.saved { background: var(--md-sys-color-primary-container, rgba(168,199,250,0.25)) !important; color: var(--md-sys-color-primary) !important; }
     .fp-tonal.saved .material-icons-round { animation: heartPop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1); }
     .save-btn:active { transform: scale(0.85); }
+    .more-btn { width: 40px; height: 40px; border-radius: 50%; border: none; background: transparent; color: var(--md-sys-color-on-surface-variant); display: grid; place-items: center; cursor: pointer; flex-shrink: 0; transition: color var(--transition), transform 0.2s, background 0.2s; }
+    .more-btn:active { transform: scale(0.85); background: rgba(255,255,255,0.08); }
+    .more-btn:hover { color: var(--md-sys-color-on-surface); }
 
     /* RECOMMENDATIONS */
     .rec-grid {
@@ -1101,7 +1104,7 @@
       top: 6px;
       bottom: 6px;
       left: 6px;
-      width: calc((100% - 12px) / 3);
+      width: calc((100% - 12px) / 4);
       border-radius: 26px;
       background: var(--md-sys-color-primary-container);
       transform: translateX(calc(var(--nav-idx) * 100%));
@@ -1251,7 +1254,7 @@
       .track-item { gap: 10px; padding: 8px; }
       .track-art { width: 44px; height: 44px; }
       .track-duration { display: none; }
-      .save-btn { width: 36px; height: 36px; }
+      .save-btn, .more-btn { width: 36px; height: 36px; }
       .player-art { width: 42px; height: 42px; }
       .player-controls { gap: 0; }
       .player-controls .icon-btn { width: 36px; height: 36px; }
@@ -1322,7 +1325,8 @@
     /* Меню трека (долгое нажатие) */
     .tm-head { display: flex; align-items: center; gap: 14px; padding: 0 4px 16px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 8px; }
     .tm-head img { width: 52px; height: 52px; border-radius: 10px; object-fit: cover; background: var(--md-sys-color-surface-container-highest); }
-    .tm-head .tm-t { font-weight: 500; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tm-head .tm-t { font-weight: 500; font-size: 1rem; line-height: 1.3; white-space: normal; overflow-wrap: anywhere; }
+    .account-soon { min-height: 50vh; }
     .tm-head .tm-a { font-size: 0.85rem; color: var(--md-sys-color-on-surface-variant); margin-top: 2px; }
     .tm-list button {
       display: flex; align-items: center; gap: 16px; width: 100%; padding: 14px 8px; border: none;
@@ -1558,6 +1562,328 @@
     .trim-times{display:flex;justify-content:space-between;font-size:.82rem;color:var(--md-sys-color-on-surface-variant);margin:10px 2px 14px;font-variant-numeric:tabular-nums;}
     .trim-times b{color:var(--md-sys-color-on-surface);font-weight:500;}
     .trim-hint{font-size:.78rem;color:var(--md-sys-color-outline);margin-top:12px;text-align:center;}
+    /* ===== Якість / тип звуку / історія ===== */
+    .settings-item.static { cursor: default; }
+    .settings-item.static:hover { background: transparent; }
+    .opt-row { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 18px 6px; }
+    .opt-hint { font-size: 0.78rem; line-height: 1.4; color: var(--md-sys-color-on-surface-variant); padding: 6px 18px 16px; }
+    .opt-sep { border-top: 1px solid rgba(255,255,255,0.05); }
+    .hist-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+    .hist-head .modal-title { margin: 0; text-align: left; flex: 1; }
+    .hist-clear { background: none; border: none; color: var(--md-sys-color-error); font: inherit; font-size: 0.9rem; padding: 8px 10px; border-radius: 12px; cursor: pointer; }
+    .hist-clear:active { background: rgba(255,255,255,0.08); }
+    .hist-day { font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--md-sys-color-on-surface-variant); margin: 16px 4px 6px; }
+    .hist-day:first-child { margin-top: 4px; }
+    .hist-item { display: flex; align-items: center; gap: 12px; padding: 8px 4px; border-radius: 12px; cursor: pointer; transition: background var(--transition); }
+    .hist-item:hover { background: rgba(255,255,255,0.05); }
+    .hist-item:active { background: rgba(255,255,255,0.09); }
+    .hist-item img { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; flex-shrink: 0; background: var(--md-sys-color-surface-container-high); }
+    .hist-info { flex: 1; min-width: 0; }
+    .hist-t, .hist-a { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .hist-t { font-size: 0.95rem; font-weight: 500; }
+    .hist-a { font-size: 0.8rem; color: var(--md-sys-color-on-surface-variant); margin-top: 1px; }
+    .hist-time { font-size: 0.75rem; color: var(--md-sys-color-outline); flex-shrink: 0; }
+    .hist-del { width: 36px; height: 36px; flex-shrink: 0; }
+    .hist-del .material-icons-round { font-size: 20px; color: var(--md-sys-color-on-surface-variant); }
+
+    /* =====================================================================
+       ПЕРСОНАЛІЗАЦІЯ — все керується атрибутами data-* на <html>
+       ===================================================================== */
+    html .fp-bg { filter: blur(var(--fp-blur, 40px)) brightness(.35); }
+    html .track-item.playing { background: color-mix(in srgb, var(--md-sys-color-primary) 14%, transparent); }
+    html[data-pal="1"] .player-bar, html[data-pal="1"] .bottom-nav { background: var(--glass); }
+    html[data-font]:not([data-font="default"]) body,
+    html[data-font]:not([data-font="default"]) button,
+    html[data-font]:not([data-font="default"]) input,
+    html[data-font]:not([data-font="default"]) select,
+    html[data-font]:not([data-font="default"]) textarea { font-family: var(--ufont) !important; }
+
+    /* --- світла схема: виправляємо жорстко задані «білі» накладки --- */
+    html[data-scheme="light"] .track-item:hover, html[data-scheme="light"] .track-item:active { background: rgba(0,0,0,.06); }
+    html[data-scheme="light"] .player-bar, html[data-scheme="light"] .bottom-nav { border-color: rgba(0,0,0,.08); box-shadow: 0 8px 24px rgba(0,0,0,.14); }
+    html[data-scheme="light"] .settings-item { border-bottom-color: rgba(0,0,0,.06); }
+    html[data-scheme="light"] .settings-item:hover { background: rgba(0,0,0,.04); }
+    html[data-scheme="light"] .fp-bg { filter: blur(var(--fp-blur, 40px)) brightness(1.25) saturate(.8); opacity: .5; }
+    html[data-scheme="light"] .fp-progress input[type="range"] { background: rgba(0,0,0,.14); }
+    html[data-scheme="light"] .fp-top-btn, html[data-scheme="light"] .fp-extra .fp-tonal, html[data-scheme="light"] .fp-controls .fp-skip { background: rgba(0,0,0,.07); }
+    html[data-scheme="light"] .more-menu button:active, html[data-scheme="light"] .tm-list button:active { background: rgba(0,0,0,.08); }
+    html[data-scheme="light"] .modal-overlay { background: rgba(0,0,0,.35); }
+
+    /* --- форма обкладинки --- */
+    html[data-artshape="circle"] .fp-art, html[data-artshape="circle"] .player-art { border-radius: 50%; }
+    html[data-artshape="square"] .fp-art, html[data-artshape="square"] .player-art { border-radius: 0; }
+    html[data-artshape="squircle"] .fp-art, html[data-artshape="squircle"] .player-art { border-radius: 32%; }
+
+    /* --- фон великого плеєра --- */
+    html[data-fpbg="gradient"] .fp-bg { background: linear-gradient(165deg, var(--md-sys-color-primary-container), var(--md-sys-color-surface) 72%) !important; filter: none; transform: none; opacity: 1; }
+    html[data-fpbg="solid"] .fp-bg { display: none; }
+    html[data-fpbg="black"] .full-player { background: #000; }
+    html[data-fpbg="black"] .fp-bg { display: none; }
+    html[data-glow="on"] .fp-art { box-shadow: 0 0 64px color-mix(in srgb, var(--md-sys-color-primary) 60%, transparent), 0 20px 50px rgba(0,0,0,.5); }
+
+    /* --- нижня панель та міні-плеєр --- */
+    html[data-nav="flat"] { --nav-gap: 0px; }
+    html[data-nav="flat"] .bottom-nav { left: 0; right: 0; max-width: none; margin: 0; bottom: 0; height: calc(var(--nav-height) + var(--safe-bottom)); padding: 6px 6px calc(6px + var(--safe-bottom)); border-radius: 0; border-width: 1px 0 0 0; box-shadow: 0 -4px 20px rgba(0,0,0,.25); }
+    html[data-nav="flat"] .nav-indicator { bottom: calc(6px + var(--safe-bottom)); border-radius: 20px; }
+    html[data-navlabels="off"] { --nav-height: 54px; }
+    html[data-navlabels="off"] .bottom-nav .nav-item span:last-child { display: none; }
+    html[data-miniprog="off"] .progress-line { display: none; }
+    @media (max-width: 899px) {
+      html[data-mini="flat"] .player-bar { left: 0; right: 0; border-radius: 0; border-width: 1px 0; bottom: var(--nav-total); }
+    }
+
+    /* --- ефекти --- */
+    html[data-blur="off"] *, html[data-blur="off"] *::before, html[data-blur="off"] *::after { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+    html[data-blur="off"] .player-bar, html[data-blur="off"] .bottom-nav { background: var(--md-sys-color-surface-container-high) !important; }
+    html[data-anim="off"] *:not(.spin):not(.spin *), html[data-anim="off"] *::before, html[data-anim="off"] *::after {
+      animation-duration: .001ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important;
+      transition-duration: .001ms !important; transition-delay: 0s !important; scroll-behavior: auto !important;
+    }
+    html[data-round="sharp"] :is(.player-bar,.bottom-nav,.nav-indicator,.search-bar,.settings-group,.rec-card,.modal,.chip,.eq-preset,.btn-filled,.btn-outline,.fab-option,.field-input,.more-menu,.track-art,.player-art,.fp-art,.cust-preview) { border-radius: 4px !important; }
+    html[data-round="round"] :is(.player-bar,.bottom-nav,.nav-indicator,.search-bar,.settings-group,.rec-card,.modal,.fab-option,.more-menu,.cust-preview) { border-radius: 30px !important; }
+    html[data-shadow="off"] :is(.bottom-nav,.fp-art,.rec-card,.track-art,.fab-main,.modal,.more-menu) { box-shadow: none !important; }
+    html[data-shadow="off"]:not([data-player^="win"]) .player-bar { box-shadow: none !important; }
+
+    /* --- список треків --- */
+    html[data-density="compact"] .track-item { padding: 5px 10px; gap: 10px; }
+    html[data-density="compact"] .track-art { width: 40px; height: 40px; }
+    html[data-density="compact"] .track-list { gap: 0; }
+    html[data-density="comfy"] .track-item { padding: 14px 12px; gap: 16px; }
+    html[data-density="comfy"] .track-art { width: 64px; height: 64px; }
+    html[data-listart="circle"] .track-art { border-radius: 50%; }
+    html[data-listart="square"] .track-art { border-radius: 0; }
+    html[data-showdur="off"] .track-duration { display: none; }
+
+    /* ===================== СТИЛЬ ПЛЕЄРА: МІНІМАЛ ===================== */
+    html[data-player="minimal"] .fp-bg { display: none; }
+    html[data-player="minimal"] .full-player { background: var(--md-sys-color-surface); }
+    html[data-player="minimal"] .fp-art { box-shadow: none; }
+    html[data-player="minimal"] .fp-info { text-align: left; }
+    html[data-player="minimal"] .fp-title { font-size: 1.8rem; font-weight: 700; line-height: 1.15; }
+    html[data-player="minimal"] .fp-artist { padding-left: 0; font-size: 1.05rem; }
+    html[data-player="minimal"] .player-bar { background: transparent; border-color: transparent; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
+
+    /* ===================== СТИЛЬ ПЛЕЄРА: ВІНІЛ ===================== */
+    @keyframes vinylSpin { to { transform: rotate(360deg); } }
+    html[data-player="vinyl"] .fp-art-wrap { position: relative; --fpd: min(72vw, 40vh, 320px); }
+    html[data-player="vinyl"] .fp-art-wrap::before {
+      content: ''; position: absolute; left: 50%; top: 50%; width: var(--fpd); height: var(--fpd);
+      margin: calc(var(--fpd) / -2) 0 0 calc(var(--fpd) / -2); border-radius: 50%;
+      background:
+        radial-gradient(circle at 30% 25%, rgba(255,255,255,.10), transparent 40%),
+        repeating-radial-gradient(circle at center, #0b0b0b 0 1.5px, #1d1d1d 1.5px 3px);
+      box-shadow: inset 0 0 0 3px #2b2b2b, 0 20px 50px rgba(0,0,0,.6);
+    }
+    html[data-player="vinyl"] .fp-art {
+      width: calc(var(--fpd) * .4) !important; height: calc(var(--fpd) * .4) !important;
+      border-radius: 50% !important; position: relative; z-index: 1; transform: none;
+      box-shadow: 0 0 0 4px #0b0b0b !important;
+      -webkit-mask-image: radial-gradient(circle at center, transparent 0 5px, #000 5.5px); mask-image: radial-gradient(circle at center, transparent 0 5px, #000 5.5px);
+      animation: vinylSpin 6s linear infinite paused;
+    }
+    html[data-player="vinyl"] .fp-art.playing { animation-play-state: running; }
+    html[data-player="vinyl"] .fp-art-wrap::after {
+      content: ''; position: absolute; z-index: 2; width: 7px; height: calc(var(--fpd) * .6);
+      left: calc(50% + var(--fpd) / 2 + 2px); top: calc(50% - var(--fpd) / 2 + 4px);
+      border-radius: 4px; background: linear-gradient(90deg, #8a8a8a, #e2e2e2 45%, #7a7a7a);
+      transform-origin: 50% 5px; transform: rotate(-10deg); transition: transform .9s cubic-bezier(.4,0,.2,1);
+      box-shadow: 4px 6px 10px rgba(0,0,0,.45), 0 0 0 3px rgba(0,0,0,.0);
+    }
+    html[data-player="vinyl"] .fp-art-wrap:has(.fp-art.playing)::after { transform: rotate(24deg); }
+    html[data-player="vinyl"] .player-art {
+      border-radius: 50% !important; box-shadow: 0 0 0 4px #0b0b0b, 0 0 0 5px #3a3a3a !important;
+      animation: vinylSpin 6s linear infinite paused;
+    }
+    html[data-player="vinyl"] .player-bar:has(.play-btn.is-playing) .player-art { animation-play-state: running; }
+    html[data-spin="off"][data-player="vinyl"] .fp-art, html[data-spin="off"][data-player="vinyl"] .player-art { animation: none; }
+
+    /* ===================== СТИЛЬ ПЛЕЄРА: WINDOWS 95 / 98 ===================== */
+    html[data-player^="win"], html[data-ui^="win"] {
+      --w-out: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf;
+      --w-in: inset -1px -1px #fff, inset 1px 1px #808080, inset -2px -2px #dfdfdf, inset 2px 2px #0a0a0a;
+      --w-title: linear-gradient(90deg, #000080, #1084d0); --w-title-fg: #fff;
+    }
+    html[data-player="win95"], html[data-ui="win95"] { --w-title: #000080; }
+    html[data-wintitle="accent"][data-player^="win"], html[data-wintitle="accent"][data-ui^="win"] { --w-title: var(--md-sys-color-primary); --w-title-fg: var(--md-sys-color-on-primary); }
+    html[data-player^="win"] .player-bar, html[data-player^="win"] .full-player,
+    html[data-player^="win"] .player-bar button, html[data-player^="win"] .full-player button { font-family: Tahoma, "MS Sans Serif", Verdana, Geneva, sans-serif; }
+    /* міні-плеєр */
+    html[data-player^="win"] .player-bar { background: #c0c0c0 !important; color: #000; border: none; border-radius: 0 !important; box-shadow: var(--w-out) !important; backdrop-filter: none; -webkit-backdrop-filter: none; }
+    html[data-player^="win"] .player-title { color: #000; font-weight: 700; }
+    html[data-player^="win"] .player-artist { color: #333; }
+    html[data-player^="win"] .player-art { border-radius: 0 !important; padding: 2px; background: #c0c0c0; border: 2px solid; border-color: #808080 #fff #fff #808080; box-shadow: none !important; }
+    html[data-player^="win"] .player-bar .icon-btn, html[data-player^="win"] .player-controls .play-btn {
+      border-radius: 0 !important; background: #c0c0c0 !important; color: #000 !important; box-shadow: var(--w-out) !important;
+    }
+    html[data-player^="win"] .player-bar .icon-btn:active { box-shadow: var(--w-in) !important; transform: none; }
+    html[data-player^="win"] .player-bar .material-icons-round { color: #000; }
+    html[data-player^="win"] .progress-line { height: 7px; border-radius: 0; background: repeating-linear-gradient(90deg, #000080 0 7px, transparent 7px 9px); }
+    /* великий плеєр = вікно */
+    html[data-player^="win"] .full-player { background: #008080; }
+    html[data-player^="win"] .fp-bg { display: none; }
+    html[data-player^="win"] .fp-content { background: #c0c0c0; box-shadow: var(--w-out); color: #000; padding: 3px; height: auto; max-height: calc(100% - 24px); width: calc(100% - 24px); max-width: 420px; margin: auto; }
+    html[data-player^="win"] .fp-header { background: var(--w-title); color: var(--w-title-fg); padding: 2px 3px; margin: 0 0 12px; height: 24px; align-items: center; gap: 3px; }
+    html[data-player^="win"] .fp-header .fp-grip { order: -1; flex: 1; text-align: left; opacity: 1 !important; font-size: .78rem !important; font-weight: 700; padding-left: 4px; display: flex; align-items: center; gap: 4px; }
+    html[data-player^="win"] .fp-grip-hint { display: none; }
+    html[data-player^="win"] .fp-top-btn { width: 20px !important; height: 18px !important; border-radius: 0 !important; background: #c0c0c0 !important; color: #000 !important; box-shadow: var(--w-out) !important; display: grid; place-items: center; }
+    html[data-player^="win"] .fp-top-btn:active { box-shadow: var(--w-in) !important; }
+    html[data-player^="win"] .fp-top-btn .material-icons-round { font-size: 14px; color: #000; }
+    html[data-player^="win"] #closeFullPlayer .material-icons-round { display: none; }
+    html[data-player^="win"] #closeFullPlayer::after { content: '\00d7'; font: 700 16px/1 Tahoma, sans-serif; color: #000; }
+    html[data-player^="win"] .fp-art-wrap, html[data-player^="win"] .fp-info, html[data-player^="win"] .fp-progress,
+    html[data-player^="win"] .fp-times, html[data-player^="win"] .fp-controls, html[data-player^="win"] .fp-extra { margin-left: 12px; margin-right: 12px; }
+    html[data-player^="win"] .fp-art-wrap { margin-top: 4px; }
+    html[data-player^="win"] .fp-art { width: min(60vw, 32vh, 250px); height: min(60vw, 32vh, 250px); border-radius: 0 !important; padding: 3px; background: #c0c0c0; border: 2px solid; border-color: #808080 #fff #fff #808080; box-shadow: none !important; transform: none; }
+    html[data-player^="win"] .fp-title { color: #000; font-size: 1.05rem; font-weight: 700; }
+    html[data-player^="win"] .fp-artist { color: #222; font-size: .9rem; }
+    html[data-player^="win"] .fp-times { color: #000; font-size: .78rem; }
+    html[data-player^="win"] .fp-info { margin-bottom: 14px; }
+    html[data-player^="win"] .fp-progress input[type="range"] { -webkit-appearance: none; appearance: none; height: 22px; background: transparent; border-radius: 0; }
+    html[data-player^="win"] .fp-progress input[type="range"]::-webkit-slider-runnable-track { height: 4px; background: #c0c0c0; border: 1px solid; border-color: #808080 #fff #fff #808080; box-shadow: inset 1px 1px #0a0a0a; }
+    html[data-player^="win"] .fp-progress input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 12px; height: 22px; margin-top: -10px; border-radius: 0; border: none; background: #c0c0c0; box-shadow: var(--w-out); }
+    html[data-player^="win"] .fp-progress input[type="range"]::-moz-range-thumb { width: 12px; height: 22px; border-radius: 0; border: none; background: #c0c0c0; box-shadow: var(--w-out); }
+    html[data-player^="win"] .fp-controls .icon-btn, html[data-player^="win"] .fp-extra .fp-tonal {
+      border-radius: 0 !important; background: #c0c0c0 !important; color: #000 !important; box-shadow: var(--w-out) !important;
+      width: 52px !important; height: 40px !important; transform: none !important;
+    }
+    html[data-player^="win"] .fp-controls .icon-btn:active { box-shadow: var(--w-in) !important; }
+    html[data-player^="win"] .fp-extra .fp-tonal.saved { box-shadow: var(--w-in) !important; }
+    html[data-player^="win"] .fp-controls .icon-btn .material-icons-round, html[data-player^="win"] .fp-extra .material-icons-round { font-size: 24px !important; color: #000 !important; }
+    html[data-player^="win"] .fp-controls .fp-mode.on .material-icons-round, html[data-player^="win"] .fp-controls .fp-mode.active .material-icons-round { color: #000080 !important; }
+    html[data-player^="win"] .fp-volume .vol-fold { border-radius: 0; background: #c0c0c0; box-shadow: var(--w-out); backdrop-filter: none; }
+    html[data-player^="win"] .fp-volume .material-icons-round { color: #000; }
+    html[data-player^="win"] .more-menu { background: #c0c0c0; color: #000; border-radius: 0 !important; box-shadow: var(--w-out); }
+    html[data-player^="win"] .more-menu button, html[data-player^="win"] .more-menu .material-icons-round { color: #000; }
+
+    /* ===================== WINDOWS 95 / 98 — ВЕСЬ ЗАСТОСУНОК ===================== */
+    html[data-ui^="win"] { --w-hi: #000080; --w-hi-fg: #fff; --header-height: 36px; --transition: 0s; }
+    html[data-ui^="win"][data-wintitle="accent"] { --w-hi: var(--md-sys-color-primary); --w-hi-fg: var(--md-sys-color-on-primary); }
+    html[data-ui^="win"] *, html[data-ui^="win"] *::before, html[data-ui^="win"] *::after { border-radius: 0 !important; box-shadow: none; text-shadow: none; }
+    html[data-ui^="win"] body, html[data-ui^="win"] .app { background: #c0c0c0; }
+    html[data-ui^="win"] .app { background-image: none; }
+    /* заголовок вікна */
+    html[data-ui^="win"] .header { background: var(--w-title); color: var(--w-title-fg); border: 0; padding: 0 4px 0 8px; margin: 3px 3px 0; height: 28px; }
+    html[data-ui^="win"] .header > div[style] { display: none; }
+    html[data-ui^="win"] .logo { font-size: .9rem; font-weight: 700; gap: 6px; letter-spacing: 0; color: var(--w-title-fg); }
+    html[data-ui^="win"] .logo-icon { width: 18px; height: 18px; background: none; color: var(--w-title-fg); box-shadow: none; font-size: 16px; }
+    html[data-ui^="win"] .logo-icon .material-icons-round { font-size: 16px; }
+    html[data-ui^="win"] .header::after { content: '_  \25a1  \00d7'; white-space: pre; font: 700 12px/16px Tahoma, sans-serif; color: #000; background: #c0c0c0; padding: 1px 6px; box-shadow: var(--w-out) !important; }
+    html[data-ui^="win"] .main { background: #c0c0c0; }
+    html[data-ui^="win"] .section-header h2 { font-size: 1.05rem; font-weight: 700; color: #000; }
+    /* списки */
+    html[data-ui^="win"] .track-list { background: #fff; box-shadow: var(--w-in) !important; padding: 3px; gap: 0; }
+    html[data-ui^="win"] .track-item { color: #000; padding: 4px 6px; gap: 8px; }
+    html[data-ui^="win"] .track-item:hover, html[data-ui^="win"] .track-item:active { background: #e6e6f4; transform: none; }
+    html[data-ui^="win"] .track-item.playing { background: var(--w-hi); color: var(--w-hi-fg); }
+    html[data-ui^="win"] .track-item.playing :is(.track-title,.track-artist,.track-duration,.save-btn,.more-btn,.save-btn .material-icons-round,.more-btn .material-icons-round) { color: var(--w-hi-fg); }
+    html[data-ui^="win"] .track-art { width: 40px; height: 40px; border: 1px solid #808080; }
+    html[data-ui^="win"] .track-title { color: inherit; }
+    html[data-ui^="win"] .save-btn.saved .material-icons-round { color: #c00000; }
+    /* рамки та групи */
+    html[data-ui^="win"] .settings-group, html[data-ui^="win"] .rec-card, html[data-ui^="win"] .playlist-card, html[data-ui^="win"] .eq-panel { background: #c0c0c0; color: #000; box-shadow: var(--w-out) !important; border: 0; }
+    html[data-ui^="win"] .rec-card:hover, html[data-ui^="win"] .playlist-card:hover { transform: none; }
+    html[data-ui^="win"] .settings-item { border-bottom: 1px solid #808080; }
+    html[data-ui^="win"] .settings-item:last-child { border-bottom: 0; }
+    html[data-ui^="win"] .settings-item:hover, html[data-ui^="win"] .settings-item:active { background: var(--w-hi); color: var(--w-hi-fg); }
+    html[data-ui^="win"] .settings-item:hover :is(.material-icons-round,.settings-item-sub,.settings-item-title), html[data-ui^="win"] .settings-item:active :is(.material-icons-round,.settings-item-sub,.settings-item-title) { color: var(--w-hi-fg); }
+    html[data-ui^="win"] .settings-item-left .material-icons-round { color: #000; }
+    html[data-ui^="win"] .settings-item.static:hover { background: transparent; color: #000; }
+    /* поля */
+    html[data-ui^="win"] .search-bar, html[data-ui^="win"] .field-input { background: #fff; color: #000; border: 0; box-shadow: var(--w-in) !important; padding: 6px 8px; }
+    html[data-ui^="win"] .search-bar:focus-within { outline: 1px dotted #000; outline-offset: -4px; }
+    html[data-ui^="win"] .search-bar input { color: #000; }
+    /* кнопки */
+    html[data-ui^="win"] :is(.btn-filled,.btn-outline,.fab-option,.modal-actions button,.cust-btn,.eq-preset,.hist-clear,.chip,.filter-toggle) {
+      background: #c0c0c0; color: #000; border: 0; box-shadow: var(--w-out) !important; font-weight: 400; transform: none !important; }
+    html[data-ui^="win"] :is(.btn-filled,.btn-outline,.fab-option,.modal-actions button,.cust-btn,.eq-preset,.hist-clear,.chip,.filter-toggle):active,
+    html[data-ui^="win"] :is(.eq-preset.active,.chip.on) { box-shadow: var(--w-in) !important; }
+    html[data-ui^="win"] .chip.on, html[data-ui^="win"] .eq-preset.active { font-weight: 700; background-color: #c0c0c0; background-image: conic-gradient(#c0c0c0 25%, #fff 0 50%, #c0c0c0 0 75%, #fff 0); background-size: 2px 2px; color: #000; }
+    html[data-ui^="win"] .cust-btn.danger { color: #c00000; }
+    html[data-ui^="win"] .fab-main { background: #c0c0c0 !important; color: #000 !important; box-shadow: var(--w-out) !important; }
+    html[data-ui^="win"] .fab-main .material-icons-round { color: #000; }
+    html[data-ui^="win"] .fab-main:active { box-shadow: var(--w-in) !important; }
+    html[data-ui^="win"] .icon-btn:hover { background: rgba(0,0,0,.08); }
+    /* перемикач → прапорець у стилі Windows */
+    html[data-ui^="win"] .switch { width: 44px; height: 22px; background: #fff; box-shadow: var(--w-in) !important; }
+    html[data-ui^="win"] .switch::after { top: 2px; left: 2px; width: 16px; height: 16px; background: #c0c0c0; box-shadow: var(--w-out) !important; }
+    html[data-ui^="win"] .switch.on { background: var(--w-hi); }
+    html[data-ui^="win"] .switch.on::after { transform: translateX(22px); background: #c0c0c0; }
+    /* повзунки */
+    html[data-ui^="win"] .cust-range { height: 20px; background: transparent; }
+    html[data-ui^="win"] .cust-range::-webkit-slider-runnable-track { height: 4px; background: #c0c0c0; box-shadow: inset 1px 1px #0a0a0a, inset -1px -1px #fff; }
+    html[data-ui^="win"] .cust-range::-webkit-slider-thumb { width: 12px; height: 20px; margin-top: -8px; background: #c0c0c0; box-shadow: var(--w-out); }
+    html[data-ui^="win"] .cust-range::-moz-range-thumb { width: 12px; height: 20px; background: #c0c0c0; box-shadow: var(--w-out); }
+    html[data-ui^="win"] .cust-range-row .top b { color: var(--w-hi); }
+    /* нижня панель = панель завдань */
+    html[data-ui^="win"] .bottom-nav { background: #c0c0c0 !important; box-shadow: var(--w-out) !important; border: 0; gap: 3px; padding: 4px 4px calc(4px + var(--safe-bottom)); }
+    html[data-ui^="win"] .nav-indicator { display: none; }
+    html[data-ui^="win"] .bottom-nav .nav-item, html[data-ui^="win"] .sidebar-nav .nav-item { background: #c0c0c0; color: #000; box-shadow: var(--w-out) !important; }
+    html[data-ui^="win"] .bottom-nav .nav-item.active, html[data-ui^="win"] .sidebar-nav .nav-item.active { box-shadow: var(--w-in) !important; font-weight: 700; color: #000; background-color: #c0c0c0; background-image: conic-gradient(#c0c0c0 25%, #fff 0 50%, #c0c0c0 0 75%, #fff 0); background-size: 2px 2px; }
+    html[data-ui^="win"] .nav-item.active .material-icons-round { transform: none; }
+    html[data-ui^="win"] .sidebar { background: #c0c0c0; border: 0; box-shadow: var(--w-out) !important; }
+    html[data-ui^="win"] .sidebar .logo { color: #000; }
+    html[data-ui^="win"] .sidebar .logo-icon { color: #000; }
+    html[data-ui^="win"] .sidebar-foot button { background: #c0c0c0; color: #000; box-shadow: var(--w-out) !important; border: 0; }
+    /* діалоги = вікна */
+    html[data-ui^="win"] .modal-overlay { background: rgba(0,0,0,.3); }
+    html[data-ui^="win"] .modal { background: #c0c0c0; color: #000; box-shadow: var(--w-out) !important; padding: 3px 12px 12px; }
+    html[data-ui^="win"] .modal-title { background: var(--w-title); color: var(--w-title-fg); margin: 0 -12px 12px; padding: 4px 8px; font-size: .85rem; font-weight: 700; text-align: left; }
+    html[data-ui^="win"] .hist-head .modal-title { margin: 0; background: none; color: #000; padding: 0; }
+    html[data-ui^="win"] .tm-list button, html[data-ui^="win"] .tm-head .tm-t { color: #000; }
+    html[data-ui^="win"] .tm-list button:active { background: var(--w-hi); color: var(--w-hi-fg); }
+    html[data-ui^="win"] .tm-list button:active .material-icons-round { color: var(--w-hi-fg); }
+    html[data-ui^="win"] .toast { background: #ffffe1; color: #000; border: 1px solid #000; padding: 5px 10px; font-size: .8rem; }
+    /* сторінка персоналізації */
+    html[data-ui^="win"] .cust-page { background: #c0c0c0; }
+    html[data-ui^="win"] .cust-top { background: var(--w-title); color: var(--w-title-fg); margin: 3px 3px 6px; padding: 3px 3px 3px 8px; width: calc(100% - 6px); max-width: none; }
+    html[data-ui^="win"] .cust-top h2 { font-size: .9rem; font-weight: 700; }
+    html[data-ui^="win"] .cust-top .icon-btn { width: 22px; height: 20px; background: #c0c0c0; color: #000; box-shadow: var(--w-out) !important; }
+    html[data-ui^="win"] .cust-top .icon-btn .material-icons-round { font-size: 14px; color: #000; }
+    html[data-ui^="win"] .cust-preview { background: #fff; border: 0; box-shadow: var(--w-in) !important; }
+    html[data-ui^="win"] .cust-sec { color: #000; font-weight: 700; }
+    /* класичні смуги прокрутки */
+    html[data-ui^="win"] ::-webkit-scrollbar { width: 16px; height: 16px; }
+    html[data-ui^="win"] ::-webkit-scrollbar-track { background-color: #c0c0c0; background-image: conic-gradient(#c0c0c0 25%, #fff 0 50%, #c0c0c0 0 75%, #fff 0); background-size: 2px 2px; }
+    html[data-ui^="win"] ::-webkit-scrollbar-thumb { background: #c0c0c0; box-shadow: var(--w-out); }
+    .cust-note { margin: 6px 0 10px; padding: 10px 14px; font-size: .85rem; line-height: 1.4; background: var(--md-sys-color-surface-container-high); color: var(--md-sys-color-on-surface); border-left: 4px solid var(--md-sys-color-primary); }
+
+    /* ===================== СТОРІНКА ПЕРСОНАЛІЗАЦІЇ ===================== */
+    .cust-page { position: fixed; inset: 0; z-index: 90; background: var(--md-sys-color-surface); display: flex; flex-direction: column;
+      transform: translateX(100%); visibility: hidden; transition: transform .35s cubic-bezier(.4,0,.2,1), visibility 0s linear .35s; }
+    .cust-page.open { transform: none; visibility: visible; transition-delay: 0s; }
+    .cust-top { display: flex; align-items: center; gap: 6px; padding: calc(10px + env(safe-area-inset-top, 0px)) 12px 8px; max-width: 640px; width: 100%; margin: 0 auto; }
+    .cust-top h2 { font-size: 1.3rem; font-weight: 500; flex: 1; }
+    .cust-body { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 6px 16px calc(40px + var(--safe-bottom)); max-width: 640px; width: 100%; margin: 0 auto; overscroll-behavior: contain; }
+    .cust-sec { font-size: .76rem; letter-spacing: .09em; text-transform: uppercase; color: var(--md-sys-color-on-surface-variant); margin: 20px 6px 8px; font-weight: 500; }
+    .cust-lab { padding: 14px 18px 8px; font-size: .95rem; font-weight: 500; }
+    .cust-lab small { display: block; font-weight: 400; font-size: .8rem; color: var(--md-sys-color-on-surface-variant); margin-top: 2px; }
+    .cust-group .opt-row { padding-bottom: 14px; }
+    .cust-group .settings-item { cursor: pointer; }
+    .chip .dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 7px; vertical-align: -1px; border: 1px solid rgba(128,128,128,.55); }
+    .cust-range-row { padding: 8px 18px 16px; }
+    .cust-range-row .top { display: flex; justify-content: space-between; font-size: .95rem; font-weight: 500; margin-bottom: 10px; }
+    .cust-range-row .top b { color: var(--md-sys-color-primary); font-weight: 500; }
+    .cust-range { width: 100%; height: 6px; -webkit-appearance: none; appearance: none; border-radius: 3px; background: var(--md-sys-color-outline-variant); outline: none; }
+    .cust-range::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 22px; height: 22px; border-radius: 50%; background: var(--md-sys-color-primary); border: 0; }
+    .cust-range::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: var(--md-sys-color-primary); border: 0; }
+    .cust-colors { display: flex; flex-wrap: wrap; gap: 12px; padding: 4px 18px 18px; align-items: center; }
+    .cust-colors .theme-swatch { margin: 0; }
+    .cust-colorpick { display: flex; align-items: center; gap: 14px; padding: 6px 18px 18px; }
+    .cust-colorpick span { flex: 1; font-size: .85rem; color: var(--md-sys-color-on-surface-variant); }
+    input.cust-color { width: 44px; height: 44px; border: 0; padding: 0; border-radius: 50%; background: none; cursor: pointer; -webkit-appearance: none; appearance: none; flex-shrink: 0; }
+    input.cust-color::-webkit-color-swatch-wrapper { padding: 0; }
+    input.cust-color::-webkit-color-swatch { border: 2px solid var(--md-sys-color-outline); border-radius: 50%; }
+    input.cust-color::-moz-color-swatch { border: 2px solid var(--md-sys-color-outline); border-radius: 50%; }
+    .cust-colorbtn { position: relative; width: 36px; height: 36px; border-radius: 50%; background: conic-gradient(red, yellow, lime, aqua, blue, magenta, red); border: 2px solid transparent; flex-shrink: 0; }
+    .cust-colorbtn.active { border-color: #fff; transform: scale(1.1); }
+    .cust-colorbtn input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+    .cust-btn { display: block; width: calc(100% - 36px); margin: 4px 18px 16px; padding: 13px 16px; border-radius: 14px; border: 1px solid var(--md-sys-color-outline-variant); background: transparent; color: var(--md-sys-color-primary); font: inherit; font-weight: 500; cursor: pointer; }
+    .cust-btn.danger { color: var(--md-sys-color-error); }
+    .cust-btn:active { transform: scale(.98); }
+    .cust-preview { pointer-events: none; border-radius: 20px; padding: 12px; margin: 6px 0 4px; background: var(--md-sys-color-surface-container-lowest); border: 1px dashed var(--md-sys-color-outline-variant); display: flex; flex-direction: column; gap: 12px; overflow: hidden; }
+    .cust-preview .player-bar, .cust-preview .bottom-nav { position: relative !important; left: auto !important; right: auto !important; bottom: auto !important; margin: 0 !important; max-width: none !important; transform: none !important; opacity: 1 !important; width: 100%; }
+    .cust-preview .nav-item { pointer-events: none; }
+    .cust-preview-label { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--md-sys-color-on-surface-variant); margin: 0 6px -6px; }
   </style>
 </head>
 <body>
@@ -1579,6 +1905,10 @@
         <button class="nav-item" data-view="settings">
           <span class="material-icons-round">settings</span>
           <span>Налаштування</span>
+        </button>
+        <button class="nav-item" data-view="account">
+          <span class="material-icons-round">account_circle</span>
+          <span>Акаунт</span>
         </button>
       </nav>
       <div class="sidebar-foot">
@@ -1602,6 +1932,7 @@
         <div id="libraryRoot">
           <div class="section-header">
             <h2>Моя музика</h2>
+            <button class="icon-btn" id="openHistory" aria-label="Історія прослуховування"><span class="material-icons-round">history</span></button>
           </div>
 
           <div class="section-title">Плейлисти</div>
@@ -1689,9 +2020,31 @@
         </div>
       </div>
 
+      <!-- ACCOUNT VIEW -->
+      <div class="view" id="view-account">
+        <div class="section-header"><h2>Акаунт</h2></div>
+        <div class="empty-state account-soon">
+          <span class="material-icons-round">account_circle</span>
+          <h3>Скоро</h3>
+          <p>Акаунт ще в розробці. Незабаром тут можна буде увійти та синхронізувати свою музику.</p>
+        </div>
+      </div>
+
       <!-- SETTINGS VIEW -->
       <div class="view" id="view-settings">
         <div class="section-header"><h2>Налаштування</h2></div>
+        <div class="settings-group">
+          <div class="settings-item" id="custOpenItem">
+            <div class="settings-item-left">
+              <span class="material-icons-round">palette</span>
+              <div>
+                <div class="settings-item-title">Персоналізація</div>
+                <div class="settings-item-sub">Кольори, плеєр, ретро-стилі, ефекти, шрифти</div>
+              </div>
+            </div>
+            <span class="material-icons-round">chevron_right</span>
+          </div>
+        </div>
         <div class="settings-group" id="installGroup" style="display:none">
           <div class="settings-item" id="installItem">
             <div class="settings-item-left">
@@ -1721,16 +2074,51 @@
           </div>
         </div>
         <div class="settings-group">
-          <div class="settings-item">
+          <div class="settings-item static">
             <div class="settings-item-left">
-              <span class="material-icons-round">palette</span>
+              <span class="material-icons-round">high_quality</span>
               <div>
-                <div class="settings-item-title">Колір акценту</div>
-                <div class="settings-item-sub">Material You</div>
+                <div class="settings-item-title">Якість звуку</div>
+                <div class="settings-item-sub">Бітрейт потоку для YouTube та Jamendo</div>
               </div>
             </div>
           </div>
-          <div class="theme-colors" id="themeColors"></div>
+          <div class="opt-row" id="qualityChips"></div>
+          <div class="opt-hint" id="qualityHint"></div>
+          <div class="opt-sep"></div>
+          <div class="settings-item static">
+            <div class="settings-item-left">
+              <span class="material-icons-round">surround_sound</span>
+              <div>
+                <div class="settings-item-title">Тип звуку</div>
+                <div class="settings-item-sub">Стерео, моно та інші режими</div>
+              </div>
+            </div>
+          </div>
+          <div class="opt-row" id="soundChips"></div>
+          <div class="opt-hint" id="soundHint"></div>
+        </div>
+        <div class="settings-group">
+          <div class="settings-item" id="histOpenItem">
+            <div class="settings-item-left">
+              <span class="material-icons-round">history</span>
+              <div>
+                <div class="settings-item-title">Історія прослуховування</div>
+                <div class="settings-item-sub" id="histCount">Порожньо</div>
+              </div>
+            </div>
+            <span class="material-icons-round">chevron_right</span>
+          </div>
+          <div class="settings-item" id="histToggle">
+            <div class="settings-item-left">
+              <span class="material-icons-round">manage_history</span>
+              <div>
+                <div class="settings-item-title">Зберігати історію</div>
+                <div class="settings-item-sub">Записувати, що ви слухали</div>
+              </div>
+            </div>
+            <div class="switch on" id="histSwitch"></div>
+          </div>
         </div>
         <div class="settings-group">
           <div class="settings-item" id="gaplessToggle">
@@ -1817,7 +2205,21 @@
         <span class="material-icons-round">settings</span>
         <span>Налаштування</span>
       </button>
+      <button class="nav-item" data-view="account">
+        <span class="material-icons-round">account_circle</span>
+        <span>Акаунт</span>
+      </button>
     </nav>
+  </div>
+
+  <!-- ПЕРСОНАЛІЗАЦІЯ -->
+  <div class="cust-page" id="custPage">
+    <div class="cust-top">
+      <button class="icon-btn" id="custBack" aria-label="Назад"><span class="material-icons-round">arrow_back</span></button>
+      <h2 id="custTitle">Персоналізація</h2>
+      <button class="icon-btn" id="custClose" aria-label="Закрити"><span class="material-icons-round">close</span></button>
+    </div>
+    <div class="cust-body" id="custBody"></div>
   </div>
 
   <!-- FULL PLAYER -->
@@ -1991,6 +2393,23 @@
       <div class="modal-actions" style="margin-top:16px;">
         <button class="btn-cancel" id="addToPlCancel" style="flex:1;">Закрити</button>
       </div>
+    </div>
+  </div>
+
+  <!-- HISTORY MODAL -->
+  <div class="modal-overlay" id="historyModal">
+    <div class="modal">
+      <div class="hist-head">
+        <div class="modal-title">Історія прослуховування</div>
+        <button class="hist-clear" id="histClear">Очистити</button>
+        <button class="icon-btn" id="histClose" aria-label="Закрити" style="width:36px;height:36px;"><span class="material-icons-round" style="font-size:22px">close</span></button>
+      </div>
+      <div id="histEmpty" class="empty-state" style="display:none;padding:32px;">
+        <span class="material-icons-round">history</span>
+        <h3>Історія порожня</h3>
+        <p>Тут зʼявляться треки, які ви послухали</p>
+      </div>
+      <div id="histList"></div>
     </div>
   </div>
 
@@ -2291,13 +2710,13 @@
       });
     }
     const pipedOne = (base, id) => fetchJson(`${base}/streams/${id}`).then(data => {
-      const audio = (data.audioStreams || []).filter(s => s.url && !s.videoOnly).sort((a, b) => (b.bitrate || 0) - (a.bitrate || 0))[0];
+      const audio = pickByQuality((data.audioStreams || []).filter(s => s.url && !s.videoOnly), s => s.bitrate || 0);
       if (!audio) return null;
       console.log('[Piped] OK via', base);
       return { url: audio.url, title: data.title || '', artist: data.uploader || '', duration: data.duration || 0, art: data.thumbnailUrl || '' };
     });
     const invOne = (base, id) => fetchJson(`${base}/api/v1/videos/${id}?local=true&fields=title,author,lengthSeconds,adaptiveFormats`).then(data => {
-      const audio = (data.adaptiveFormats || []).filter(f => f.url && /^audio\//.test(f.type || '')).sort((a, b) => (parseInt(b.bitrate) || 0) - (parseInt(a.bitrate) || 0))[0];
+      const audio = pickByQuality((data.adaptiveFormats || []).filter(f => f.url && /^audio\//.test(f.type || '')), f => parseInt(f.bitrate) || 0);
       if (!audio) return null;
       const u = audio.url.startsWith('http') ? audio.url : base + audio.url;
       console.log('[Invidious] OK via', base);
@@ -2519,6 +2938,7 @@
       { name: 'Green', primary: '#86d992', onPrimary: '#003911', container: '#00531d' },
     ];
     function applyTheme(t) {
+      if (window.gmCustom) { window.gmCustom.setAccentFromTheme(t); return; }
       document.documentElement.style.setProperty('--md-sys-color-primary', t.primary);
       document.documentElement.style.setProperty('--md-sys-color-on-primary', t.onPrimary);
       document.documentElement.style.setProperty('--md-sys-color-primary-container', t.container);
@@ -2550,13 +2970,156 @@
         });
         let prev = sourceNode;
         eqFilters.forEach(f => { prev.connect(f); prev = f; });
-        prev.connect(gainNode);
+        stage = buildStereoStage(audioCtx);
+        prev.connect(stage.input);
+        stage.output.connect(gainNode);
         gainNode.connect(audioCtx.destination);
+        applySoundMode(true);
       }
     }
     function setEQGains(gains) {
       if (!eqFilters.length) return;
       gains.forEach((g, i) => { if (eqFilters[i]) eqFilters[i].gain.value = g; });
+    }
+
+    // ========== ЯКІСТЬ / ТИП ЗВУКУ / ІСТОРІЯ ==========
+    let gQuality = 'auto', gSound = 'stereo';
+    try { gQuality = localStorage.getItem('gmusic_quality') || 'auto'; gSound = localStorage.getItem('gmusic_sound') || 'stereo'; } catch (e) {}
+    let histOn = true;
+    try { histOn = localStorage.getItem('gmusic_hist_on') !== '0'; } catch (e) {}
+    let playHistory = [];
+    try { playHistory = JSON.parse(localStorage.getItem('gmusic_history') || '[]'); if (!Array.isArray(playHistory)) playHistory = []; } catch (e) { playHistory = []; }
+    const HIST_MAX = 300;
+    let histPending = null, customQueue = null, resumeAt = 0, resumeId = null;
+
+    // --- якість ---
+    const QUALITY_OPTS = [['auto', 'Авто'], ['high', 'Висока'], ['mid', 'Середня'], ['low', 'Низька']];
+    const QUALITY_HINTS = {
+      auto: 'Найвища якість; на повільному інтернеті чи в режимі економії трафіку — нижча.',
+      high: 'Максимальний доступний бітрейт.',
+      mid: 'Близько 128 кбіт/с — баланс якості та трафіку.',
+      low: 'Мінімальний бітрейт — економить трафік.'
+    };
+    function effQuality() {
+      if (gQuality !== 'auto') return gQuality;
+      const c = navigator.connection;
+      if (c) {
+        if (c.saveData || /2g/.test(c.effectiveType || '')) return 'low';
+        if (c.effectiveType === '3g') return 'mid';
+      }
+      return 'high';
+    }
+    // Вибір аудіопотоку зі списку за обраною якістю
+    function pickByQuality(list, br) {
+      if (!list || !list.length) return null;
+      const sorted = list.slice().sort((a, b) => br(b) - br(a));
+      const known = sorted.filter(x => br(x) > 0);
+      const pool = known.length ? known : sorted;
+      const q = effQuality();
+      if (q === 'high') return pool[0];
+      if (q === 'low') return pool[pool.length - 1];
+      return pool.reduce((best, x) => Math.abs(br(x) - 128000) < Math.abs(br(best) - 128000) ? x : best, pool[0]);
+    }
+    // Jamendo: mp32 (вища якість) / mp31 (стандартна)
+    const jamendoFormat = () => effQuality() === 'high' ? 'mp32' : 'mp31';
+    const setJamFmt = (url, fmt) => /([?&])format=[a-z0-9]+/i.test(url) ? url.replace(/([?&])format=[a-z0-9]+/i, '$1format=' + fmt) : url;
+
+    // --- тип звуку (Web Audio: Mid/Side) ---
+    const SOUND_MODES = {
+      stereo:  { name: 'Стерео',     m: 1,   sL: 1,    sR: -1,   hint: 'Звичайне стерео, без змін.' },
+      mono:    { name: 'Моно',       m: 1,   sL: 0,    sR: 0,    hint: 'Обидва канали однакові — зручно з однією колонкою чи навушником.' },
+      wide:    { name: 'Широке',     m: 0.9, sL: 1.7,  sR: -1.7, hint: 'Розширена стереобаза: звук стає «просторішим».' },
+      karaoke: { name: 'Мінус вокал', m: 0,  sL: 1.4,  sR: 1.4,  hint: 'Приглушує центр мікса, де зазвичай вокал. Результат залежить від запису.' }
+    };
+    let stage = null;
+    function buildStereoStage(c) {
+      const mk = v => { const g = c.createGain(); g.gain.value = v; return g; };
+      const input = c.createGain();
+      input.channelCount = 2; input.channelCountMode = 'explicit'; input.channelInterpretation = 'speakers'; // моно-джерело → у два канали
+      const split = c.createChannelSplitter(2), merge = c.createChannelMerger(2);
+      const lM = mk(0.5), rM = mk(0.5), lS = mk(0.5), rS = mk(-0.5);
+      const mid = mk(1), side = mk(1);
+      const midL = mk(1), midR = mk(1), sideL = mk(1), sideR = mk(-1);
+      input.connect(split);
+      split.connect(lM, 0); split.connect(lS, 0); split.connect(rM, 1); split.connect(rS, 1);
+      lM.connect(mid); rM.connect(mid); lS.connect(side); rS.connect(side);
+      mid.connect(midL); mid.connect(midR); side.connect(sideL); side.connect(sideR);
+      midL.connect(merge, 0, 0); sideL.connect(merge, 0, 0);
+      midR.connect(merge, 0, 1); sideR.connect(merge, 0, 1);
+      return { input, output: merge, midL, midR, sideL, sideR };
+    }
+    function applySoundMode(instant) {
+      if (!stage || !audioCtx) return;
+      const p = SOUND_MODES[gSound] || SOUND_MODES.stereo, t = audioCtx.currentTime;
+      [[stage.midL, p.m], [stage.midR, p.m], [stage.sideL, p.sL], [stage.sideR, p.sR]].forEach(([n, v]) => {
+        if (instant) n.gain.value = v; else n.gain.setTargetAtTime(v, t, 0.03);
+      });
+    }
+
+    // --- історія ---
+    function saveHistory() { try { localStorage.setItem('gmusic_history', JSON.stringify(playHistory)); } catch (e) {} }
+    function commitHistory() {
+      const t = histPending; histPending = null;
+      if (!t || !histOn) return;
+      const now = Date.now(), last = playHistory[0];
+      if (last && last.id === t.id && now - last.ts < 30000) { last.ts = now; }
+      else {
+        const direct = t.url && !/^blob:/.test(t.url) && !['youtube', 'jamendo', 'audius'].includes(t.source);
+        playHistory.unshift({
+          id: t.id, title: t.title, artist: t.artist, duration: t.duration || 0,
+          art: (t.art && !t.art.startsWith('blob:')) ? t.art : '',
+          source: t.source || null, streamId: t.streamId || null,
+          url: direct ? t.url : '', preview: !!t.preview, local: !!t.local, ts: now
+        });
+      }
+      if (playHistory.length > HIST_MAX) playHistory.length = HIST_MAX;
+      saveHistory(); updateHistCount();
+      if (document.getElementById('historyModal')?.classList.contains('open')) renderHistory();
+    }
+    function updateHistCount() {
+      const el = document.getElementById('histCount'); if (!el) return;
+      const n = playHistory.length;
+      el.textContent = n ? `${n} ${n % 10 === 1 && n % 100 !== 11 ? 'запис' : ([2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100)) ? 'записи' : 'записів'}` : 'Порожньо';
+    }
+    function entryToTrack(e) {
+      return findTrackById(e.id) || { id: e.id, title: e.title, artist: e.artist, duration: e.duration, art: e.art, source: e.source, streamId: e.streamId, url: e.url, preview: e.preview, local: e.local };
+    }
+    function dayLabel(ts) {
+      const d = new Date(ts), n = new Date();
+      const s0 = x => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+      const diff = Math.round((s0(n) - s0(d)) / 86400000);
+      if (diff === 0) return 'Сьогодні';
+      if (diff === 1) return 'Учора';
+      return d.toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', year: d.getFullYear() === n.getFullYear() ? undefined : 'numeric' });
+    }
+    function renderHistory() {
+      const list = document.getElementById('histList'), empty = document.getElementById('histEmpty');
+      document.getElementById('histClear').style.display = playHistory.length ? '' : 'none';
+      if (!playHistory.length) { list.innerHTML = ''; empty.style.display = 'flex'; return; }
+      empty.style.display = 'none';
+      let html = '', lastDay = '';
+      playHistory.forEach((e, i) => {
+        const day = dayLabel(e.ts);
+        if (day !== lastDay) { html += `<div class="hist-day">${escapeHtml(day)}</div>`; lastDay = day; }
+        const tm = new Date(e.ts).toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
+        html += `<div class="hist-item" data-i="${i}">
+          <img src="${e.art || ART_PLACEHOLDER}" alt="" loading="lazy" />
+          <div class="hist-info"><div class="hist-t">${escapeHtml(e.title)}</div><div class="hist-a">${escapeHtml(e.artist)}</div></div>
+          <span class="hist-time">${tm}</span>
+          <button class="icon-btn hist-del" data-i="${i}" aria-label="Видалити із історії"><span class="material-icons-round">close</span></button>
+        </div>`;
+      });
+      list.innerHTML = html;
+    }
+    function playFromHistory(i) {
+      const e = playHistory[i]; if (!e) return;
+      const seen = new Set(), q = [];
+      playHistory.forEach(x => { if (!seen.has(x.id)) { seen.add(x.id); q.push(entryToTrack(x)); } });
+      const t = q.find(x => x.id === e.id);
+      if (!t || !(t.url || t.streamId || t.blobUrl)) { toast('Цей трек більше недоступний'); return; }
+      document.getElementById('historyModal').classList.remove('open');
+      playTrack(t, q);
+      openFullPlayer();
     }
 
     // ========== UTILS ==========
@@ -2724,6 +3287,9 @@
                 </button>
               `}
             `}
+            <button class="more-btn" data-id="${t.id}" title="Ще" aria-label="Ще">
+              <span class="material-icons-round">more_vert</span>
+            </button>
           </div>
         </div>
       `;
@@ -2761,7 +3327,7 @@
         item.addEventListener('contextmenu', (e) => e.preventDefault());
         item.addEventListener('click', (e) => {
           if (longPressed) { longPressed = false; return; }
-          if (e.target.closest('.save-btn') || e.target.closest('.add-to-pl-btn') || e.target.closest('.remove-from-pl')) return;
+          if (e.target.closest('.save-btn') || e.target.closest('.add-to-pl-btn') || e.target.closest('.remove-from-pl') || e.target.closest('.more-btn')) return;
           const t = findTrackById(item.dataset.id);
           if (t) { playTrack(t); openFullPlayer(); }
         });
@@ -2770,6 +3336,12 @@
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
           toggleSave(btn.dataset.id);
+        });
+      });
+      container.querySelectorAll('.more-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openTrackMenu(btn.dataset.id);
         });
       });
       container.querySelectorAll('.add-to-pl-btn').forEach(btn => {
@@ -3103,10 +3675,15 @@
       updatePlayerUI();
       toast('Не вдалося завантажити трек без реклами. Спробуйте пізніше');
     }
-    async function playTrack(track) {
+    async function playTrack(track, q) {
       if (!track) return;
+      const resumePos = (resumeAt > 0 && resumeId === track.id) ? resumeAt : 0;
+      resumeAt = 0; resumeId = null;
       currentTrack = track;
-      if (currentPlaylistId) {
+      if (Array.isArray(q)) customQueue = q; else if (q !== 'next') customQueue = null;
+      if (customQueue && customQueue.some(t => t.id === track.id)) {
+        queue = customQueue;
+      } else if (currentPlaylistId) {
         const pl = playlists.find(p => p.id === currentPlaylistId);
         queue = (pl?.trackIds || []).map(id => library.find(t => t.id === id)).filter(Boolean);
       } else {
@@ -3125,15 +3702,16 @@
       if (track.source === 'jamendo' && track.streamId) {
         isLoading = true; updatePlayerUI();
         try {
-          const d = await jamendoFetch('/tracks/', { id: track.streamId });
+          const fmt = track._noFmt ? null : jamendoFormat();
+          const d = await jamendoFetch('/tracks/', fmt ? { id: track.streamId, audioformat: fmt } : { id: track.streamId });
           const r = d.results && d.results[0];
-          if (r && r.audio) { src = r.audio; track.url = r.audio; }
+          if (r && r.audio) { src = fmt ? setJamFmt(r.audio, fmt) : r.audio; track.url = src; track._fmtApplied = !!fmt; }
         } catch (e) { console.error(e); }
         if (currentTrack !== track) return;
       }
       if (track.source === 'youtube' && track.streamId) {
         // Якщо URL вже є (з попереднього успішного Piped) — використовуємо його
-        if (track.url && !track._forceYt) {
+        if (track.url && !track._forceYt && track._q === effQuality()) {
           src = track.url;
           showYtBox(false);
         } else {
@@ -3150,6 +3728,7 @@
               if (piped.art && !track.art) track.art = piped.art;
               src = piped.url;
               track.url = piped.url; // кешуємо на сесію
+              track._q = effQuality();
               // далі звичайний шлях відтворення нижче
             } else {
               failYt();
@@ -3175,6 +3754,10 @@
       if (track.preview) toast('Превʼю 30 с (iTunes)');
 
       audio.src = src;
+      if (resumePos > 0) {
+        histPending = null;
+        audio.addEventListener('loadedmetadata', () => { try { audio.currentTime = resumePos; } catch (e) {} }, { once: true });
+      } else histPending = track;
       if (audio === audioCors) {
         initEQ();
         if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
@@ -3208,13 +3791,13 @@
     function nextTrack() {
       if (!queue.length) return;
       currentIndex = (currentIndex + 1) % queue.length;
-      playTrack(queue[currentIndex]);
+      playTrack(queue[currentIndex], 'next');
     }
     function prevTrack() {
       if (!queue.length) return;
       if (audio.currentTime > 3) { audio.currentTime = 0; return; }
       currentIndex = (currentIndex - 1 + queue.length) % queue.length;
-      playTrack(queue[currentIndex]);
+      playTrack(queue[currentIndex], 'next');
     }
     function updatePlayerUI() {
       if (!currentTrack) return;
@@ -3522,7 +4105,7 @@
     });
 
     // ========== NAV ==========
-    const VIEW_ORDER = ['library', 'search', 'settings'];
+    const VIEW_ORDER = ['library', 'search', 'settings', 'account'];
     function switchView(name) {
       const idx = Math.max(0, VIEW_ORDER.indexOf(name));
       document.querySelectorAll('.view').forEach(v => {
@@ -3792,22 +4375,7 @@
 
     // ========== INIT ==========
     document.addEventListener('DOMContentLoaded', () => {
-      const savedTheme = localStorage.getItem('gmusic_theme');
-      if (savedTheme) applyTheme(JSON.parse(savedTheme));
-      else applyTheme(THEMES[0]);
-
-      // Theme swatches
-      const themeEl = document.getElementById('themeColors');
-      themeEl.innerHTML = THEMES.map((t, i) => `
-        <div class="theme-swatch ${i === 0 ? 'active' : ''}" style="background:${t.primary}" data-idx="${i}"></div>
-      `).join('');
-      themeEl.querySelectorAll('.theme-swatch').forEach(s => {
-        s.addEventListener('click', () => {
-          themeEl.querySelectorAll('.theme-swatch').forEach(x => x.classList.remove('active'));
-          s.classList.add('active');
-          applyTheme(THEMES[+s.dataset.idx]);
-        });
-      });
+      /* тема й акцент керуються розділом «Персоналізація» (див. нижній <script>) */
 
       // EQ helper — bind sliders + presets to a container pair
       function bindEQControls(slidersEl, presetsEl) {
@@ -3862,6 +4430,72 @@
       document.getElementById('normalizeToggle').addEventListener('click', () => {
         document.getElementById('normalizeSwitch').classList.toggle('on');
       });
+
+      // ----- Якість / тип звуку / історія -----
+      const qChips = document.getElementById('qualityChips'), sChips = document.getElementById('soundChips');
+      const renderQuality = () => {
+        qChips.innerHTML = QUALITY_OPTS.map(([k, n]) => `<button class="chip ${gQuality === k ? 'on' : ''}" data-k="${k}">${n}</button>`).join('');
+        document.getElementById('qualityHint').textContent = QUALITY_HINTS[gQuality] + ' Діє для YouTube та Jamendo; iTunes-превʼю і власні файли — без змін.';
+      };
+      const renderSound = () => {
+        sChips.innerHTML = Object.entries(SOUND_MODES).map(([k, m]) => `<button class="chip ${gSound === k ? 'on' : ''}" data-k="${k}">${m.name}</button>`).join('');
+        document.getElementById('soundHint').textContent = SOUND_MODES[gSound].hint + ' Не діє на iTunes-превʼю та треки без CORS.';
+      };
+      renderQuality(); renderSound();
+      qChips.addEventListener('click', e => {
+        const b = e.target.closest('.chip'); if (!b) return;
+        const before = effQuality();
+        gQuality = b.dataset.k;
+        try { localStorage.setItem('gmusic_quality', gQuality); } catch (err) {}
+        renderQuality();
+        const after = effQuality();
+        const streamed = currentTrack && ['youtube', 'jamendo'].includes(currentTrack.source);
+        if (before !== after && streamed) {
+          if (isPlaying) {
+            resumeAt = audio.currentTime || 0; resumeId = currentTrack.id;
+            playTrack(currentTrack, 'next');
+            toast('Якість змінено, перезавантажую трек…');
+          } else {
+            currentTrack._q = null;
+            toast('Нова якість застосується при наступному запуску');
+          }
+        } else toast('Якість: ' + QUALITY_OPTS.find(o => o[0] === gQuality)[1]);
+      });
+      sChips.addEventListener('click', e => {
+        const b = e.target.closest('.chip'); if (!b) return;
+        gSound = b.dataset.k;
+        try { localStorage.setItem('gmusic_sound', gSound); } catch (err) {}
+        renderSound();
+        applySoundMode(false);
+        if (currentTrack && isPlaying && (audio !== audioCors || !audioCtx)) toast('Для цього треку режим звуку недоступний');
+        else toast('Тип звуку: ' + SOUND_MODES[gSound].name);
+      });
+
+      const histModal = document.getElementById('historyModal');
+      const openHist = () => { renderHistory(); histModal.classList.add('open'); };
+      document.getElementById('openHistory').addEventListener('click', openHist);
+      document.getElementById('histOpenItem').addEventListener('click', openHist);
+      document.getElementById('histClose').addEventListener('click', () => histModal.classList.remove('open'));
+      histModal.addEventListener('click', e => { if (e.target === histModal) histModal.classList.remove('open'); });
+      document.getElementById('histClear').addEventListener('click', () => {
+        if (!confirm('Очистити всю історію прослуховування?')) return;
+        playHistory = []; saveHistory(); renderHistory(); updateHistCount(); toast('Історію очищено');
+      });
+      document.getElementById('histList').addEventListener('click', e => {
+        const del = e.target.closest('.hist-del');
+        if (del) { e.stopPropagation(); playHistory.splice(+del.dataset.i, 1); saveHistory(); renderHistory(); updateHistCount(); return; }
+        const it = e.target.closest('.hist-item');
+        if (it) playFromHistory(+it.dataset.i);
+      });
+      const histSwitch = document.getElementById('histSwitch');
+      histSwitch.classList.toggle('on', histOn);
+      document.getElementById('histToggle').addEventListener('click', () => {
+        histOn = !histOn;
+        histSwitch.classList.toggle('on', histOn);
+        try { localStorage.setItem('gmusic_hist_on', histOn ? '1' : '0'); } catch (err) {}
+        toast(histOn ? 'Історію увімкнено' : 'Історію вимкнено');
+      });
+      updateHistCount();
 
       // Nav
       document.querySelectorAll('.nav-item').forEach(btn => {
@@ -4019,6 +4653,7 @@
       });
       [audioCors, audioPlain, ytAudio].forEach(a => {
         a.addEventListener('timeupdate', () => {
+          if (histPending && a === audio && a.currentTime >= Math.min(5, (a.duration || 99) / 2)) commitHistory();
           if (a !== audio || !a.duration) return;
           const pct = (a.currentTime / a.duration) * 100;
           document.getElementById('progressLine').style.width = pct + '%';
@@ -4026,7 +4661,7 @@
           document.getElementById('fpCurrent').textContent = formatTime(a.currentTime);
           document.getElementById('fpDuration').textContent = formatTime(a.duration);
         });
-        a.addEventListener('ended', () => { if (a === audio) nextTrack(); });
+        a.addEventListener('ended', () => { if (a === audio) { commitHistory(); nextTrack(); } });
         const setLoad = (v) => () => { if (a === audio && isLoading !== v) { isLoading = v; updatePlayerUI(); } };
         a.addEventListener('playing', setLoad(false));
         a.addEventListener('canplay', setLoad(false));
@@ -4037,6 +4672,11 @@
         a.addEventListener('play', () => { if (a === audio) { isPlaying = true; updatePlayerUI(); } });
         a.addEventListener('pause', () => { if (a === audio) { isPlaying = false; updatePlayerUI(); } });
         a.addEventListener('error', () => {
+          if (a === audio && currentTrack && currentTrack.source === 'jamendo' && currentTrack._fmtApplied && !currentTrack._noFmt) {
+            currentTrack._noFmt = true;   // формат не підійшов → стандартний потік
+            playTrack(currentTrack, 'next');
+            return;
+          }
           if (a === audio && a === audioCors && currentTrack && (currentTrack.source === 'jamendo' || currentTrack.source === 'freesound' || currentTrack.source === 'youtube') && !currentTrack._plain) {
             currentTrack._plain = true;   // нет CORS → играем без эквалайзера
             playTrack(currentTrack);
@@ -4303,5 +4943,385 @@
       addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
     }
   </script>
+
+<script>
+/* ===================== ПЕРСОНАЛІЗАЦІЯ ===================== */
+(function () {
+  'use strict';
+  const KEY = 'gmusic_custom';
+  const DEF = {
+    uiStyle: 'material', base: 'dark', bg: '#1b2a4a', accent: null,
+    playerStyle: 'material', artShape: 'round', fpBg: 'cover', glow: false, spin: true, winTitle: 'classic',
+    nav: 'float', navLabels: true, mini: 'float', miniProg: true,
+    blur: true, blurAmt: 24, fpBlur: 40, anim: true, round: 'normal', shadow: true,
+    font: 'default', fontScale: 100,
+    density: 'normal', listArt: 'round', showDur: true,
+  };
+  let cust = Object.assign({}, DEF);
+  try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s && typeof s === 'object') Object.assign(cust, s); } catch (e) {}
+  if (!cust.accent) {
+    try { const t = JSON.parse(localStorage.getItem('gmusic_theme') || 'null'); if (t && t.primary) cust.accent = t.primary; } catch (e) {}
+  }
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(cust)); } catch (e) {} };
+
+  /* ---------- кольорові утиліти ---------- */
+  function hexToHsl(hex) {
+    hex = String(hex || '#000').replace('#', '');
+    if (hex.length === 3) hex = hex.split('').map(x => x + x).join('');
+    const r = parseInt(hex.slice(0, 2), 16) / 255, g = parseInt(hex.slice(2, 4), 16) / 255, b = parseInt(hex.slice(4, 6), 16) / 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min;
+    let h = 0, s = 0; const l = (max + min) / 2;
+    if (d) {
+      s = l > .5 ? d / (2 - max - min) : d / (max + min);
+      h = max === r ? (g - b) / d + (g < b ? 6 : 0) : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+      h *= 60;
+    }
+    return [h, s * 100, l * 100];
+  }
+  function hslToHex(h, s, l) {
+    s = Math.max(0, Math.min(100, s)) / 100; l = Math.max(0, Math.min(100, l)) / 100;
+    const k = n => (n + h / 30) % 12, a = s * Math.min(l, 1 - l);
+    const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+    const t = x => Math.round(255 * x).toString(16).padStart(2, '0');
+    return '#' + t(f(0)) + t(f(8)) + t(f(4));
+  }
+  function lum(hex) {
+    hex = hex.replace('#', '');
+    const c = [0, 2, 4].map(i => { const v = parseInt(hex.slice(i, i + 2), 16) / 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); });
+    return .2126 * c[0] + .7152 * c[1] + .0722 * c[2];
+  }
+  function rgba(hex, a) {
+    hex = hex.replace('#', '');
+    return `rgba(${parseInt(hex.slice(0, 2), 16)},${parseInt(hex.slice(2, 4), 16)},${parseInt(hex.slice(4, 6), 16)},${a})`;
+  }
+
+  /* ---------- палітри фону ---------- */
+  const PRESETS = [
+    { id: 'dark', n: 'Темна', dot: '#1e1f25' },
+    { id: 'amoled', n: 'AMOLED', dot: '#000000', h: 230, s: 8, l: 0 },
+    { id: 'light', n: 'Світла', dot: '#f3f4fa', h: 225, s: 25, l: 97 },
+    { id: 'ocean', n: 'Океан', dot: '#10233f', h: 215, s: 45, l: 9 },
+    { id: 'forest', n: 'Ліс', dot: '#0f2a1f', h: 150, s: 30, l: 8 },
+    { id: 'plum', n: 'Слива', dot: '#26142f', h: 285, s: 32, l: 9 },
+    { id: 'ruby', n: 'Рубін', dot: '#2d1218', h: 350, s: 32, l: 9 },
+    { id: 'custom', n: 'Свій колір', dot: 'conic-gradient(red,yellow,lime,aqua,blue,magenta,red)' },
+  ];
+  const PAL_VARS = ['--md-sys-color-surface', '--md-sys-color-surface-dim', '--md-sys-color-surface-bright', '--md-sys-color-surface-container-lowest',
+    '--md-sys-color-surface-container-low', '--md-sys-color-surface-container', '--md-sys-color-surface-container-high', '--md-sys-color-surface-container-highest',
+    '--md-sys-color-on-surface', '--md-sys-color-on-surface-variant', '--md-sys-color-outline', '--md-sys-color-outline-variant',
+    '--md-sys-color-secondary', '--md-sys-color-on-secondary', '--md-sys-color-secondary-container', '--md-sys-color-on-secondary-container',
+    '--md-sys-color-error', '--md-sys-color-on-error', '--blur-bg', '--glass'];
+
+  function applyPalette(root) {
+    PAL_VARS.forEach(v => root.style.removeProperty(v));
+    if (cust.uiStyle !== 'material') {
+      const W = { 'surface': '#c0c0c0', 'surface-dim': '#c0c0c0', 'surface-bright': '#dfdfdf', 'surface-container-lowest': '#ffffff', 'surface-container-low': '#c0c0c0',
+        'surface-container': '#c0c0c0', 'surface-container-high': '#c0c0c0', 'surface-container-highest': '#dfdfdf', 'on-surface': '#000000', 'on-surface-variant': '#404040',
+        'outline': '#808080', 'outline-variant': '#808080', 'secondary': '#404040', 'on-secondary': '#ffffff', 'secondary-container': '#000080', 'on-secondary-container': '#ffffff',
+        'error': '#c00000', 'on-error': '#ffffff' };
+      Object.keys(W).forEach(k => root.style.setProperty('--md-sys-color-' + k, W[k]));
+      root.style.setProperty('--glass', '#c0c0c0');
+      root.dataset.pal = '1'; root.dataset.scheme = 'light';
+      return 'light';
+    }
+    let p = null;
+    if (cust.base === 'custom') { const [h, s, l] = hexToHsl(cust.bg); p = { h, s, l }; }
+    else { const pr = PRESETS.find(x => x.id === cust.base); if (pr && pr.h !== undefined) p = pr; }
+    if (!p) { delete root.dataset.pal; root.dataset.scheme = 'dark'; return 'dark'; }
+    const light = p.l > 60, h = Math.round(p.h), ss = Math.min(p.s, 60);
+    const set = (k, v) => root.style.setProperty('--md-sys-color-' + k, v);
+    let base;
+    if (!light) {
+      base = Math.max(0, Math.min(p.l, 30));
+      const L = d => hslToHex(h, ss, Math.max(0, base + d));
+      set('surface', L(0)); set('surface-dim', L(0)); set('surface-bright', L(14));
+      set('surface-container-lowest', L(-3)); set('surface-container-low', L(2.5)); set('surface-container', L(5));
+      set('surface-container-high', L(9)); set('surface-container-highest', L(13));
+      set('on-surface', hslToHex(h, 12, 90)); set('on-surface-variant', hslToHex(h, 10, 77));
+      set('outline', hslToHex(h, 6, 58)); set('outline-variant', hslToHex(h, ss * .5, base + 22));
+      set('secondary', hslToHex(h, 10, 78)); set('on-secondary', hslToHex(h, ss, base));
+      set('secondary-container', L(14)); set('on-secondary-container', hslToHex(h, 12, 92));
+      root.style.setProperty('--blur-bg', rgba(L(4), .72));
+      root.style.setProperty('--glass', rgba(L(7), .88));
+    } else {
+      base = Math.max(90, Math.min(p.l, 99));
+      const L = d => hslToHex(h, ss, Math.min(100, base + d));
+      set('surface', L(0)); set('surface-dim', L(-6)); set('surface-bright', L(1));
+      set('surface-container-lowest', '#ffffff'); set('surface-container-low', L(-2)); set('surface-container', L(-4.5));
+      set('surface-container-high', L(-8)); set('surface-container-highest', L(-12));
+      set('on-surface', hslToHex(h, 15, 10)); set('on-surface-variant', hslToHex(h, 10, 30));
+      set('outline', hslToHex(h, 6, 45)); set('outline-variant', hslToHex(h, 10, 78));
+      set('secondary', hslToHex(h, 10, 30)); set('on-secondary', '#ffffff');
+      set('secondary-container', L(-12)); set('on-secondary-container', hslToHex(h, 15, 12));
+      set('error', '#b3261e'); set('on-error', '#ffffff');
+      root.style.setProperty('--blur-bg', rgba(L(0), .78));
+      root.style.setProperty('--glass', rgba('#ffffff', .88));
+    }
+    root.dataset.pal = '1';
+    root.dataset.scheme = light ? 'light' : 'dark';
+    return root.dataset.scheme;
+  }
+
+  function applyAccent(root, scheme) {
+    const hex = String(cust.accent || (typeof THEMES !== 'undefined' ? THEMES[0].primary : '#a8c7fa')).toLowerCase();
+    const [h, s, l] = hexToHsl(hex);
+    const sat = Math.min(s, 75);
+    let P, onP, C, onC;
+    if (scheme === 'dark') {
+      const th = (typeof THEMES !== 'undefined') ? THEMES.find(t => t.primary.toLowerCase() === hex) : null;
+      P = hex; onP = th ? th.onPrimary : (lum(hex) > .4 ? '#141414' : '#ffffff');
+      C = th ? th.container : hslToHex(h, sat * .8, Math.min(Math.max(l * .45, 16), 30));
+      onC = hslToHex(h, sat, 92);
+    } else {
+      P = hslToHex(h, s, Math.min(l, 42)); onP = '#ffffff'; C = hslToHex(h, sat, 90); onC = hslToHex(h, sat, 14);
+    }
+    const st = root.style;
+    st.setProperty('--md-sys-color-primary', P); st.setProperty('--md-sys-color-on-primary', onP);
+    st.setProperty('--md-sys-color-primary-container', C); st.setProperty('--md-sys-color-on-primary-container', onC);
+  }
+
+  /* ---------- шрифти ---------- */
+  const FONTS = {
+    default: null,
+    system: 'system-ui,-apple-system,"Segoe UI",sans-serif',
+    serif: 'Georgia,"Times New Roman",serif',
+    mono: 'ui-monospace,"Cascadia Mono",Consolas,monospace',
+    pixel: '"VT323",ui-monospace,monospace',
+    rounded: '"Nunito",system-ui,sans-serif',
+    win: 'Tahoma,"MS Sans Serif",Verdana,Geneva,sans-serif',
+  };
+  const FONT_LINKS = { pixel: 'https://fonts.googleapis.com/css2?family=VT323&subset=cyrillic&display=swap', rounded: 'https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;700&subset=cyrillic&display=swap' };
+  const loadedFonts = {};
+  function ensureFont(k) {
+    if (!FONT_LINKS[k] || loadedFonts[k]) return;
+    loadedFonts[k] = 1;
+    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = FONT_LINKS[k]; document.head.appendChild(l);
+  }
+
+  /* ---------- застосування ---------- */
+  function apply() {
+    const r = document.documentElement, d = r.dataset, c = cust;
+    const win = c.uiStyle !== 'material';
+    d.ui = c.uiStyle; d.player = win ? c.uiStyle : c.playerStyle; d.artshape = c.artShape; d.fpbg = c.fpBg; d.glow = c.glow ? 'on' : 'off'; d.spin = c.spin ? 'on' : 'off';
+    d.wintitle = c.winTitle; d.nav = win ? 'flat' : c.nav; d.navlabels = c.navLabels ? 'on' : 'off'; d.mini = win ? 'flat' : c.mini; d.miniprog = c.miniProg ? 'on' : 'off';
+    d.blur = (c.blur && !win) ? 'on' : 'off'; d.anim = c.anim ? 'on' : 'off'; d.round = c.round; d.shadow = c.shadow ? 'on' : 'off';
+    d.font = (win && c.font === 'default') ? 'win' : c.font; d.density = c.density; d.listart = c.listArt; d.showdur = c.showDur ? 'on' : 'off';
+    const scheme = applyPalette(r);
+    applyAccent(r, scheme);
+    if (win && c.winTitle === 'classic') { const st = r.style; st.setProperty('--md-sys-color-primary', '#000080'); st.setProperty('--md-sys-color-on-primary', '#ffffff'); st.setProperty('--md-sys-color-primary-container', '#000080'); st.setProperty('--md-sys-color-on-primary-container', '#ffffff'); }
+    if (!c.blur || win) r.style.setProperty('--blur-bg', 'var(--md-sys-color-surface-container)');
+    r.style.setProperty('--blur-strong', c.blur ? `blur(${c.blurAmt}px) saturate(180%)` : 'none');
+    r.style.setProperty('--fp-blur', c.fpBlur + 'px');
+    r.style.fontSize = c.fontScale === 100 ? '' : c.fontScale + '%';
+    const fk = d.font;
+    if (FONTS[fk]) { ensureFont(fk); r.style.setProperty('--ufont', FONTS[fk]); } else r.style.removeProperty('--ufont');
+    const tc = document.querySelector('meta[name="theme-color"]');
+    if (tc) { const bg = getComputedStyle(r).getPropertyValue('--md-sys-color-surface').trim(); if (bg) tc.setAttribute('content', bg); }
+  }
+  apply();
+
+  /* зворотна сумісність: main-скрипт викликає applyTheme(t) */
+  window.gmCustom = {
+    setAccentFromTheme(t) {
+      cust.accent = t.primary; save();
+      try { localStorage.setItem('gmusic_theme', JSON.stringify(t)); } catch (e) {}
+      apply();
+    },
+    apply,
+  };
+
+  /* ---------- сторінки налаштувань ---------- */
+  const OPT = {
+    shape: [['round', 'Закруглена'], ['circle', 'Коло'], ['square', 'Квадрат'], ['squircle', 'Сквіркл']],
+  };
+  const PAGES = [
+    { id: 'colors', note: 'Зараз увімкнено стиль Windows для всього застосунку — кольори фону й акценту тимчасово не діють (окрім кольору заголовка вікон). Поверніть «Material You» у «Стиль застосунку».', icon: 'palette', t: 'Кольори', sub: 'Тема, фон та колір акценту', pv: ['track', 'mini', 'nav'], groups: [
+      { title: 'Фон та тема', items: [
+        { type: 'chips', k: 'base', label: 'Основа інтерфейсу', opts: PRESETS.map(p => [p.id, p.n, p.dot]) },
+        { type: 'bgcolor', showIf: c => c.base === 'custom' },
+      ] },
+      { title: 'Акцент', items: [{ type: 'accent' }] },
+    ] },
+    { id: 'player', note: 'Зараз увімкнено стиль Windows для всього застосунку — плеєр оформлений у ньому автоматично.', icon: 'play_circle', t: 'Плеєр', sub: 'Стиль, обкладинка, фон, вініл, ретро', pv: ['mini'], groups: [
+      { title: 'Стиль плеєра', items: [
+        { type: 'chips', k: 'playerStyle', label: 'Вигляд', sub: 'Застосовується до міні-плеєра і великого плеєра', opts: [
+          ['material', 'Material You'], ['vinyl', '💿 Вініл'], ['win98', '🖥 Windows 98'], ['win95', '🖥 Windows 95'], ['minimal', 'Мінімал']] },
+        { type: 'chips', k: 'winTitle', label: 'Колір заголовка вікна', showIf: c => c.playerStyle.startsWith('win') || c.uiStyle !== 'material', opts: [['classic', 'Класичний синій'], ['accent', 'Колір акценту']] },
+        { type: 'switch', k: 'spin', label: 'Крутити платівку', sub: 'Обертання обкладинки під час відтворення', showIf: c => c.playerStyle === 'vinyl' && c.uiStyle === 'material' },
+        { type: 'button', act: 'fullprev', label: '▶  Відкрити великий плеєр для перегляду' },
+      ] },
+      { title: 'Обкладинка і фон', items: [
+        { type: 'chips', k: 'artShape', label: 'Форма обкладинки', sub: 'Для стилів Вініл і Windows форма фіксована', opts: OPT.shape },
+        { type: 'chips', k: 'fpBg', label: 'Фон великого плеєра', opts: [['cover', 'Розмите фото'], ['gradient', 'Градієнт акценту'], ['solid', 'Однотонний'], ['black', 'Чорний']] },
+        { type: 'switch', k: 'glow', label: 'Світіння обкладинки', sub: 'М’яке сяйво кольору акценту' },
+      ] },
+    ] },
+    { id: 'nav', note: 'У стилі Windows панелі завжди на всю ширину.', icon: 'dock_to_bottom', t: 'Панелі', sub: 'Нижня панель і міні-плеєр', pv: ['mini', 'nav'], groups: [
+      { title: 'Нижня панель', items: [
+        { type: 'chips', k: 'nav', label: 'Форма', opts: [['float', 'Плаваюча'], ['flat', 'На всю ширину']] },
+        { type: 'switch', k: 'navLabels', label: 'Підписи під іконками' },
+      ] },
+      { title: 'Міні-плеєр', items: [
+        { type: 'chips', k: 'mini', label: 'Форма', opts: [['float', 'Плаваючий'], ['flat', 'На всю ширину']] },
+        { type: 'switch', k: 'miniProg', label: 'Лінія прогресу' },
+      ] },
+    ] },
+    { id: 'fx', note: 'У стилі Windows скляне розмиття вимкнено, а елементи гострі.', icon: 'auto_awesome', t: 'Ефекти', sub: 'Розмиття, анімації, форма елементів', pv: ['mini', 'nav'], groups: [
+      { title: 'Розмиття', items: [
+        { type: 'switch', k: 'blur', label: 'Скляне розмиття', sub: 'Напівпрозорі панелі з ефектом скла' },
+        { type: 'range', k: 'blurAmt', label: 'Сила розмиття панелей', min: 2, max: 40, step: 1, unit: 'px', showIf: c => c.blur },
+        { type: 'range', k: 'fpBlur', label: 'Розмиття фону плеєра', min: 0, max: 80, step: 2, unit: 'px', showIf: c => c.fpBg === 'cover' },
+      ] },
+      { title: 'Рух і форма', items: [
+        { type: 'switch', k: 'anim', label: 'Анімації', sub: 'Вимкніть для максимальної швидкості' },
+        { type: 'chips', k: 'round', label: 'Заокруглення елементів', opts: [['sharp', 'Гострі'], ['normal', 'Стандарт'], ['round', 'Дуже круглі']] },
+        { type: 'switch', k: 'shadow', label: 'Тіні' },
+      ] },
+    ] },
+    { id: 'text', icon: 'text_fields', t: 'Текст', sub: 'Шрифт і розмір', pv: ['track', 'mini'], groups: [
+      { title: 'Шрифт', items: [
+        { type: 'chips', k: 'font', label: 'Гарнітура', sub: 'Піксельний і Круглий завантажуються з інтернету', opts: [
+          ['default', 'Roboto'], ['system', 'Системний'], ['serif', 'З засічками'], ['mono', 'Моноширинний'], ['pixel', 'Піксельний'], ['rounded', 'Круглий']] },
+        { type: 'range', k: 'fontScale', label: 'Розмір тексту', min: 80, max: 130, step: 5, unit: '%' },
+      ] },
+    ] },
+    { id: 'tracks', icon: 'queue_music', t: 'Список треків', sub: 'Щільність, обкладинки, тривалість', pv: ['track', 'track'], groups: [
+      { title: 'Список', items: [
+        { type: 'chips', k: 'density', label: 'Щільність', opts: [['compact', 'Компактна'], ['normal', 'Стандартна'], ['comfy', 'Просторна']] },
+        { type: 'chips', k: 'listArt', label: 'Форма обкладинок', opts: [['round', 'Закруглена'], ['circle', 'Коло'], ['square', 'Квадрат']] },
+        { type: 'switch', k: 'showDur', label: 'Показувати тривалість' },
+      ] },
+    ] },
+  ];
+
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  let page = null;
+
+  function previewHTML(list) {
+    const art = typeof ART_PLACEHOLDER !== 'undefined' ? ART_PLACEHOLDER : '';
+    let h = '<div class="cust-preview-label">Попередній перегляд</div><div class="cust-preview">';
+    list.forEach(k => {
+      if (k === 'track' && typeof trackHTML === 'function') {
+        h += trackHTML({ id: '__pv' + Math.random(), title: 'Назва треку', artist: 'Виконавець', duration: 215, art }, true);
+      } else if (k === 'mini') {
+        h += `<div class="player-bar visible"><div class="progress-line" style="width:42%"></div><img class="player-art" src="${art}" alt=""><div class="player-info"><div class="player-title">Назва треку</div><div class="player-artist">Виконавець</div></div><div class="player-controls"><button class="icon-btn"><span class="material-icons-round">skip_previous</span></button><button class="icon-btn play-btn is-playing"><span class="material-icons-round">pause</span></button><button class="icon-btn"><span class="material-icons-round">skip_next</span></button></div></div>`;
+      } else if (k === 'nav') {
+        h += `<nav class="bottom-nav" style="--nav-idx:1"><span class="nav-indicator"></span>
+          <button class="nav-item"><span class="material-icons-round">library_music</span><span>Моя музика</span></button>
+          <button class="nav-item active"><span class="material-icons-round">search</span><span>Пошук</span></button>
+          <button class="nav-item"><span class="material-icons-round">settings</span><span>Налаштування</span></button>
+          <button class="nav-item"><span class="material-icons-round">account_circle</span><span>Акаунт</span></button></nav>`;
+      }
+    });
+    return h + '</div>';
+  }
+
+  function ctl(it) {
+    if (it.showIf && !it.showIf(cust)) return '';
+    switch (it.type) {
+      case 'chips':
+        return `<div class="cust-lab">${it.label}${it.sub ? `<small>${it.sub}</small>` : ''}</div><div class="opt-row">` +
+          it.opts.map(o => `<button class="chip ${String(cust[it.k]) === o[0] ? 'on' : ''}" data-k="${it.k}" data-v="${o[0]}">${o[2] ? `<span class="dot" style="background:${o[2]}"></span>` : ''}${o[1]}</button>`).join('') + '</div>';
+      case 'switch':
+        return `<div class="settings-item" data-sw="${it.k}"><div class="settings-item-left"><div><div class="settings-item-title">${it.label}</div>${it.sub ? `<div class="settings-item-sub">${it.sub}</div>` : ''}</div></div><div class="switch ${cust[it.k] ? 'on' : ''}"></div></div>`;
+      case 'range':
+        return `<div class="cust-range-row"><div class="top"><span>${it.label}</span><b id="rv_${it.k}">${cust[it.k]}${it.unit}</b></div><input class="cust-range" type="range" data-rg="${it.k}" data-unit="${it.unit}" min="${it.min}" max="${it.max}" step="${it.step}" value="${cust[it.k]}"></div>`;
+      case 'bgcolor':
+        return `<div class="cust-colorpick"><span>Оберіть будь-який колір — світлий дасть світлу тему, темний — темну</span><input class="cust-color" type="color" data-col="bg" value="${cust.bg}"></div>`;
+      case 'accent': {
+        const th = (typeof THEMES !== 'undefined') ? THEMES : [];
+        const cur = String(cust.accent || (th[0] && th[0].primary) || '').toLowerCase();
+        const isPreset = th.some(t => t.primary.toLowerCase() === cur);
+        return `<div class="cust-colors">` + th.map((t, i) => `<div class="theme-swatch ${t.primary.toLowerCase() === cur ? 'active' : ''}" style="background:${t.primary}" data-acc="${i}" title="${esc(t.name)}"></div>`).join('') +
+          `<label class="cust-colorbtn ${isPreset ? '' : 'active'}" title="Свій колір"><input type="color" data-col="accent" value="${/^#[0-9a-f]{6}$/.test(cur) ? cur : '#a8c7fa'}"></label></div>`;
+      }
+      case 'button':
+        return `<button class="cust-btn ${it.danger ? 'danger' : ''}" data-act="${it.act}">${it.label}</button>`;
+    }
+    return '';
+  }
+
+  function renderBody(keepScroll) {
+    const body = $('custBody'), top = body.scrollTop;
+    let h = '';
+    if (!page) {
+      $('custTitle').textContent = 'Персоналізація';
+      h += previewHTML(['track', 'mini', 'nav']);
+      h += '<div class="cust-sec">Стиль застосунку</div><div class="settings-group cust-group">' + ctl({ type: 'chips', k: 'uiStyle', label: 'Оформлення всієї програми', sub: 'Windows 95/98 змінює все: вікна, кнопки, списки, панель завдань і плеєр', opts: [['material', 'Material You'], ['win98', '🖥 Windows 98'], ['win95', '🖥 Windows 95']] }) + '</div>';
+      h += '<div class="settings-group cust-group" style="margin-top:16px">' + PAGES.map(p => `<div class="settings-item" data-open="${p.id}"><div class="settings-item-left"><span class="material-icons-round">${p.icon}</span><div><div class="settings-item-title">${p.t}</div><div class="settings-item-sub">${p.sub}</div></div></div><span class="material-icons-round">chevron_right</span></div>`).join('') + '</div>';
+      h += '<div class="settings-group cust-group"><button class="cust-btn danger" style="margin-top:16px" data-act="reset">Скинути все до стандартного</button></div>';
+    } else {
+      const p = PAGES.find(x => x.id === page);
+      $('custTitle').textContent = p.t;
+      h += previewHTML(p.pv);
+      if (p.note && cust.uiStyle !== 'material') h += `<div class="cust-note">${p.note}</div>`;
+      p.groups.forEach(g => {
+        const inner = g.items.map(ctl).join('');
+        if (inner) h += `<div class="cust-sec">${g.title}</div><div class="settings-group cust-group">${inner}</div>`;
+      });
+    }
+    body.innerHTML = h;
+    body.scrollTop = keepScroll ? top : 0;
+  }
+
+  function set(k, v, rerender) {
+    cust[k] = v; save(); apply();
+    if (rerender !== false) renderBody(true);
+  }
+
+  function previewFull() {
+    const fp = $('fullPlayer');
+    if (typeof currentTrack === 'undefined' || !currentTrack) {
+      $('fpTitle').textContent = 'Назва треку'; $('fpArtist').textContent = 'Виконавець';
+      $('fpArt').src = ART_PLACEHOLDER; $('fpArt').classList.add('playing');
+      $('fpBg').style.backgroundImage = `url("${ART_PLACEHOLDER}")`;
+      $('fpDuration').textContent = '3:35'; $('fpCurrent').textContent = '1:12'; $('fpSeek').value = 33;
+      window._custPreview = true;
+    }
+    fp.classList.add('open');
+  }
+
+  function open() { page = null; renderBody(); $('custPage').classList.add('open'); }
+  function close() { $('custPage').classList.remove('open'); }
+  function back() { if (page) { page = null; renderBody(); } else close(); }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const openBtn = $('custOpenItem'); if (openBtn) openBtn.addEventListener('click', open);
+    $('custBack').addEventListener('click', back);
+    $('custClose').addEventListener('click', close);
+    const closeFp = $('closeFullPlayer');
+    if (closeFp) closeFp.addEventListener('click', () => { if (window._custPreview) { window._custPreview = false; $('fpArt').classList.remove('playing'); } });
+    const body = $('custBody');
+    body.addEventListener('click', e => {
+      let t;
+      if ((t = e.target.closest('[data-open]'))) { page = t.dataset.open; renderBody(); return; }
+      if ((t = e.target.closest('.chip[data-k]'))) { set(t.dataset.k, t.dataset.v); return; }
+      if ((t = e.target.closest('[data-sw]'))) { set(t.dataset.sw, !cust[t.dataset.sw]); return; }
+      if ((t = e.target.closest('[data-acc]'))) { set('accent', THEMES[+t.dataset.acc].primary); try { localStorage.setItem('gmusic_theme', JSON.stringify(THEMES[+t.dataset.acc])); } catch (er) {} return; }
+      if ((t = e.target.closest('[data-act]'))) {
+        if (t.dataset.act === 'fullprev') previewFull();
+        else if (t.dataset.act === 'reset' && confirm('Скинути всі налаштування персоналізації?')) {
+          cust = Object.assign({}, DEF, { accent: THEMES[0].primary }); save();
+          try { localStorage.setItem('gmusic_theme', JSON.stringify(THEMES[0])); } catch (er) {}
+          apply(); renderBody(true);
+          if (typeof toast === 'function') toast('Налаштування скинуто');
+        }
+      }
+    });
+    body.addEventListener('input', e => {
+      const t = e.target;
+      if (t.dataset.rg) { const v = +t.value; cust[t.dataset.rg] = v; save(); apply(); const lab = $('rv_' + t.dataset.rg); if (lab) lab.textContent = v + t.dataset.unit; }
+      else if (t.dataset.col) {
+        if (t.dataset.col === 'bg') { cust.bg = t.value; cust.base = 'custom'; }
+        else cust.accent = t.value;
+        save(); apply();
+      }
+    });
+    body.addEventListener('change', e => { if (e.target.dataset.col) renderBody(true); });
+    apply();
+  });
+})();
+</script>
 </body>
 </html>
