@@ -1847,6 +1847,197 @@
     html[data-ui^="win"] ::-webkit-scrollbar-thumb { background: #c0c0c0; box-shadow: var(--w-out); }
     .cust-note { margin: 6px 0 10px; padding: 10px 14px; font-size: .85rem; line-height: 1.4; background: var(--md-sys-color-surface-container-high); color: var(--md-sys-color-on-surface); border-left: 4px solid var(--md-sys-color-primary); }
 
+
+    /* ===================== ПОВНІ СТИЛІ ЗАСТОСУНКУ: NEON / GLASS / PAPER / TERMINAL / MAC / BRUTAL ===================== */
+
+    /* ---------- NEON (кіберпанк) ---------- */
+    html[data-ui="neon"] .app { background: radial-gradient(900px 520px at 90% -8%, rgba(255,43,214,.24), transparent 60%), radial-gradient(800px 520px at -10% 108%, rgba(0,229,255,.2), transparent 60%), #0b0614; }
+    html[data-ui="neon"] :is(.settings-group,.rec-card,.playlist-card,.search-bar,.modal,.filter-toggle,.chip,.player-bar,.bottom-nav,.fab-option,.cust-preview,.eq-panel,.btn-outline,.lyr-bar) { border: 1px solid rgba(255,43,214,.5); box-shadow: 0 0 14px rgba(255,43,214,.22), inset 0 0 14px rgba(255,43,214,.06); }
+    html[data-ui="neon"] :is(.chip.on,.eq-preset.active) { border-color: #00e5ff; color: #8ff3ff; box-shadow: 0 0 12px rgba(0,229,255,.55); }
+    html[data-ui="neon"] .nav-indicator { background: rgba(0,229,255,.14); border: 1px solid #00e5ff; box-shadow: 0 0 14px rgba(0,229,255,.55); }
+    html[data-ui="neon"] .nav-item.active { color: #8ff3ff; }
+    html[data-ui="neon"] :is(.section-header h2,.logo,.fp-title,.cust-top h2) { text-shadow: 0 0 12px rgba(255,43,214,.85); letter-spacing: .04em; }
+    html[data-ui="neon"] .section-header h2 { text-transform: uppercase; }
+    html[data-ui="neon"] .track-item.playing { background: rgba(255,43,214,.13); box-shadow: inset 3px 0 0 #ff2bd6; }
+    html[data-ui="neon"] .progress-line { background: linear-gradient(90deg, #ff2bd6, #00e5ff); box-shadow: 0 0 10px #ff2bd6; }
+    html[data-ui="neon"] .switch.on { background: #ff2bd6; box-shadow: 0 0 12px #ff2bd6; }
+    html[data-ui="neon"] .logo-icon { background: linear-gradient(135deg, #ff2bd6, #00e5ff); box-shadow: 0 0 18px rgba(255,43,214,.7); color: #0b0614; }
+    html[data-ui="neon"] .fp-art { box-shadow: 0 0 46px rgba(255,43,214,.55), 0 0 90px rgba(0,229,255,.25); }
+    html[data-ui="neon"] .cust-page, html[data-ui="neon"] .lyr-view { background: #0b0614; }
+
+    /* ---------- GLASS (матове скло) ---------- */
+    html[data-ui="glass"] .app { background: radial-gradient(720px 520px at 8% 0, #7b5cff 0, transparent 62%), radial-gradient(760px 620px at 100% 100%, #00b4d8 0, transparent 58%), radial-gradient(500px 400px at 60% 40%, rgba(255,92,180,.45), transparent 70%), linear-gradient(160deg, #1b1740, #0e2a5c); }
+    html[data-ui="glass"] :is(.settings-group,.rec-card,.playlist-card,.search-bar,.filter-toggle,.chip,.player-bar,.bottom-nav,.fab-option,.eq-panel,.cust-preview,.sidebar,.track-list,.btn-outline) {
+      backdrop-filter: blur(26px) saturate(165%) !important; -webkit-backdrop-filter: blur(26px) saturate(165%) !important;
+      border: 1px solid rgba(255,255,255,.24); box-shadow: 0 8px 32px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.18); }
+    html[data-ui="glass"] :is(.modal,.more-menu,.fp-eq-sheet) { background: rgba(32,30,86,.78) !important; backdrop-filter: blur(30px) saturate(160%) !important; -webkit-backdrop-filter: blur(30px) saturate(160%) !important; border: 1px solid rgba(255,255,255,.26); }
+    html[data-ui="glass"] :is(.settings-group,.rec-card,.playlist-card,.modal,.player-bar,.bottom-nav,.search-bar,.track-list) { border-radius: 24px; }
+    html[data-ui="glass"] .track-list { padding: 6px; }
+    html[data-ui="glass"] .track-item.playing { background: rgba(255,255,255,.18); }
+    html[data-ui="glass"] .nav-indicator { background: rgba(255,255,255,.22); }
+    html[data-ui="glass"] .cust-page, html[data-ui="glass"] .lyr-view { background: linear-gradient(160deg, #1b1740, #0e2a5c); }
+    html[data-ui="glass"] .logo-icon { background: rgba(255,255,255,.2); box-shadow: inset 0 1px 0 rgba(255,255,255,.4); color: #fff; }
+
+    /* ---------- PAPER (папір) ---------- */
+    html[data-ui="paper"] .app { background: #f5eedc repeating-linear-gradient(0deg, rgba(120,90,40,.035) 0 1px, transparent 1px 4px); }
+    html[data-ui="paper"] .header { border-bottom: 3px double #cdbf9d; background: #f5eedc; }
+    html[data-ui="paper"] :is(.settings-group,.rec-card,.playlist-card,.search-bar,.modal,.filter-toggle,.chip,.player-bar,.bottom-nav,.fab-option,.eq-panel,.track-list,.btn-outline) { border: 1px solid #cdbf9d; box-shadow: 2px 3px 0 rgba(120,90,40,.14); }
+    html[data-ui="paper"] .track-art, html[data-ui="paper"] .rec-art { filter: sepia(.28) saturate(.9); }
+    html[data-ui="paper"] .section-header h2 { font-style: italic; font-weight: 600; }
+    html[data-ui="paper"] .logo { font-style: italic; }
+    html[data-ui="paper"] .logo-icon { background: #b5532f; color: #fff; box-shadow: none; }
+    html[data-ui="paper"] .track-item.playing { background: rgba(181,83,47,.14); }
+    html[data-ui="paper"] .cust-page, html[data-ui="paper"] .lyr-view { background: #f5eedc; }
+
+    /* ---------- TERMINAL (зелений фосфор) ---------- */
+    html[data-ui="terminal"] *, html[data-ui="terminal"] *::before, html[data-ui="terminal"] *::after { border-radius: 0 !important; box-shadow: none; }
+    html[data-ui="terminal"] body, html[data-ui="terminal"] .app { background: #000; }
+    html[data-ui="terminal"] .app { background-image: none; }
+    html[data-ui="terminal"] body::after { content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 999; background: repeating-linear-gradient(transparent 0 2px, rgba(51,255,102,.045) 2px 3px); }
+    html[data-ui="terminal"] :is(.settings-group,.rec-card,.playlist-card,.search-bar,.modal,.filter-toggle,.chip,.player-bar,.bottom-nav,.fab-option,.eq-panel,.track-list,.btn-outline,.btn-filled,.cust-btn,.field-input,.cust-preview,.lyr-bar) { border: 1px solid #1f8f3a; background-color: #000; }
+    html[data-ui="terminal"] :is(.settings-group,.rec-card,.playlist-card,.player-bar,.bottom-nav) { background: #000 !important; }
+    html[data-ui="terminal"] body, html[data-ui="terminal"] button, html[data-ui="terminal"] input { text-shadow: 0 0 5px rgba(51,255,102,.45); }
+    html[data-ui="terminal"] .logo span::before { content: '> '; }
+    html[data-ui="terminal"] .logo-icon { background: none; box-shadow: none; color: #33ff66; }
+    html[data-ui="terminal"] .header { border-bottom: 1px solid #1f8f3a; }
+    html[data-ui="terminal"] .section-header h2::before { content: '# '; opacity: .7; }
+    html[data-ui="terminal"] .track-item.playing, html[data-ui="terminal"] .chip.on, html[data-ui="terminal"] .nav-item.active { background: #33ff66; color: #000; text-shadow: none; }
+    html[data-ui="terminal"] .track-item.playing :is(.track-title,.track-artist,.track-duration,.save-btn,.more-btn,.material-icons-round) { color: #000; }
+    html[data-ui="terminal"] .nav-item.active .material-icons-round, html[data-ui="terminal"] .nav-item.active span { color: #000; }
+    html[data-ui="terminal"] .nav-indicator { display: none; }
+    html[data-ui="terminal"] .progress-line { background: #33ff66; }
+    html[data-ui="terminal"] .switch { border: 1px solid #33ff66; background: #000; }
+    html[data-ui="terminal"] .switch.on { background: #33ff66; }
+    html[data-ui="terminal"] .switch::after { background: #33ff66; }
+    html[data-ui="terminal"] .switch.on::after { background: #000; }
+    html[data-ui="terminal"] .cust-page, html[data-ui="terminal"] .lyr-view { background: #000; }
+
+    /* ---------- MAC (класичний Mac OS) ---------- */
+    html[data-ui="mac"] body, html[data-ui="mac"] .app { background: #fff; }
+    html[data-ui="mac"] .app { background-image: none; }
+    html[data-ui="mac"] .header { background: repeating-linear-gradient(#fff 0 2px, #000 2px 3px); border-bottom: 2px solid #000; height: 34px; justify-content: center; }
+    html[data-ui="mac"] .header > div[style] { display: none; }
+    html[data-ui="mac"] .logo { background: #fff; padding: 0 12px; font-size: .95rem; font-weight: 700; gap: 6px; letter-spacing: 0; }
+    html[data-ui="mac"] .logo-icon { width: 16px; height: 16px; background: none; box-shadow: none; color: #000; font-size: 15px; }
+    html[data-ui="mac"] .logo-icon .material-icons-round { font-size: 15px; }
+    html[data-ui="mac"] :is(.settings-group,.rec-card,.playlist-card,.search-bar,.modal,.player-bar,.bottom-nav,.eq-panel,.track-list,.cust-preview,.more-menu) { border: 2px solid #000; border-radius: 0 !important; box-shadow: 3px 3px 0 #000; background: #fff !important; }
+    html[data-ui="mac"] :is(.filter-toggle,.chip,.fab-option,.btn-outline,.btn-filled,.cust-btn,.modal-actions button) { border: 2px solid #000; border-radius: 9px !important; box-shadow: 1px 1px 0 #000; background: #fff; color: #000; }
+    html[data-ui="mac"] :is(.chip.on,.eq-preset.active,.nav-item.active,.track-item.playing) { background: #000 !important; color: #fff; }
+    html[data-ui="mac"] .track-item.playing :is(.track-title,.track-artist,.track-duration,.save-btn,.more-btn,.material-icons-round) { color: #fff; }
+    html[data-ui="mac"] .nav-indicator { display: none; }
+    html[data-ui="mac"] .nav-item.active :is(.material-icons-round,span) { color: #fff; }
+    html[data-ui="mac"] .progress-line { background: repeating-linear-gradient(90deg, #000 0 2px, #fff 2px 3px); }
+    html[data-ui="mac"] .modal-title { background: repeating-linear-gradient(#fff 0 2px, #000 2px 3px); text-align: center; padding: 4px 0; margin: -2px -2px 12px; }
+    html[data-ui="mac"] .switch { border: 2px solid #000; background: #fff; }
+    html[data-ui="mac"] .switch::after { background: #000; }
+    html[data-ui="mac"] .switch.on { background: #000; }
+    html[data-ui="mac"] .switch.on::after { background: #fff; }
+    html[data-ui="mac"] .cust-page, html[data-ui="mac"] .lyr-view { background: #fff; }
+    html[data-ui="mac"] .track-art { border: 1px solid #000; }
+
+    /* ---------- BRUTAL (необруталізм) ---------- */
+    html[data-ui="brutal"] body, html[data-ui="brutal"] .app { background: #fff6d6; }
+    html[data-ui="brutal"] .app { background-image: none; }
+    html[data-ui="brutal"] .header { background: #ffe14d; border-bottom: 3px solid #000; }
+    html[data-ui="brutal"] .logo-icon { background: #ff4d6d; color: #000; border: 2px solid #000; box-shadow: 2px 2px 0 #000; border-radius: 8px; }
+    html[data-ui="brutal"] :is(.settings-group,.rec-card,.playlist-card,.search-bar,.modal,.filter-toggle,.chip,.player-bar,.bottom-nav,.fab-option,.eq-panel,.track-list,.btn-outline,.btn-filled,.cust-btn,.cust-preview,.more-menu,.field-input) { border: 3px solid #000; box-shadow: 4px 4px 0 #000; border-radius: 12px; background-color: #fff; color: #000; }
+    html[data-ui="brutal"] :is(.player-bar,.bottom-nav) { background: #fff !important; }
+    html[data-ui="brutal"] :is(.filter-toggle,.chip,.fab-option,.btn-outline,.btn-filled,.cust-btn):active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 #000; }
+    html[data-ui="brutal"] .chip.on, html[data-ui="brutal"] .eq-preset.active { background: #ff9ec4; }
+    html[data-ui="brutal"] .nav-indicator { background: #ffe14d; border: 2px solid #000; }
+    html[data-ui="brutal"] .nav-item.active :is(.material-icons-round,span) { color: #000; }
+    html[data-ui="brutal"] .track-item { border-bottom: 2px solid #000; }
+    html[data-ui="brutal"] .track-item.playing { background: #ffe14d; }
+    html[data-ui="brutal"] .track-art, html[data-ui="brutal"] .rec-art { border: 2px solid #000; }
+    html[data-ui="brutal"] .section-header h2 { font-weight: 700; text-transform: uppercase; letter-spacing: .02em; }
+    html[data-ui="brutal"] .progress-line { background: #ff4d6d; height: 5px; border-top: 2px solid #000; }
+    html[data-ui="brutal"] .switch { border: 2px solid #000; background: #fff; }
+    html[data-ui="brutal"] .switch.on { background: #7ae582; }
+    html[data-ui="brutal"] .cust-page, html[data-ui="brutal"] .lyr-view { background: #fff6d6; }
+
+    /* ===================== ТЕКСТ ПІСНІ / КАРАОКЕ ===================== */
+    .fp-art { cursor: pointer; }
+    .lyr-view {
+      --ly-fs: 1.45rem;
+      --ly-off: color-mix(in srgb, var(--md-sys-color-on-surface) 58%, transparent);
+      --ly-past: color-mix(in srgb, var(--md-sys-color-on-surface) 30%, transparent);
+      position: fixed; inset: 0; z-index: 110; display: flex; flex-direction: column;
+      background: color-mix(in srgb, var(--md-sys-color-surface) 90%, transparent);
+      -webkit-backdrop-filter: var(--blur-strong); backdrop-filter: var(--blur-strong);
+      color: var(--md-sys-color-on-surface);
+      transform: translateY(100%); visibility: hidden;
+      transition: transform .4s cubic-bezier(.32,.72,0,1), visibility 0s linear .4s;
+    }
+    .lyr-view.open { transform: none; visibility: visible; transition-delay: 0s; }
+    .lyr-art-bg { position: absolute; inset: 0; z-index: -1; background-size: cover; background-position: center; filter: blur(50px) brightness(.4) saturate(1.3); transform: scale(1.3); opacity: .75; }
+    html[data-scheme="light"] .lyr-art-bg { filter: blur(50px) brightness(1.3) saturate(.8); opacity: .4; }
+    .lyr-top { display: flex; align-items: center; gap: 4px; padding: calc(8px + env(safe-area-inset-top, 0px)) 8px 6px; max-width: 720px; width: 100%; margin: 0 auto; }
+    .lyr-meta { flex: 1; min-width: 0; }
+    .lyr-t { font-weight: 600; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .lyr-a { font-size: .82rem; color: var(--md-sys-color-on-surface-variant); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .lyr-menu { position: absolute; top: calc(56px + env(safe-area-inset-top, 0px)); right: 10px; z-index: 5; min-width: 250px; padding: 8px; border-radius: 18px;
+      background: var(--md-sys-color-surface-container-highest); box-shadow: 0 12px 36px rgba(0,0,0,.45); display: none; flex-direction: column; gap: 2px; }
+    .lyr-menu.open { display: flex; }
+    .lyr-menu button { display: flex; align-items: center; gap: 12px; padding: 12px 12px; border: 0; background: transparent; color: var(--md-sys-color-on-surface); font: inherit; font-size: .92rem; border-radius: 12px; cursor: pointer; text-align: left; }
+    .lyr-menu button:active { background: rgba(128,128,128,.2); }
+    .lyr-menu .lyr-off { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 8px 8px 12px; font-size: .9rem; }
+    .lyr-menu .lyr-off div { display: flex; align-items: center; gap: 6px; }
+    .lyr-menu .lyr-off button { padding: 6px 10px; border: 1px solid var(--md-sys-color-outline-variant); }
+    .lyr-menu .lyr-off b { min-width: 52px; text-align: center; font-weight: 500; }
+    .lyr-body { flex: 1; overflow-y: auto; overflow-x: hidden; position: relative; max-width: 720px; width: 100%; margin: 0 auto; padding: 8px 0; overscroll-behavior: contain;
+      -webkit-mask-image: linear-gradient(transparent 0, #000 7%, #000 90%, transparent 100%); mask-image: linear-gradient(transparent 0, #000 7%, #000 90%, transparent 100%); scrollbar-width: none; }
+    .lyr-body::-webkit-scrollbar { display: none; }
+    .lyr-spacer { height: 34vh; }
+    .ly-line { font-size: var(--ly-fs); font-weight: 700; line-height: 1.28; padding: 8px 22px; color: var(--ly-off); cursor: pointer; transform-origin: left center; transition: transform .4s cubic-bezier(.2,.8,.2,1), color .35s; -webkit-tap-highlight-color: transparent; }
+    .ly-line.past { color: var(--ly-past); }
+    .ly-line.on { color: var(--md-sys-color-on-surface); transform: scale(1.04); }
+    .ly-line.on .ly-w { background: linear-gradient(90deg, var(--md-sys-color-primary) var(--w, 0%), var(--md-sys-color-on-surface) var(--w, 0%)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: none; }
+    .ly-dots { display: flex; gap: 10px; padding: 14px 22px; cursor: default; }
+    .ly-d { width: 13px; height: 13px; border-radius: 50%; background: var(--ly-past); transition: background .25s, transform .25s; }
+    .ly-d.on { background: var(--md-sys-color-primary); transform: scale(1.3); }
+    .ly-plain { white-space: pre-wrap; font-size: calc(var(--ly-fs) * .78); line-height: 1.65; font-weight: 500; padding: 8px 22px; }
+    .ly-note { font-size: .8rem; color: var(--md-sys-color-on-surface-variant); padding: 4px 22px 10px; }
+    .ly-state { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; padding: 40px 28px; min-height: 50%; color: var(--md-sys-color-on-surface-variant); }
+    .ly-state .material-icons-round { font-size: 52px; opacity: .7; }
+    .ly-state b { color: var(--md-sys-color-on-surface); font-size: 1.15rem; font-weight: 600; }
+    .ly-btns { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 6px; }
+    .ly-btn { padding: 11px 18px; border-radius: 22px; border: 1px solid var(--md-sys-color-outline); background: transparent; color: var(--md-sys-color-primary); font: inherit; font-weight: 500; cursor: pointer; }
+    .ly-btn.fill { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); border-color: transparent; }
+    .ly-btn:active { transform: scale(.96); }
+    .ly-spin { width: 34px; height: 34px; border-radius: 50%; border: 3px solid var(--ly-past); border-top-color: var(--md-sys-color-primary); animation: lyrSpin .8s linear infinite; }
+    @keyframes lyrSpin { to { transform: rotate(360deg); } }
+    .ly-form { display: flex; flex-direction: column; gap: 10px; padding: 14px 22px; }
+    .ly-form label { font-size: .8rem; color: var(--md-sys-color-on-surface-variant); }
+    .ly-form input, .ly-form textarea { width: 100%; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--md-sys-color-outline); background: var(--md-sys-color-surface-container); color: var(--md-sys-color-on-surface); font: inherit; resize: vertical; }
+    .ly-form textarea { min-height: 38vh; font-size: .95rem; }
+    .lyr-bar { display: flex; flex-direction: column; gap: 4px; padding: 6px 18px calc(10px + var(--safe-bottom)); max-width: 720px; width: 100%; margin: 0 auto; }
+    .lyr-seek { display: flex; align-items: center; gap: 10px; font-size: .75rem; color: var(--md-sys-color-on-surface-variant); }
+    .lyr-seek input { flex: 1; height: 4px; -webkit-appearance: none; appearance: none; border-radius: 2px; background: var(--md-sys-color-outline-variant); outline: none; }
+    .lyr-seek input::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--md-sys-color-primary); }
+    .lyr-seek input::-moz-range-thumb { width: 14px; height: 14px; border: 0; border-radius: 50%; background: var(--md-sys-color-primary); }
+    .lyr-ctl { display: flex; justify-content: center; align-items: center; gap: 18px; }
+    .lyr-ctl .icon-btn { width: 48px; height: 48px; }
+    .lyr-ctl .lyr-play { width: 60px; height: 60px; background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
+    .lyr-ctl .lyr-play .material-icons-round { font-size: 32px; }
+    /* Windows */
+    html[data-player^="win"] .lyr-view { background: #c0c0c0; backdrop-filter: none; -webkit-backdrop-filter: none; font-family: Tahoma, "MS Sans Serif", Verdana, sans-serif; }
+    html[data-player^="win"] .lyr-art-bg { display: none; }
+    html[data-player^="win"] .lyr-top { background: var(--w-title); color: var(--w-title-fg); margin: 3px; width: calc(100% - 6px); max-width: none; padding: 3px 3px 3px 8px; }
+    html[data-player^="win"] .lyr-a { color: var(--w-title-fg); opacity: .85; }
+    html[data-player^="win"] .lyr-top .icon-btn { width: 24px; height: 22px; background: #c0c0c0; color: #000; box-shadow: var(--w-out) !important; border-radius: 0 !important; }
+    html[data-player^="win"] .lyr-top .icon-btn .material-icons-round { font-size: 15px; color: #000; }
+    html[data-player^="win"] .lyr-body { background: #fff; box-shadow: var(--w-in) !important; margin: 4px 8px; width: calc(100% - 16px); -webkit-mask-image: none; mask-image: none; }
+    html[data-player^="win"] .ly-line { color: #666; }
+    html[data-player^="win"] .ly-line.past { color: #999; }
+    html[data-player^="win"] .ly-line.on { color: #000; transform: none; }
+    html[data-player^="win"] .ly-line.on .ly-w { background: linear-gradient(90deg, var(--w-hi, #000080) var(--w, 0%), #000 var(--w, 0%)); -webkit-background-clip: text; background-clip: text; }
+    html[data-player^="win"] .lyr-ctl .icon-btn { background: #c0c0c0; color: #000; box-shadow: var(--w-out) !important; border-radius: 0 !important; }
+    html[data-player^="win"] .lyr-ctl .icon-btn .material-icons-round { color: #000; }
+    html[data-player^="win"] .lyr-menu { background: #c0c0c0; color: #000; box-shadow: var(--w-out); border-radius: 0; }
+    html[data-player^="win"] .lyr-menu button { color: #000; border-radius: 0; }
+    html[data-player^="win"] .ly-btn { background: #c0c0c0; color: #000; box-shadow: var(--w-out); border: 0; border-radius: 0; }
+    html[data-player^="win"] .ly-spin { border-color: #999; border-top-color: #000080; }
+    html[data-player^="win"] .lyr-seek { color: #000; }
     /* ===================== СТОРІНКА ПЕРСОНАЛІЗАЦІЇ ===================== */
     .cust-page { position: fixed; inset: 0; z-index: 90; background: var(--md-sys-color-surface); display: flex; flex-direction: column;
       transform: translateX(100%); visibility: hidden; transition: transform .35s cubic-bezier(.4,0,.2,1), visibility 0s linear .35s; }
@@ -2212,6 +2403,27 @@
     </nav>
   </div>
 
+  <!-- ТЕКСТ ПІСНІ / КАРАОКЕ -->
+  <div class="lyr-view" id="lyrView">
+    <div class="lyr-art-bg" id="lyrBg"></div>
+    <div class="lyr-top">
+      <button class="icon-btn" id="lyrClose" aria-label="Закрити"><span class="material-icons-round">keyboard_arrow_down</span></button>
+      <div class="lyr-meta"><div class="lyr-t" id="lyrTitle">—</div><div class="lyr-a" id="lyrArtist"></div></div>
+      <button class="icon-btn" id="lyrFs" aria-label="Розмір тексту"><span class="material-icons-round">format_size</span></button>
+      <button class="icon-btn" id="lyrMenuBtn" aria-label="Ще"><span class="material-icons-round">more_vert</span></button>
+    </div>
+    <div class="lyr-menu" id="lyrMenu"></div>
+    <div class="lyr-body" id="lyrBody"></div>
+    <div class="lyr-bar">
+      <div class="lyr-seek"><span id="lyrCur">0:00</span><input type="range" id="lyrSeek" min="0" max="100" step="0.1" value="0"><span id="lyrDur">0:00</span></div>
+      <div class="lyr-ctl">
+        <button class="icon-btn" id="lyrPrev" aria-label="Попередній"><span class="material-icons-round">skip_previous</span></button>
+        <button class="icon-btn lyr-play" id="lyrPlay" aria-label="Відтворити"><span class="material-icons-round">play_arrow</span></button>
+        <button class="icon-btn" id="lyrNext" aria-label="Наступний"><span class="material-icons-round">skip_next</span></button>
+      </div>
+    </div>
+  </div>
+
   <!-- ПЕРСОНАЛІЗАЦІЯ -->
   <div class="cust-page" id="custPage">
     <div class="cust-top">
@@ -2298,6 +2510,7 @@
       <div class="fp-extra">
         <button class="icon-btn fp-tonal" id="fpSave"><span class="material-icons-round">favorite_border</span></button>
         <button class="icon-btn fp-tonal" id="fpEq"><span class="material-icons-round">equalizer</span></button>
+        <button class="icon-btn fp-tonal" id="fpLyrics" aria-label="Текст пісні"><span class="material-icons-round">lyrics</span></button>
         <button class="icon-btn fp-tonal" id="fpQueue"><span class="material-icons-round">queue_music</span></button>
       </div>
     </div>
@@ -3421,6 +3634,7 @@
       document.getElementById('tmArtist').textContent = t.artist;
       const items = [];
       items.push({ icon: 'play_arrow', text: 'Відтворити', fn: () => { playTrack(t); openFullPlayer(); } });
+      items.push({ icon: 'lyrics', text: 'Текст пісні / караоке', fn: () => window.gmLyrics && window.gmLyrics.open(t) });
       items.push({ icon: 'playlist_add', text: 'Додати до плейлиста', fn: () => openAddToPlaylist(id) });
       if (currentPlaylistId && inLib) {
         items.push({ icon: 'remove_circle_outline', text: 'Прибрати з цього плейлиста', fn: () => animateRemove(id, () => removeFromCurrentPlaylist(id)) });
@@ -4950,7 +5164,7 @@
   'use strict';
   const KEY = 'gmusic_custom';
   const DEF = {
-    uiStyle: 'material', base: 'dark', bg: '#1b2a4a', accent: null,
+    uiStyle: 'material', accentOver: {}, base: 'dark', bg: '#1b2a4a', accent: null,
     playerStyle: 'material', artShape: 'round', fpBg: 'cover', glow: false, spin: true, winTitle: 'classic',
     nav: 'float', navLabels: true, mini: 'float', miniProg: true,
     blur: true, blurAmt: 24, fpBlur: 40, anim: true, round: 'normal', shadow: true,
@@ -4959,6 +5173,7 @@
   };
   let cust = Object.assign({}, DEF);
   try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s && typeof s === 'object') Object.assign(cust, s); } catch (e) {}
+  if (!cust.accentOver || typeof cust.accentOver !== 'object') cust.accentOver = {};
   if (!cust.accent) {
     try { const t = JSON.parse(localStorage.getItem('gmusic_theme') || 'null'); if (t && t.primary) cust.accent = t.primary; } catch (e) {}
   }
@@ -5014,7 +5229,7 @@
 
   function applyPalette(root) {
     PAL_VARS.forEach(v => root.style.removeProperty(v));
-    if (cust.uiStyle !== 'material') {
+    if (cust.uiStyle.startsWith('win')) {
       const W = { 'surface': '#c0c0c0', 'surface-dim': '#c0c0c0', 'surface-bright': '#dfdfdf', 'surface-container-lowest': '#ffffff', 'surface-container-low': '#c0c0c0',
         'surface-container': '#c0c0c0', 'surface-container-high': '#c0c0c0', 'surface-container-highest': '#dfdfdf', 'on-surface': '#000000', 'on-surface-variant': '#404040',
         'outline': '#808080', 'outline-variant': '#808080', 'secondary': '#404040', 'on-secondary': '#ffffff', 'secondary-container': '#000080', 'on-secondary-container': '#ffffff',
@@ -5023,6 +5238,13 @@
       root.style.setProperty('--glass', '#c0c0c0');
       root.dataset.pal = '1'; root.dataset.scheme = 'light';
       return 'light';
+    }
+    const sty = STYLES[cust.uiStyle];
+    if (sty) {
+      Object.keys(sty.pal).forEach(k => root.style.setProperty('--md-sys-color-' + k, sty.pal[k]));
+      root.style.setProperty('--blur-bg', sty.bb); root.style.setProperty('--glass', sty.glass);
+      root.dataset.pal = '1'; root.dataset.scheme = sty.light ? 'light' : 'dark';
+      return root.dataset.scheme;
     }
     let p = null;
     if (cust.base === 'custom') { const [h, s, l] = hexToHsl(cust.bg); p = { h, s, l }; }
@@ -5063,7 +5285,13 @@
   }
 
   function applyAccent(root, scheme) {
-    const hex = String(cust.accent || (typeof THEMES !== 'undefined' ? THEMES[0].primary : '#a8c7fa')).toLowerCase();
+    const sty = STYLES[cust.uiStyle], over = sty && cust.accentOver[cust.uiStyle];
+    if (sty && !over) {
+      const st = root.style; st.setProperty('--md-sys-color-primary', sty.acc[0]); st.setProperty('--md-sys-color-on-primary', sty.acc[1]);
+      st.setProperty('--md-sys-color-primary-container', sty.acc[2]); st.setProperty('--md-sys-color-on-primary-container', sty.acc[3]);
+      return;
+    }
+    const hex = String(over || cust.accent || (typeof THEMES !== 'undefined' ? THEMES[0].primary : '#a8c7fa')).toLowerCase();
     const [h, s, l] = hexToHsl(hex);
     const sat = Math.min(s, 75);
     let P, onP, C, onC;
@@ -5080,6 +5308,30 @@
     st.setProperty('--md-sys-color-primary-container', C); st.setProperty('--md-sys-color-on-primary-container', onC);
   }
 
+
+  /* ---------- повні стилі застосунку ---------- */
+  const mk = (a) => { const k = ['surface','surface-dim','surface-bright','surface-container-lowest','surface-container-low','surface-container','surface-container-high','surface-container-highest','on-surface','on-surface-variant','outline','outline-variant','secondary','on-secondary','secondary-container','on-secondary-container','error','on-error']; const o = {}; k.forEach((n, i) => o[n] = a[i]); return o; };
+  const STYLES = {
+    neon: { n: 'Neon', light: false, font: 'exo',
+      pal: mk(['#0b0614','#0b0614','#1c0f33','#07030f','#100820','#150a28','#1d1037','#281a4a','#f3e8ff','#b9a6e0','#7b4bd6','#3a2166','#00e5ff','#00262b','#2a1450','#8ff3ff','#ff5c7a','#2a0010']),
+      bb: 'rgba(11,6,20,.78)', glass: 'rgba(21,10,40,.88)', acc: ['#ff2bd6', '#1a0016', '#4a0a45', '#ffd1f7'] },
+    glass: { n: 'Glass', light: false, blur: true,
+      pal: mk(['#14123a','#14123a','rgba(255,255,255,.2)','rgba(255,255,255,.04)','rgba(255,255,255,.07)','rgba(255,255,255,.10)','rgba(255,255,255,.15)','rgba(255,255,255,.22)','#ffffff','rgba(255,255,255,.74)','rgba(255,255,255,.42)','rgba(255,255,255,.2)','#dcd6ff','#14123a','rgba(255,255,255,.24)','#ffffff','#ffb4ab','#690005']),
+      bb: 'rgba(255,255,255,.08)', glass: 'rgba(255,255,255,.14)', acc: ['#9ec1ff', '#0b1330', '#3d4fa0', '#e3e9ff'] },
+    paper: { n: 'Paper', light: true, blur: false, font: 'lora', shadow: false,
+      pal: mk(['#f5eedc','#ece3cb','#fffaf0','#fffaf0','#f0e8d2','#ebe1c8','#e4d8bb','#ddcfae','#3b2f22','#6b5a46','#9c8767','#cdbf9d','#6b5a46','#ffffff','#e0cfa6','#3b2f22','#a4271d','#ffffff']),
+      bb: 'rgba(245,238,220,.92)', glass: 'rgba(245,238,220,.96)', acc: ['#b5532f', '#ffffff', '#f3d3c4', '#4a1d0c'] },
+    terminal: { n: 'Terminal', light: false, blur: false, font: 'plex', round: 'sharp', shadow: false,
+      pal: mk(['#000000','#000000','#0c1a0f','#000000','#050a05','#08120a','#0c1a0f','#112417','#33ff66','#1fbf4a','#1f8f3a','#124d20','#1fbf4a','#000000','#33ff66','#000000','#ff5555','#000000']),
+      bb: '#000', glass: '#000', acc: ['#33ff66', '#000000', '#0f3d1b', '#7dffa0'] },
+    mac: { n: 'Classic Mac', light: true, blur: false, font: 'geneva', shadow: false,
+      pal: mk(['#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#f0f0f0','#dddddd','#000000','#333333','#000000','#000000','#000000','#ffffff','#000000','#ffffff','#000000','#ffffff']),
+      bb: '#ffffff', glass: '#ffffff', acc: ['#000000', '#ffffff', '#000000', '#ffffff'] },
+    brutal: { n: 'Brutalism', light: true, blur: false, font: 'rubik', shadow: false,
+      pal: mk(['#fff6d6','#fff6d6','#ffffff','#ffffff','#ffffff','#ffffff','#ffe9a3','#ffd6e8','#000000','#222222','#000000','#000000','#000000','#ffffff','#ff9ec4','#000000','#d00032','#ffffff']),
+      bb: '#ffe14d', glass: '#ffffff', acc: ['#ff4d6d', '#000000', '#ffc2cf', '#000000'] },
+  };
+
   /* ---------- шрифти ---------- */
   const FONTS = {
     default: null,
@@ -5088,9 +5340,14 @@
     mono: 'ui-monospace,"Cascadia Mono",Consolas,monospace',
     pixel: '"VT323",ui-monospace,monospace',
     rounded: '"Nunito",system-ui,sans-serif',
+    exo: '"Exo 2",system-ui,sans-serif',
+    lora: 'Lora,Georgia,serif',
+    plex: '"IBM Plex Mono",ui-monospace,Consolas,monospace',
+    rubik: 'Rubik,system-ui,sans-serif',
+    geneva: 'Geneva,"Helvetica Neue",Helvetica,Arial,sans-serif',
     win: 'Tahoma,"MS Sans Serif",Verdana,Geneva,sans-serif',
   };
-  const FONT_LINKS = { pixel: 'https://fonts.googleapis.com/css2?family=VT323&subset=cyrillic&display=swap', rounded: 'https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;700&subset=cyrillic&display=swap' };
+  const FONT_LINKS = { exo: 'https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;700&display=swap', lora: 'https://fonts.googleapis.com/css2?family=Lora:wght@400;500;700&display=swap', plex: 'https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&display=swap', rubik: 'https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap', pixel: 'https://fonts.googleapis.com/css2?family=VT323&subset=cyrillic&display=swap', rounded: 'https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;700&subset=cyrillic&display=swap' };
   const loadedFonts = {};
   function ensureFont(k) {
     if (!FONT_LINKS[k] || loadedFonts[k]) return;
@@ -5101,16 +5358,18 @@
   /* ---------- застосування ---------- */
   function apply() {
     const r = document.documentElement, d = r.dataset, c = cust;
-    const win = c.uiStyle !== 'material';
+    const win = c.uiStyle.startsWith('win');
     d.ui = c.uiStyle; d.player = win ? c.uiStyle : c.playerStyle; d.artshape = c.artShape; d.fpbg = c.fpBg; d.glow = c.glow ? 'on' : 'off'; d.spin = c.spin ? 'on' : 'off';
     d.wintitle = c.winTitle; d.nav = win ? 'flat' : c.nav; d.navlabels = c.navLabels ? 'on' : 'off'; d.mini = win ? 'flat' : c.mini; d.miniprog = c.miniProg ? 'on' : 'off';
-    d.blur = (c.blur && !win) ? 'on' : 'off'; d.anim = c.anim ? 'on' : 'off'; d.round = c.round; d.shadow = c.shadow ? 'on' : 'off';
-    d.font = (win && c.font === 'default') ? 'win' : c.font; d.density = c.density; d.listart = c.listArt; d.showdur = c.showDur ? 'on' : 'off';
+    const sty = STYLES[c.uiStyle];
+    let blurOn = c.blur; if (win) blurOn = false; else if (sty && sty.blur !== undefined) blurOn = sty.blur;
+    d.blur = blurOn ? 'on' : 'off'; d.anim = c.anim ? 'on' : 'off'; d.round = (sty && sty.round) ? sty.round : c.round; d.shadow = (c.shadow && !(sty && sty.shadow === false)) ? 'on' : 'off';
+    d.font = c.font !== 'default' ? c.font : (win ? 'win' : (sty && sty.font) || 'default'); d.density = c.density; d.listart = c.listArt; d.showdur = c.showDur ? 'on' : 'off';
     const scheme = applyPalette(r);
     applyAccent(r, scheme);
     if (win && c.winTitle === 'classic') { const st = r.style; st.setProperty('--md-sys-color-primary', '#000080'); st.setProperty('--md-sys-color-on-primary', '#ffffff'); st.setProperty('--md-sys-color-primary-container', '#000080'); st.setProperty('--md-sys-color-on-primary-container', '#ffffff'); }
-    if (!c.blur || win) r.style.setProperty('--blur-bg', 'var(--md-sys-color-surface-container)');
-    r.style.setProperty('--blur-strong', c.blur ? `blur(${c.blurAmt}px) saturate(180%)` : 'none');
+    if (!blurOn) r.style.setProperty('--blur-bg', 'var(--md-sys-color-surface-container)');
+    r.style.setProperty('--blur-strong', blurOn ? `blur(${c.blurAmt}px) saturate(180%)` : 'none');
     r.style.setProperty('--fp-blur', c.fpBlur + 'px');
     r.style.fontSize = c.fontScale === 100 ? '' : c.fontScale + '%';
     const fk = d.font;
@@ -5135,18 +5394,18 @@
     shape: [['round', 'Закруглена'], ['circle', 'Коло'], ['square', 'Квадрат'], ['squircle', 'Сквіркл']],
   };
   const PAGES = [
-    { id: 'colors', note: 'Зараз увімкнено стиль Windows для всього застосунку — кольори фону й акценту тимчасово не діють (окрім кольору заголовка вікон). Поверніть «Material You» у «Стиль застосунку».', icon: 'palette', t: 'Кольори', sub: 'Тема, фон та колір акценту', pv: ['track', 'mini', 'nav'], groups: [
+    { id: 'colors', note: c => c.uiStyle.startsWith('win') ? 'Зараз увімкнено стиль Windows — колір фону не діє, а акцент змінює лише заголовки вікон (якщо вибрано «Колір акценту» у розділі «Плеєр»).' : 'Фон і основа задаються обраним стилем застосунку. Колір акценту можна змінити.', icon: 'palette', t: 'Кольори', sub: 'Тема, фон та колір акценту', pv: ['track', 'mini', 'nav'], groups: [
       { title: 'Фон та тема', items: [
         { type: 'chips', k: 'base', label: 'Основа інтерфейсу', opts: PRESETS.map(p => [p.id, p.n, p.dot]) },
         { type: 'bgcolor', showIf: c => c.base === 'custom' },
       ] },
       { title: 'Акцент', items: [{ type: 'accent' }] },
     ] },
-    { id: 'player', note: 'Зараз увімкнено стиль Windows для всього застосунку — плеєр оформлений у ньому автоматично.', icon: 'play_circle', t: 'Плеєр', sub: 'Стиль, обкладинка, фон, вініл, ретро', pv: ['mini'], groups: [
+    { id: 'player', note: c => c.uiStyle.startsWith('win') ? 'Зараз увімкнено стиль Windows для всього застосунку — плеєр оформлений у ньому автоматично.' : null, icon: 'play_circle', t: 'Плеєр', sub: 'Стиль, обкладинка, фон, вініл, ретро', pv: ['mini'], groups: [
       { title: 'Стиль плеєра', items: [
         { type: 'chips', k: 'playerStyle', label: 'Вигляд', sub: 'Застосовується до міні-плеєра і великого плеєра', opts: [
           ['material', 'Material You'], ['vinyl', '💿 Вініл'], ['win98', '🖥 Windows 98'], ['win95', '🖥 Windows 95'], ['minimal', 'Мінімал']] },
-        { type: 'chips', k: 'winTitle', label: 'Колір заголовка вікна', showIf: c => c.playerStyle.startsWith('win') || c.uiStyle !== 'material', opts: [['classic', 'Класичний синій'], ['accent', 'Колір акценту']] },
+        { type: 'chips', k: 'winTitle', label: 'Колір заголовка вікна', showIf: c => c.playerStyle.startsWith('win') || c.uiStyle.startsWith('win'), opts: [['classic', 'Класичний синій'], ['accent', 'Колір акценту']] },
         { type: 'switch', k: 'spin', label: 'Крутити платівку', sub: 'Обертання обкладинки під час відтворення', showIf: c => c.playerStyle === 'vinyl' && c.uiStyle === 'material' },
         { type: 'button', act: 'fullprev', label: '▶  Відкрити великий плеєр для перегляду' },
       ] },
@@ -5156,7 +5415,7 @@
         { type: 'switch', k: 'glow', label: 'Світіння обкладинки', sub: 'М’яке сяйво кольору акценту' },
       ] },
     ] },
-    { id: 'nav', note: 'У стилі Windows панелі завжди на всю ширину.', icon: 'dock_to_bottom', t: 'Панелі', sub: 'Нижня панель і міні-плеєр', pv: ['mini', 'nav'], groups: [
+    { id: 'nav', note: c => c.uiStyle.startsWith('win') ? 'У стилі Windows панелі завжди на всю ширину.' : null, icon: 'dock_to_bottom', t: 'Панелі', sub: 'Нижня панель і міні-плеєр', pv: ['mini', 'nav'], groups: [
       { title: 'Нижня панель', items: [
         { type: 'chips', k: 'nav', label: 'Форма', opts: [['float', 'Плаваюча'], ['flat', 'На всю ширину']] },
         { type: 'switch', k: 'navLabels', label: 'Підписи під іконками' },
@@ -5166,7 +5425,7 @@
         { type: 'switch', k: 'miniProg', label: 'Лінія прогресу' },
       ] },
     ] },
-    { id: 'fx', note: 'У стилі Windows скляне розмиття вимкнено, а елементи гострі.', icon: 'auto_awesome', t: 'Ефекти', sub: 'Розмиття, анімації, форма елементів', pv: ['mini', 'nav'], groups: [
+    { id: 'fx', note: c => c.uiStyle !== 'material' ? 'Деякі параметри (розмиття, заокруглення, тіні) задаються обраним стилем застосунку.' : null, icon: 'auto_awesome', t: 'Ефекти', sub: 'Розмиття, анімації, форма елементів', pv: ['mini', 'nav'], groups: [
       { title: 'Розмиття', items: [
         { type: 'switch', k: 'blur', label: 'Скляне розмиття', sub: 'Напівпрозорі панелі з ефектом скла' },
         { type: 'range', k: 'blurAmt', label: 'Сила розмиття панелей', min: 2, max: 40, step: 1, unit: 'px', showIf: c => c.blur },
@@ -5231,7 +5490,8 @@
         return `<div class="cust-colorpick"><span>Оберіть будь-який колір — світлий дасть світлу тему, темний — темну</span><input class="cust-color" type="color" data-col="bg" value="${cust.bg}"></div>`;
       case 'accent': {
         const th = (typeof THEMES !== 'undefined') ? THEMES : [];
-        const cur = String(cust.accent || (th[0] && th[0].primary) || '').toLowerCase();
+        const stx = STYLES[cust.uiStyle];
+        const cur = String((stx ? (cust.accentOver[cust.uiStyle] || stx.acc[0]) : cust.accent) || (th[0] && th[0].primary) || '').toLowerCase();
         const isPreset = th.some(t => t.primary.toLowerCase() === cur);
         return `<div class="cust-colors">` + th.map((t, i) => `<div class="theme-swatch ${t.primary.toLowerCase() === cur ? 'active' : ''}" style="background:${t.primary}" data-acc="${i}" title="${esc(t.name)}"></div>`).join('') +
           `<label class="cust-colorbtn ${isPreset ? '' : 'active'}" title="Свій колір"><input type="color" data-col="accent" value="${/^#[0-9a-f]{6}$/.test(cur) ? cur : '#a8c7fa'}"></label></div>`;
@@ -5248,14 +5508,15 @@
     if (!page) {
       $('custTitle').textContent = 'Персоналізація';
       h += previewHTML(['track', 'mini', 'nav']);
-      h += '<div class="cust-sec">Стиль застосунку</div><div class="settings-group cust-group">' + ctl({ type: 'chips', k: 'uiStyle', label: 'Оформлення всієї програми', sub: 'Windows 95/98 змінює все: вікна, кнопки, списки, панель завдань і плеєр', opts: [['material', 'Material You'], ['win98', '🖥 Windows 98'], ['win95', '🖥 Windows 95']] }) + '</div>';
+      h += '<div class="cust-sec">Стиль застосунку</div><div class="settings-group cust-group">' + ctl({ type: 'chips', k: 'uiStyle', label: 'Оформлення всієї програми', sub: 'Повна зміна вигляду: кольори, шрифти, кнопки, списки, панелі та плеєр', opts: [['material', 'Material You'], ['neon', '🌆 Neon'], ['glass', '🫧 Glass'], ['paper', '📜 Paper'], ['terminal', '⌨ Terminal'], ['mac', '🍎 Classic Mac'], ['brutal', '🟨 Brutalism'], ['win98', '🖥 Windows 98'], ['win95', '🖥 Windows 95']] }) + '</div>';
       h += '<div class="settings-group cust-group" style="margin-top:16px">' + PAGES.map(p => `<div class="settings-item" data-open="${p.id}"><div class="settings-item-left"><span class="material-icons-round">${p.icon}</span><div><div class="settings-item-title">${p.t}</div><div class="settings-item-sub">${p.sub}</div></div></div><span class="material-icons-round">chevron_right</span></div>`).join('') + '</div>';
       h += '<div class="settings-group cust-group"><button class="cust-btn danger" style="margin-top:16px" data-act="reset">Скинути все до стандартного</button></div>';
     } else {
       const p = PAGES.find(x => x.id === page);
       $('custTitle').textContent = p.t;
       h += previewHTML(p.pv);
-      if (p.note && cust.uiStyle !== 'material') h += `<div class="cust-note">${p.note}</div>`;
+      const nt = typeof p.note === 'function' ? p.note(cust) : null;
+      if (nt) h += `<div class="cust-note">${nt}</div>`;
       p.groups.forEach(g => {
         const inner = g.items.map(ctl).join('');
         if (inner) h += `<div class="cust-sec">${g.title}</div><div class="settings-group cust-group">${inner}</div>`;
@@ -5298,11 +5559,12 @@
       if ((t = e.target.closest('[data-open]'))) { page = t.dataset.open; renderBody(); return; }
       if ((t = e.target.closest('.chip[data-k]'))) { set(t.dataset.k, t.dataset.v); return; }
       if ((t = e.target.closest('[data-sw]'))) { set(t.dataset.sw, !cust[t.dataset.sw]); return; }
+      if ((t = e.target.closest('[data-acc]')) && STYLES[cust.uiStyle]) { cust.accentOver[cust.uiStyle] = THEMES[+t.dataset.acc].primary; save(); apply(); renderBody(true); return; }
       if ((t = e.target.closest('[data-acc]'))) { set('accent', THEMES[+t.dataset.acc].primary); try { localStorage.setItem('gmusic_theme', JSON.stringify(THEMES[+t.dataset.acc])); } catch (er) {} return; }
       if ((t = e.target.closest('[data-act]'))) {
         if (t.dataset.act === 'fullprev') previewFull();
         else if (t.dataset.act === 'reset' && confirm('Скинути всі налаштування персоналізації?')) {
-          cust = Object.assign({}, DEF, { accent: THEMES[0].primary }); save();
+          cust = Object.assign({}, DEF, { accent: THEMES[0].primary, accentOver: {} }); save();
           try { localStorage.setItem('gmusic_theme', JSON.stringify(THEMES[0])); } catch (er) {}
           apply(); renderBody(true);
           if (typeof toast === 'function') toast('Налаштування скинуто');
@@ -5314,6 +5576,7 @@
       if (t.dataset.rg) { const v = +t.value; cust[t.dataset.rg] = v; save(); apply(); const lab = $('rv_' + t.dataset.rg); if (lab) lab.textContent = v + t.dataset.unit; }
       else if (t.dataset.col) {
         if (t.dataset.col === 'bg') { cust.bg = t.value; cust.base = 'custom'; }
+        else if (STYLES[cust.uiStyle]) cust.accentOver[cust.uiStyle] = t.value;
         else cust.accent = t.value;
         save(); apply();
       }
@@ -5321,6 +5584,349 @@
     body.addEventListener('change', e => { if (e.target.dataset.col) renderBody(true); });
     apply();
   });
+})();
+</script>
+
+<script>
+/* ===================== ТЕКСТ ПІСНІ + КАРАОКЕ ===================== */
+(function () {
+  'use strict';
+  const API = 'https://lrclib.net/api';
+  const $ = id => document.getElementById(id);
+  const FS = [1.15, 1.45, 1.8, 2.2];
+  const lsGet = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } };
+  const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  /* ---------- нормалізація назв ---------- */
+  const norm = s => String(s || '').toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+  function cleanTitle(s) {
+    return String(s || '')
+      .replace(/\[[^\]]*\]/g, ' ')
+      .replace(/\((?:[^)]*?)(official|lyric|lyrics|audio|video|music video|hd|hq|4k|remaster|visuali[sz]er|клип|кліп|аудио|аудіо|текст|премьера|прем'єра)[^)]*\)/ig, ' ')
+      .replace(/\s*[|｜]\s*.*$/, ' ')
+      .replace(/\s+(?:ft\.?|feat\.?|featuring)\s.*$/i, ' ')
+      .replace(/\s{2,}/g, ' ').trim();
+  }
+  function cleanArtist(s) {
+    return String(s || '').replace(/\s*-\s*topic$/i, '').replace(/\s*(vevo|official)$/i, '').replace(/,.*$/, '').trim();
+  }
+  function candidates(t) {
+    const A = cleanArtist(t.artist), T = cleanTitle(t.title), out = [];
+    const parts = T.split(/\s+[-–—]\s+/);
+    if (parts.length >= 2) {
+      const L = parts[0].trim(), R = parts.slice(1).join(' - ').trim();
+      out.push({ a: L, t: R });
+      if (A && !norm(L).includes(norm(A)) && !norm(A).includes(norm(L))) out.push({ a: A, t: R });
+      out.push({ a: '', t: R });
+    } else {
+      out.push({ a: A, t: T });
+      out.push({ a: '', t: T });
+    }
+    const seen = new Set();
+    return out.filter(c => c.t && !seen.has(c.a + '|' + c.t) && seen.add(c.a + '|' + c.t));
+  }
+  const tkey = t => { const c = candidates(t)[0] || { a: '', t: '' }; return norm(c.a) + '|' + norm(c.t); };
+
+  /* ---------- LRC ---------- */
+  function parseLrc(src) {
+    const out = [];
+    String(src || '').split(/\r?\n/).forEach(raw => {
+      const re = /\[(\d{1,3}):(\d{1,2}(?:[.:]\d{1,3})?)\]/g; let m, last = 0; const ts = [];
+      while ((m = re.exec(raw))) { ts.push(parseInt(m[1], 10) * 60 + parseFloat(m[2].replace(':', '.'))); last = re.lastIndex; }
+      if (!ts.length) return;
+      const text = raw.slice(last).replace(/<\d{1,3}:\d{1,2}(?:[.:]\d{1,3})?>/g, '').trim();
+      ts.forEach(tm => out.push({ t: tm, text }));
+    });
+    out.sort((a, b) => a.t - b.t);
+    return out;
+  }
+  const isLrc = s => (String(s).match(/\[\d{1,3}:\d{1,2}(?:[.:]\d{1,3})?\]/g) || []).length >= 2;
+
+  /* ---------- кеш і власні тексти ---------- */
+  const CK = 'gmusic_lyr_cache', UK = 'gmusic_lyr_custom', OK = 'gmusic_lyr_off';
+  function cacheGet(key) {
+    const c = lsGet(CK, {}), e = c[key]; if (!e) return null;
+    if (e.nf && Date.now() - e.ts > 12 * 3600 * 1000) return null;
+    return e;
+  }
+  function cachePut(key, e) {
+    const c = lsGet(CK, {}); e.ts = Date.now(); c[key] = e;
+    const keys = Object.keys(c);
+    if (keys.length > 60) keys.sort((a, b) => c[a].ts - c[b].ts).slice(0, keys.length - 60).forEach(k => delete c[k]);
+    lsSet(CK, c);
+  }
+  const offGet = id => (lsGet(OK, {})[id] || 0);
+  const offSet = (id, v) => { const o = lsGet(OK, {}); o[id] = v; lsSet(OK, o); };
+
+  /* ---------- пошук у LRCLIB ---------- */
+  async function jget(url, ms) {
+    const c = new AbortController(), to = setTimeout(() => c.abort(), ms || 9000);
+    try {
+      const r = await fetch(url, { signal: c.signal });
+      if (r.status === 404) return null;
+      if (!r.ok) throw new Error('http ' + r.status);
+      return await r.json();
+    } finally { clearTimeout(to); }
+  }
+  const qs = o => Object.keys(o).filter(k => o[k] !== '' && o[k] != null).map(k => k + '=' + encodeURIComponent(o[k])).join('&');
+  function toResult(r) {
+    if (!r) return null;
+    const synced = r.syncedLyrics ? parseLrc(r.syncedLyrics) : [];
+    const plain = r.plainLyrics || '';
+    if (!synced.length && !plain && !r.instrumental) return null;
+    return { synced, plain, instr: !!r.instrumental && !synced.length && !plain, name: (r.artistName || '') + ' — ' + (r.trackName || '') };
+  }
+  function score(r, c, dur) {
+    let s = 0;
+    if (r.syncedLyrics) s += 2;
+    if (dur && r.duration && Math.abs(r.duration - dur) <= Math.max(5, dur * .08)) s += 2;
+    const a = norm(r.trackName), b = norm(c.t);
+    if (a === b) s += 4; else if (a && b && (a.includes(b) || b.includes(a))) s += 3;
+    if (c.a) { const x = norm(r.artistName), y = norm(c.a); if (x && y && (x.includes(y) || y.includes(x))) s += 2; }
+    return s;
+  }
+  async function findLyrics(track, extra) {
+    const dur = Math.round(track.duration || 0);
+    const list = extra ? [extra] : candidates(track);
+    let n = 0;
+    for (let i = 0; i < list.length && n < 5; i++) {
+      const c = list[i];
+      if (c.a && dur && !extra) {
+        n++; const r = toResult(await jget(`${API}/get?${qs({ artist_name: c.a, track_name: c.t, duration: dur })}`));
+        if (r && (r.synced.length || r.plain)) return r;
+      }
+      n++;
+      const arr = await jget(`${API}/search?${qs({ track_name: c.t, artist_name: c.a })}`);
+      if (Array.isArray(arr) && arr.length) {
+        const ranked = arr.map(r => ({ r, s: score(r, c, dur) })).filter(x => x.s >= (c.a ? 4 : 5)).sort((x, y) => y.s - x.s);
+        for (const x of ranked) { const res = toResult(x.r); if (res && (res.synced.length || res.plain || res.instr)) return res; }
+      }
+    }
+    return null;
+  }
+  async function getLyrics(track, force, extra) {
+    const key = tkey(track);
+    const custom = lsGet(UK, {})[key];
+    if (custom) return isLrc(custom) ? { synced: parseLrc(custom), plain: '', custom: true } : { synced: [], plain: custom, custom: true };
+    if (!force) {
+      const c = cacheGet(key);
+      if (c) return c.nf ? null : { synced: c.s ? parseLrc(c.s) : [], plain: c.p || '', instr: !!c.i, name: c.n };
+    }
+    const res = await findLyrics(track, extra);
+    if (!res) { cachePut(key, { nf: 1 }); return null; }
+    cachePut(key, { s: res.synced.length ? res.synced.map(l => `[${Math.floor(l.t / 60)}:${(l.t % 60).toFixed(2).padStart(5, '0')}]${l.text}`).join('\n') : '', p: res.plain, i: res.instr ? 1 : 0, n: res.name });
+    return res;
+  }
+
+  /* ---------- стан в'ю ---------- */
+  const S = { open: false, track: null, follow: true, data: null, lines: [], els: [], idx: -1, seq: 0, raf: 0, userUntil: 0, off: 0, fs: lsGet('gmusic_lyr_fs', 1), lastBar: 0, mode: 'none' };
+
+  function curAudio() { try { return typeof audio !== 'undefined' ? audio : null; } catch (e) { return null; } }
+  function curTrack() { try { return typeof currentTrack !== 'undefined' ? currentTrack : null; } catch (e) { return null; } }
+  const fmt = s => { s = Math.max(0, Math.floor(s || 0)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+
+  function setHeader() {
+    $('lyrTitle').textContent = S.track.title || '—';
+    $('lyrArtist').textContent = S.track.artist || '';
+    $('lyrBg').style.backgroundImage = `url("${S.track.art || (typeof ART_PLACEHOLDER !== 'undefined' ? ART_PLACEHOLDER : '')}")`;
+  }
+  function applyFs() { $('lyrView').style.setProperty('--ly-fs', FS[S.fs] + 'rem'); }
+
+  function stateHTML(icon, title, text, btns) {
+    return `<div class="ly-state"><span class="material-icons-round">${icon}</span><b>${title}</b><div>${text || ''}</div><div class="ly-btns">${btns || ''}</div></div>`;
+  }
+  const BTN_MANUAL = '<button class="ly-btn" data-ly="manual">Шукати вручну</button>';
+  const BTN_OWN = '<button class="ly-btn fill" data-ly="own">Додати свій текст</button>';
+
+  function buildLines(synced) {
+    const L = [];
+    synced.forEach((l, i) => {
+      const prev = synced[i - 1];
+      if (!l.text) return;
+      const prevT = prev ? prev.t : -99;
+      if (l.t - prevT > 10 || (!prev && l.t > 8)) L.push({ t: Math.max(0, l.t - 4), dots: true, end: l.t });
+      L.push({ t: l.t, text: l.text });
+    });
+    // кінець кожного рядка = початок наступного (включно з порожніми)
+    const all = synced.map(l => l.t);
+    L.forEach(l => {
+      if (l.dots) return;
+      const nxt = all.find(x => x > l.t + 0.01);
+      l.end = nxt != null ? nxt : l.t + 6;
+    });
+    return L;
+  }
+
+  async function load(force, extra) {
+    const seq = ++S.seq, t = S.track; S.data = null; S.lines = []; S.els = []; S.idx = -1; S.mode = 'none';
+    S.off = offGet(t.id);
+    setHeader(); updateMenu();
+    $('lyrBody').innerHTML = `<div class="ly-state"><div class="ly-spin"></div><div>Шукаємо текст…</div></div>`;
+    let data = null, err = false;
+    try { data = await getLyrics(t, force, extra); } catch (e) { err = true; }
+    if (seq !== S.seq || !S.open) return;
+    if (err) { $('lyrBody').innerHTML = stateHTML('cloud_off', 'Не вдалося завантажити', 'Перевірте інтернет — текст шукається онлайн.', '<button class="ly-btn fill" data-ly="retry">Спробувати ще</button>' + BTN_OWN); return; }
+    if (!data) { $('lyrBody').innerHTML = stateHTML('lyrics', 'Тексту не знайдено', 'Для цього треку нічого немає в базі. Спробуйте змінити запит або вставте текст самі — він збережеться на пристрої.', BTN_MANUAL + BTN_OWN); return; }
+    if (data.instr) { $('lyrBody').innerHTML = stateHTML('piano', 'Інструментальна композиція', 'У цьому треку немає слів.', BTN_MANUAL); return; }
+    S.data = data;
+    if (data.synced.length) {
+      S.mode = 'sync'; S.lines = buildLines(data.synced);
+      let h = '<div class="lyr-spacer"></div>';
+      S.lines.forEach((l, i) => {
+        if (l.dots) h += `<div class="ly-line ly-dots" data-i="${i}"><i class="ly-d"></i><i class="ly-d"></i><i class="ly-d"></i></div>`;
+        else h += `<div class="ly-line" data-i="${i}">${l.text.split(/\s+/).map(w => `<span class="ly-w">${esc(w)}</span>`).join(' ')}</div>`;
+      });
+      h += `<div class="ly-note">${data.custom ? 'Ваш власний текст' : 'Текст: LRCLIB'} · торкніться рядка, щоб перемотати</div><div class="lyr-spacer"></div>`;
+      $('lyrBody').innerHTML = h;
+      S.els = Array.from($('lyrBody').querySelectorAll('.ly-line'));
+      S.lines.forEach((l, i) => {
+        if (l.dots) { l.dEls = Array.from(S.els[i].querySelectorAll('.ly-d')); return; }
+        l.wEls = Array.from(S.els[i].querySelectorAll('.ly-w'));
+        const lens = l.wEls.map(e => e.textContent.length + 1), tot = lens.reduce((a, b) => a + b, 0); let c = 0;
+        l.ws = lens.map(x => { const s = c / tot; c += x; return [s, c / tot]; });
+        const est = Math.max(1.5, tot * 0.075 + 1);
+        l.dur = Math.max(0.8, Math.min(l.end - l.t - 0.15, est));
+      });
+      S.lines.forEach(l => { if (l.dots) l.dur = Math.max(1, l.end - l.t); });
+    } else {
+      S.mode = 'plain';
+      $('lyrBody').innerHTML = `<div class="lyr-spacer" style="height:4vh"></div><div class="ly-plain">${esc(data.plain)}</div><div class="ly-note">${data.custom ? 'Ваш власний текст' : 'Текст: LRCLIB'} · для цього треку немає синхронізації, тому текст прокручується автоматично за часом</div><div class="lyr-spacer" style="height:12vh"></div>`;
+    }
+    $('lyrBody').scrollTop = 0;
+  }
+
+  /* ---------- цикл синхронізації ---------- */
+  function setActive(idx, snap) {
+    S.idx = idx;
+    S.els.forEach((el, i) => { el.classList.toggle('past', i < idx); el.classList.toggle('on', i === idx); if (i !== idx) { const w = S.lines[i].wEls; if (w && i < idx) w.forEach(x => x.style.removeProperty('--w')); } });
+    if (idx >= 0 && performance.now() > S.userUntil) {
+      const el = S.els[idx], b = $('lyrBody');
+      b.scrollTo({ top: Math.max(0, el.offsetTop - b.clientHeight * 0.36 + el.offsetHeight / 2), behavior: snap ? 'auto' : 'smooth' });
+    }
+  }
+  function frame() {
+    if (!S.open) return;
+    S.raf = requestAnimationFrame(frame);
+    const ct = curTrack(), a = curAudio();
+    if (ct && S.track && ct.id !== S.track.id) { if (S.follow) { S.track = ct; load(); } }
+    else if (ct && S.track && ct.id === S.track.id) S.follow = true;
+    const now = performance.now();
+    const isCur = ct && S.track && ct.id === S.track.id && a;
+    const tm = isCur ? (a.currentTime || 0) : 0;
+    if (now - S.lastBar > 200) {
+      S.lastBar = now;
+      const d = isCur ? (a.duration || S.track.duration || 0) : 0;
+      $('lyrCur').textContent = fmt(tm); $('lyrDur').textContent = fmt(d);
+      if (document.activeElement !== $('lyrSeek')) $('lyrSeek').value = d ? (tm / d) * 100 : 0;
+      const pi = $('lyrPlay').querySelector('.material-icons-round'), want = (isCur && !a.paused) ? 'pause' : 'play_arrow';
+      if (pi.textContent !== want) pi.textContent = want;
+    }
+    if (!isCur) return;
+    if (S.mode === 'sync' && S.lines.length) {
+      const t = tm + S.off;
+      let lo = 0, hi = S.lines.length - 1, idx = -1;
+      while (lo <= hi) { const mid = (lo + hi) >> 1; if (S.lines[mid].t <= t) { idx = mid; lo = mid + 1; } else hi = mid - 1; }
+      if (idx !== S.idx) setActive(idx, Math.abs(idx - S.idx) > 3);
+      if (idx >= 0) {
+        const l = S.lines[idx], p = Math.max(0, Math.min(1, (t - l.t) / l.dur));
+        if (l.dots) l.dEls.forEach((d, k) => d.classList.toggle('on', p > k / 3));
+        else l.wEls.forEach((w, k) => { const f = Math.max(0, Math.min(1, (p - l.ws[k][0]) / (l.ws[k][1] - l.ws[k][0]))); const v = (f * 100).toFixed(0) + '%'; if (w._v !== v) { w._v = v; w.style.setProperty('--w', v); } });
+      }
+    } else if (S.mode === 'plain' && now > S.userUntil) {
+      const b = $('lyrBody'), d = a.duration || S.track.duration || 0;
+      if (d) b.scrollTop = Math.max(0, Math.min(1, tm / d)) * Math.max(0, b.scrollHeight - b.clientHeight);
+    }
+  }
+
+  /* ---------- відкриття/закриття ---------- */
+  function open(track) {
+    const ct = curTrack();
+    track = track || ct;
+    if (!track) { if (typeof toast === 'function') toast('Спочатку увімкніть трек'); return; }
+    S.track = track; S.follow = !ct || ct.id === track.id; S.open = true; S.userUntil = 0;
+    applyFs();
+    $('lyrView').classList.add('open');
+    cancelAnimationFrame(S.raf); S.raf = requestAnimationFrame(frame);
+    closeMenu(); load();
+  }
+  function close() { S.open = false; S.seq++; cancelAnimationFrame(S.raf); $('lyrView').classList.remove('open'); closeMenu(); }
+  function closeMenu() { $('lyrMenu').classList.remove('open'); }
+
+  function updateMenu() {
+    const off = S.off;
+    $('lyrMenu').innerHTML = `
+      <div class="lyr-off"><span>Зсув тексту</span><div><button data-ly="offm">−0.5</button><b id="lyrOffV">${off > 0 ? '+' : ''}${off.toFixed(1)} с</b><button data-ly="offp">+0.5</button></div></div>
+      <button data-ly="manual"><span class="material-icons-round">search</span>Шукати вручну</button>
+      <button data-ly="own"><span class="material-icons-round">edit_note</span>Свій текст або LRC</button>
+      <button data-ly="retry"><span class="material-icons-round">refresh</span>Оновити з інтернету</button>
+      <button data-ly="forget"><span class="material-icons-round">delete_sweep</span>Видалити мій текст</button>`;
+  }
+
+  function manualForm() {
+    const c = candidates(S.track)[0] || { a: '', t: '' };
+    $('lyrBody').innerHTML = `<div class="ly-form"><b>Пошук тексту вручну</b>
+      <label>Виконавець</label><input id="lyMA" value="${esc(c.a)}" autocomplete="off">
+      <label>Назва пісні</label><input id="lyMT" value="${esc(c.t)}" autocomplete="off">
+      <div class="ly-btns"><button class="ly-btn fill" data-ly="msearch">Знайти</button><button class="ly-btn" data-ly="retry">Скасувати</button></div></div>`;
+  }
+  function ownForm() {
+    const cur = lsGet(UK, {})[tkey(S.track)] || '';
+    $('lyrBody').innerHTML = `<div class="ly-form"><b>Свій текст</b>
+      <label>Вставте звичайний текст або LRC із мітками часу ([01:23.45] рядок) — тоді працюватиме караоке.</label>
+      <textarea id="lyOwn" placeholder="[00:12.00] Перший рядок&#10;[00:16.50] Другий рядок">${esc(cur)}</textarea>
+      <div class="ly-btns"><button class="ly-btn fill" data-ly="osave">Зберегти</button><button class="ly-btn" data-ly="retry">Скасувати</button></div></div>`;
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    $('lyrClose').addEventListener('click', close);
+    $('lyrFs').addEventListener('click', () => { S.fs = (S.fs + 1) % FS.length; lsSet('gmusic_lyr_fs', S.fs); applyFs(); if (S.idx >= 0 && S.els[S.idx]) setActive(S.idx, true); });
+    $('lyrMenuBtn').addEventListener('click', e => { e.stopPropagation(); $('lyrMenu').classList.toggle('open'); });
+    $('lyrView').addEventListener('click', e => { if (!e.target.closest('#lyrMenu') && !e.target.closest('#lyrMenuBtn')) closeMenu(); });
+    const body = $('lyrBody');
+    ['touchstart', 'wheel', 'pointerdown'].forEach(ev => body.addEventListener(ev, () => { S.userUntil = performance.now() + 3500; }, { passive: true }));
+    $('lyrView').addEventListener('click', async e => {
+      const b = e.target.closest('[data-ly]'); if (!b) return;
+      const act = b.dataset.ly;
+      if (act === 'offm' || act === 'offp') {
+        S.off = Math.round((S.off + (act === 'offp' ? 0.5 : -0.5)) * 10) / 10; offSet(S.track.id, S.off);
+        const v = $('lyrOffV'); if (v) v.textContent = (S.off > 0 ? '+' : '') + S.off.toFixed(1) + ' с';
+        return;
+      }
+      closeMenu();
+      if (act === 'retry') load(false);
+      else if (act === 'manual') manualForm();
+      else if (act === 'own') ownForm();
+      else if (act === 'msearch') { const a = $('lyMA').value.trim(), t = $('lyMT').value.trim(); if (t) load(true, { a, t }); }
+      else if (act === 'osave') {
+        const v = $('lyOwn').value.trim(), m = lsGet(UK, {}); if (v) m[tkey(S.track)] = v; else delete m[tkey(S.track)];
+        lsSet(UK, m); load(false);
+      } else if (act === 'forget') {
+        const m = lsGet(UK, {}); delete m[tkey(S.track)]; lsSet(UK, m); if (typeof toast === 'function') toast('Власний текст видалено'); load(false);
+      }
+    });
+    body.addEventListener('click', e => {
+      const ln = e.target.closest('.ly-line'); if (!ln || S.mode !== 'sync' || ln.classList.contains('ly-dots')) return;
+      const a = curAudio(), ct = curTrack(); if (!a || !ct || ct.id !== S.track.id) return;
+      const l = S.lines[+ln.dataset.i]; a.currentTime = Math.max(0, l.t - S.off); S.userUntil = 0;
+      if (a.paused) { try { a.play(); } catch (er) {} }
+    });
+    $('lyrSeek').addEventListener('input', e => { const a = curAudio(); if (a && a.duration) a.currentTime = (e.target.value / 100) * a.duration; });
+    $('lyrPlay').addEventListener('click', () => {
+      const ct = curTrack();
+      if (!ct || ct.id !== S.track.id) { if (typeof playTrack === 'function') { playTrack(S.track); S.follow = true; } }
+      else if (typeof togglePlay === 'function') togglePlay();
+    });
+    $('lyrPrev').addEventListener('click', () => $('fpPrev').click());
+    $('lyrNext').addEventListener('click', () => $('fpNext').click());
+    // тап по обкладинці та кнопка в плеєрі
+    const wrap = document.querySelector('.fp-art-wrap');
+    if (wrap) wrap.addEventListener('click', e => { if (e.target.closest('#ytBox')) return; open(); });
+    const fb = $('fpLyrics'); if (fb) fb.addEventListener('click', () => open());
+    const pa = $('playerArt'); // довге утримання не чіпаємо: клік по міні-плеєру відкриває великий плеєр
+  });
+
+  window.gmLyrics = { open, close };
 })();
 </script>
 </body>
