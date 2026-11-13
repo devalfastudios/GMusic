@@ -656,6 +656,14 @@
       color: var(--md-sys-color-on-primary);
     }
 
+    /* CONFIRM + OFFLINE */
+    .btn-confirm.danger { background: var(--md-sys-color-error); color: var(--md-sys-color-on-error); }
+    .confirm-text { text-align: center; font-size: 0.95rem; line-height: 1.45; color: var(--md-sys-color-on-surface-variant); margin-top: -8px; word-break: break-word; }
+    .off-badge { font-size: 15px !important; vertical-align: -3px; margin-right: 4px; color: var(--md-sys-color-primary); }
+    .track-item.dl-busy .track-art { animation: dlPulse 1s ease-in-out infinite; }
+    @keyframes dlPulse { 50% { opacity: 0.35; } }
+    html.is-offline .track-item:not(.has-off) { opacity: 0.4; }
+
     /* SETTINGS */
     .settings-group {
       background: var(--md-sys-color-surface-container);
@@ -1532,7 +1540,7 @@
     .about-install.show { display: flex; }
 
     /* Гучність */
-    .fp-volume { position: absolute; right: 6px; top: 55%; width: 44px; height: 44px; z-index: 5; }
+    .fp-volume { position: absolute; right: 6px; top: 45%; width: 44px; height: 44px; z-index: 5; }
     .fp-volume .vol-fold { width: 44px; height: 44px; background: rgba(255,255,255,0.10); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
     .vol-panel { position: absolute; right: 0; bottom: 52px; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 4px 4px; width: 44px; border-radius: 22px; background: rgba(0,0,0,0.38); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); transition: opacity .2s ease, transform .25s cubic-bezier(0.2,0.8,0.2,1); transform-origin: bottom center; }
     .fp-volume:not(.open) .vol-panel { opacity: 0; transform: scale(.85) translateY(12px); pointer-events: none; }
@@ -1578,6 +1586,8 @@
     .hist-item:hover { background: rgba(255,255,255,0.05); }
     .hist-item:active { background: rgba(255,255,255,0.09); }
     .hist-item img { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; flex-shrink: 0; background: var(--md-sys-color-surface-container-high); }
+    .hist-sicon { width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: var(--md-sys-color-surface-container-high); color: var(--md-sys-color-primary); }
+    .hist-sicon .material-icons-round { font-size: 22px; }
     .hist-info { flex: 1; min-width: 0; }
     .hist-t, .hist-a { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .hist-t { font-size: 0.95rem; font-weight: 500; }
@@ -2123,7 +2133,10 @@
         <div id="libraryRoot">
           <div class="section-header">
             <h2>Моя музика</h2>
-            <button class="icon-btn" id="openHistory" aria-label="Історія прослуховування"><span class="material-icons-round">history</span></button>
+            <div style="display:flex;gap:4px;">
+              <button class="icon-btn" id="offlineAll" aria-label="Завантажити все для офлайн" title="Завантажити все для офлайн"><span class="material-icons-round">download_for_offline</span></button>
+              <button class="icon-btn" id="openHistory" aria-label="Історія прослуховування й пошуку"><span class="material-icons-round">history</span></button>
+            </div>
           </div>
 
           <div class="section-title">Плейлисти</div>
@@ -2294,7 +2307,7 @@
             <div class="settings-item-left">
               <span class="material-icons-round">history</span>
               <div>
-                <div class="settings-item-title">Історія прослуховування</div>
+                <div class="settings-item-title">Історія прослуховування й пошуку</div>
                 <div class="settings-item-sub" id="histCount">Порожньо</div>
               </div>
             </div>
@@ -2305,7 +2318,7 @@
               <span class="material-icons-round">manage_history</span>
               <div>
                 <div class="settings-item-title">Зберігати історію</div>
-                <div class="settings-item-sub">Записувати, що ви слухали</div>
+                <div class="settings-item-sub">Записувати, що ви слухали та шукали</div>
               </div>
             </div>
             <div class="switch on" id="histSwitch"></div>
@@ -2463,6 +2476,10 @@
           <span class="material-icons-round">content_cut</span>
           Обрізати трек
         </button>
+        <button id="moreOffline">
+          <span class="material-icons-round" id="moreOfflineIcon">cloud_download</span>
+          <span id="moreOfflineText">Завантажити для офлайн</span>
+        </button>
         <button id="moreDownload">
           <span class="material-icons-round">download</span>
           Завантажити на пристрій
@@ -2613,14 +2630,14 @@
   <div class="modal-overlay" id="historyModal">
     <div class="modal">
       <div class="hist-head">
-        <div class="modal-title">Історія прослуховування</div>
+        <div class="modal-title">Історія</div>
         <button class="hist-clear" id="histClear">Очистити</button>
         <button class="icon-btn" id="histClose" aria-label="Закрити" style="width:36px;height:36px;"><span class="material-icons-round" style="font-size:22px">close</span></button>
       </div>
       <div id="histEmpty" class="empty-state" style="display:none;padding:32px;">
         <span class="material-icons-round">history</span>
         <h3>Історія порожня</h3>
-        <p>Тут зʼявляться треки, які ви послухали</p>
+        <p>Тут зʼявляться треки, які ви слухали, і ваші пошукові запити</p>
       </div>
       <div id="histList"></div>
     </div>
@@ -2662,6 +2679,18 @@
         <button class="btn-confirm" id="trimSaveBtn"><span class="material-icons-round" style="font-size:20px;vertical-align:-5px">download</span> Зберегти</button>
       </div>
       <div class="trim-hint">Потягніть за ближчий край виділення. Торкніться поза модальним вікном, щоб закрити.</div>
+    </div>
+  </div>
+
+  <!-- CONFIRM MODAL -->
+  <div class="modal-overlay" id="confirmModal">
+    <div class="modal">
+      <div class="modal-title" id="cfTitle">Підтвердьте дію</div>
+      <div class="confirm-text" id="cfText"></div>
+      <div class="modal-actions">
+        <button class="btn-cancel" id="cfCancel">Скасувати</button>
+        <button class="btn-confirm danger" id="cfOk">Видалити</button>
+      </div>
     </div>
   </div>
 
@@ -3289,6 +3318,38 @@
       saveHistory(); updateHistCount();
       if (document.getElementById('historyModal')?.classList.contains('open')) renderHistory();
     }
+    // --- історія пошуку ---
+    const SRC_NAMES = { all: 'Усі джерела', jamendo: 'Jamendo', audius: 'Audius', youtube: 'YouTube', freesound: 'Freesound' };
+    const searchKey = e => [e.artist || '', e.title || '', (e.genres || []).slice().sort().join(','), e.source || 'all'].join('|').toLowerCase();
+    function commitSearchHistory() {
+      if (!histOn) return;
+      const artist = (searchFilters.artist || '').trim(), title = (searchFilters.title || '').trim();
+      if (!artist && !title) return;           // самі лише фільтри без тексту не записуємо
+      const entry = { type: 'search', artist, title, genres: [...searchFilters.genres], source: searchFilters.source, ts: Date.now() };
+      const key = searchKey(entry), now = entry.ts;
+      // Поки користувач дописує запит, замінюємо попередній неповний варіант
+      const first = playHistory[0];
+      if (first && first.type === 'search' && now - first.ts < 60000 &&
+          (first.source || 'all') === entry.source &&
+          artist.toLowerCase().startsWith((first.artist || '').toLowerCase()) &&
+          title.toLowerCase().startsWith((first.title || '').toLowerCase())) playHistory.shift();
+      // Однаковий запит не дублюємо — піднімаємо нагору
+      for (let i = playHistory.length - 1; i >= 0; i--) { if (playHistory[i].type === 'search' && searchKey(playHistory[i]) === key) playHistory.splice(i, 1); }
+      playHistory.unshift(entry);
+      if (playHistory.length > HIST_MAX) playHistory.length = HIST_MAX;
+      saveHistory(); updateHistCount();
+      if (document.getElementById('historyModal')?.classList.contains('open')) renderHistory();
+    }
+    function repeatSearchFromHistory(e) {
+      document.getElementById('historyModal').classList.remove('open');
+      searchFilters.artist = e.artist || ''; searchFilters.title = e.title || '';
+      searchFilters.genres = new Set(e.genres || []); searchFilters.source = e.source || 'all';
+      document.getElementById('fArtist').value = searchFilters.artist;
+      document.getElementById('fTitle').value = searchFilters.title;
+      switchView('search');
+      syncFieldClear(); renderFilterChips(); runSearch();
+    }
+
     function updateHistCount() {
       const el = document.getElementById('histCount'); if (!el) return;
       const n = playHistory.length;
@@ -3315,6 +3376,17 @@
         const day = dayLabel(e.ts);
         if (day !== lastDay) { html += `<div class="hist-day">${escapeHtml(day)}</div>`; lastDay = day; }
         const tm = new Date(e.ts).toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
+        if (e.type === 'search') {
+          const q = [e.artist, e.title].filter(Boolean).join(' — ');
+          const extra = [(e.genres || []).length ? 'жанр: ' + e.genres.join(', ') : '', e.source && e.source !== 'all' ? (SRC_NAMES[e.source] || e.source) : ''].filter(Boolean).join(' · ');
+          html += `<div class="hist-item" data-i="${i}">
+          <div class="hist-sicon"><span class="material-icons-round">search</span></div>
+          <div class="hist-info"><div class="hist-t">${escapeHtml(q)}</div><div class="hist-a">Пошук${extra ? ' · ' + escapeHtml(extra) : ''}</div></div>
+          <span class="hist-time">${tm}</span>
+          <button class="icon-btn hist-del" data-i="${i}" aria-label="Видалити із історії"><span class="material-icons-round">close</span></button>
+        </div>`;
+          return;
+        }
         html += `<div class="hist-item" data-i="${i}">
           <img src="${e.art || ART_PLACEHOLDER}" alt="" loading="lazy" />
           <div class="hist-info"><div class="hist-t">${escapeHtml(e.title)}</div><div class="hist-a">${escapeHtml(e.artist)}</div></div>
@@ -3326,8 +3398,9 @@
     }
     function playFromHistory(i) {
       const e = playHistory[i]; if (!e) return;
+      if (e.type === 'search') { repeatSearchFromHistory(e); return; }
       const seen = new Set(), q = [];
-      playHistory.forEach(x => { if (!seen.has(x.id)) { seen.add(x.id); q.push(entryToTrack(x)); } });
+      playHistory.forEach(x => { if (x.type !== 'search' && !seen.has(x.id)) { seen.add(x.id); q.push(entryToTrack(x)); } });
       const t = q.find(x => x.id === e.id);
       if (!t || !(t.url || t.streamId || t.blobUrl)) { toast('Цей трек більше недоступний'); return; }
       document.getElementById('historyModal').classList.remove('open');
@@ -3348,6 +3421,343 @@
       t.classList.add('show');
       setTimeout(() => t.classList.remove('show'), 2200);
     }
+    // ========== ПІДТВЕРДЖЕННЯ ДІЙ ==========
+    let _cfResolve = null;
+    function confirmDialog({ title, text, ok = 'Видалити', danger = true }) {
+      return new Promise(resolve => {
+        if (_cfResolve) _cfResolve(false);
+        _cfResolve = resolve;
+        document.getElementById('cfTitle').textContent = title;
+        document.getElementById('cfText').textContent = text || '';
+        const okb = document.getElementById('cfOk');
+        okb.textContent = ok;
+        okb.classList.toggle('danger', !!danger);
+        document.getElementById('confirmModal').classList.add('open');
+      });
+    }
+    function closeConfirm(v) {
+      document.getElementById('confirmModal').classList.remove('open');
+      const r = _cfResolve; _cfResolve = null;
+      if (r) r(v);
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('cfOk').addEventListener('click', () => closeConfirm(true));
+      document.getElementById('cfCancel').addEventListener('click', () => closeConfirm(false));
+      const ov = document.getElementById('confirmModal');
+      ov.addEventListener('click', e => { if (e.target === ov) closeConfirm(false); });
+    });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && _cfResolve) closeConfirm(false); });
+
+    function confirmRemoveTrack(id) {
+      const t = library.find(x => x.id === id) || findTrackById(id);
+      let text = `${t ? '«' + t.title + '»' : 'Цей трек'} буде видалено з вашої бібліотеки та з усіх плейлистів.`;
+      if (offlineIds.has(id)) text += ' Завантажену офлайн-копію також буде видалено.';
+      return confirmDialog({ title: 'Видалити з бібліотеки?', text, ok: 'Видалити' });
+    }
+    function confirmRemoveFromPlaylist(id) {
+      const t = library.find(x => x.id === id);
+      const pl = playlists.find(p => p.id === currentPlaylistId);
+      return confirmDialog({
+        title: 'Прибрати з плейлиста?',
+        text: `${t ? '«' + t.title + '»' : 'Трек'} буде прибрано з плейлиста${pl ? ' «' + pl.name + '»' : ''}. У бібліотеці він залишиться.`,
+        ok: 'Прибрати'
+      });
+    }
+
+    // ========== ОФЛАЙН-СХОВИЩЕ (IndexedDB) ==========
+    const offlineIds = new Set();      // id треків, збережених для офлайн
+    const offArtUrls = {};             // id -> blob: URL обкладинки
+    const offBusy = new Set();         // id треків, що зараз завантажуються
+    let offBulk = false;
+    const OFF_BADGE = '<span class="material-icons-round off-badge" title="Доступно офлайн">offline_pin</span>';
+    const artOf = t => (t && (offArtUrls[t.id] || t.art)) || '';
+    const isPlayableOffline = t => !!t && (offlineIds.has(t.id) || (t.local && !!t.blobUrl));
+
+    let _offDb = null;
+    function offDb() {
+      if (_offDb) return _offDb;
+      _offDb = new Promise((res, rej) => {
+        if (!window.indexedDB) return rej(new Error('no indexedDB'));
+        const rq = indexedDB.open('gmusic_offline', 1);
+        rq.onupgradeneeded = () => { rq.result.createObjectStore('audio'); rq.result.createObjectStore('art'); };
+        rq.onsuccess = () => res(rq.result);
+        rq.onerror = () => rej(rq.error);
+      });
+      _offDb.catch(() => { _offDb = null; });
+      return _offDb;
+    }
+    function offReq(store, mode, fn) {
+      return offDb().then(db => new Promise((res, rej) => {
+        const tx = db.transaction(store, mode);
+        const rq = fn(tx.objectStore(store));
+        tx.oncomplete = () => res(rq ? rq.result : undefined);
+        tx.onerror = tx.onabort = () => rej(tx.error || new Error('tx'));
+      }));
+    }
+    async function getOfflineBlob(id) {
+      try { return (await offReq('audio', 'readonly', s => s.get(id))) || null; } catch (e) { return null; }
+    }
+    async function getOfflineUrl(id) {
+      const b = await getOfflineBlob(id);
+      return b ? URL.createObjectURL(b) : null;
+    }
+    async function offlineDelete(id) {
+      offlineIds.delete(id);
+      if (offArtUrls[id]) { try { URL.revokeObjectURL(offArtUrls[id]); } catch (e) {} delete offArtUrls[id]; }
+      try { await offReq('audio', 'readwrite', s => s.delete(id)); } catch (e) {}
+      try { await offReq('art', 'readwrite', s => s.delete(id)); } catch (e) {}
+    }
+    async function offlineInit() {
+      try {
+        const keys = await offReq('audio', 'readonly', s => s.getAllKeys());
+        keys.forEach(k => offlineIds.add(k));
+        const db = await offDb();
+        await new Promise(res => {
+          const c = db.transaction('art', 'readonly').objectStore('art').openCursor();
+          c.onsuccess = () => {
+            const cur = c.result; if (!cur) return res();
+            if (cur.value instanceof Blob) offArtUrls[cur.key] = URL.createObjectURL(cur.value);
+            cur.continue();
+          };
+          c.onerror = () => res();
+        });
+        if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+        renderLibraryTracks(); renderPlaylists();
+        if (currentPlaylistId) openPlaylist(currentPlaylistId);
+        syncOfflineBadges(); updateMoreOffline();
+      } catch (e) { console.warn('offline init', e); }
+    }
+    function syncOfflineBadges() {
+      document.querySelectorAll('.track-item[data-id]').forEach(el => {
+        const id = el.dataset.id, t = findTrackById(id);
+        const has = offlineIds.has(id);
+        el.classList.toggle('has-off', has || isPlayableOffline(t));
+        el.classList.toggle('dl-busy', offBusy.has(id));
+        const ar = el.querySelector('.track-artist'); if (!ar) return;
+        const b = ar.querySelector('.off-badge');
+        if (has && !b) ar.insertAdjacentHTML('afterbegin', OFF_BADGE);
+        else if (!has && b) b.remove();
+      });
+    }
+    function updateMoreOffline() {
+      const ic = document.getElementById('moreOfflineIcon'), tx = document.getElementById('moreOfflineText');
+      if (!ic || !tx || !currentTrack) return;
+      const has = offlineIds.has(currentTrack.id);
+      ic.textContent = has ? 'cloud_done' : 'cloud_download';
+      tx.textContent = has ? 'Прибрати з офлайн-пам’яті' : 'Завантажити для офлайн';
+    }
+
+    // Завантаження треку у сховище. Повертає true/false.
+    async function makeOffline(t, quiet) {
+      if (!t || offBusy.has(t.id)) return false;
+      if (offlineIds.has(t.id)) { if (!quiet) toast('Вже доступний офлайн'); return true; }
+      if (t.local && !t.blobUrl && !t.url) { if (!quiet) toast('Файл недоступний'); return false; }
+      if (!navigator.onLine) { if (!quiet) toast('Немає інтернету'); return false; }
+      offBusy.add(t.id); syncOfflineBadges();
+      if (!quiet) toast('Завантажую для офлайн…');
+      try {
+        const src = await resolveTrackSrc(t);
+        if (!src) throw new Error('nosrc');
+        const r = await fetch(src);
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const total = +r.headers.get('content-length') || 0;
+        let blob;
+        if (r.body && total && !quiet) {
+          const reader = r.body.getReader(), chunks = []; let got = 0, last = -20;
+          for (;;) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            chunks.push(value); got += value.length;
+            const pct = Math.min(99, Math.floor(got / total * 100));
+            if (pct >= last + 20) { last = pct; toast('Завантаження: ' + pct + '%'); }
+          }
+          blob = new Blob(chunks, { type: r.headers.get('content-type') || 'audio/mpeg' });
+        } else blob = await r.blob();
+        if (!blob.size || /^(text\/|application\/(json|xml))/.test(blob.type)) throw new Error('bad payload');
+        if (!blob.type) blob = new Blob([blob], { type: 'audio/mpeg' });
+        await offReq('audio', 'readwrite', s => s.put(blob, t.id));
+        offlineIds.add(t.id);
+        // обкладинка (якщо джерело дозволяє CORS)
+        try {
+          if (t.art && !offArtUrls[t.id]) {
+            const ar = await fetch(t.art, { mode: 'cors' });
+            if (ar.ok) {
+              const ab = await ar.blob();
+              if (/^image\//.test(ab.type)) {
+                await offReq('art', 'readwrite', s => s.put(ab, t.id));
+                offArtUrls[t.id] = URL.createObjectURL(ab);
+              }
+            }
+          }
+        } catch (e) {}
+        // щоб трек був у «Моїй музиці» й відображався офлайн
+        if (!library.some(x => x.id === t.id)) toggleSave(t.id, true);
+        if (!quiet) toast('Доступно офлайн ✓');
+        return true;
+      } catch (e) {
+        console.error('offline dl', e);
+        await offlineDelete(t.id);
+        if (!quiet) toast(e && e.name === 'QuotaExceededError' ? 'Недостатньо місця на пристрої' : 'Не вдалося завантажити (джерело не дозволяє)');
+        return false;
+      } finally {
+        offBusy.delete(t.id);
+        renderLibraryTracks();
+        if (currentPlaylistId) openPlaylist(currentPlaylistId);
+        syncOfflineBadges(); updateMoreOffline();
+      }
+    }
+    async function toggleOffline(t) {
+      if (!t) return;
+      if (offlineIds.has(t.id)) {
+        const ok = await confirmDialog({
+          title: 'Прибрати з офлайн-пам’яті?',
+          text: `«${t.title}» залишиться в бібліотеці, але без інтернету відтворюватися не буде.`,
+          ok: 'Прибрати'
+        });
+        if (!ok) return;
+        await offlineDelete(t.id);
+        toast('Офлайн-копію видалено');
+        syncOfflineBadges(); updateMoreOffline();
+      } else makeOffline(t);
+    }
+    async function downloadAllOffline() {
+      if (offBulk) { toast('Завантаження вже триває'); return; }
+      const todo = library.filter(t => !offlineIds.has(t.id) && !(t.local && !t.blobUrl && !t.url));
+      if (!todo.length) { toast(library.length ? 'Усі треки вже доступні офлайн' : 'Бібліотека порожня'); return; }
+      if (!navigator.onLine) { toast('Немає інтернету'); return; }
+      const ok = await confirmDialog({
+        title: 'Завантажити для офлайн?',
+        text: `Буде збережено ${todo.length} ${pluralTracks(todo.length)}. Це може зайняти трохи місця на пристрої.`,
+        ok: 'Завантажити', danger: false
+      });
+      if (!ok) return;
+      offBulk = true; let done = 0, good = 0;
+      for (const t of todo) {
+        toast(`Офлайн: ${done + 1} з ${todo.length}…`);
+        if (await makeOffline(t, true)) good++;
+        done++;
+      }
+      offBulk = false;
+      toast(good === todo.length ? `Готово: ${good} ${pluralTracks(good)} офлайн` : `Збережено ${good} з ${todo.length}`);
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('offlineAll').addEventListener('click', downloadAllOffline);
+      document.getElementById('moreOffline').addEventListener('click', () => {
+        document.getElementById('moreMenu').classList.remove('open');
+        toggleOffline(currentTrack);
+      });
+    });
+    function applyNetState() {
+      const off = !navigator.onLine;
+      document.documentElement.classList.toggle('is-offline', off);
+    }
+    addEventListener('online', () => { applyNetState(); toast('Інтернет зʼявився'); });
+    addEventListener('offline', () => { applyNetState(); toast('Офлайн: доступні лише завантажені треки'); });
+    applyNetState();
+
+    // ========== ПЕРЕДЗАВАНТАЖЕННЯ СУСІДНІХ ТРЕКІВ ==========
+    // Для наступного й попереднього треків заздалегідь отримуємо посилання та (якщо джерело дозволяє CORS)
+    // повний файл у памʼять. Тоді перемикання відбувається миттєво. Якщо CORS заборонено — «гріємо» кеш браузера.
+    const _pre = new Map();            // id -> { url, blobUrl, warm, ac }
+    const PRE_MAX_BYTES = 40 * 1024 * 1024;
+    let _preTimer = 0, _preTries = 0;
+    function peekQueue(dir) {
+      const n = queue.length; if (n < 2) return null;
+      for (let k = 1; k < n; k++) {
+        const t = queue[(((currentIndex + dir * k) % n) + n) % n];
+        if (t && (navigator.onLine || isPlayableOffline(t))) return t;
+      }
+      return null;
+    }
+    function releasePre(e, keepBlob) {
+      try { e.ac && e.ac.abort(); } catch (x) {}
+      if (e.blobUrl && !keepBlob) { try { URL.revokeObjectURL(e.blobUrl); } catch (x) {} }
+      if (e.warm) { try { e.warm.removeAttribute('src'); e.warm.load(); } catch (x) {} }
+    }
+    function dropPreloaded(id) {
+      const e = _pre.get(id); if (!e) return;
+      _pre.delete(id); releasePre(e, false);
+    }
+    // Віддає готовий запис (власником blob: URL стає той, хто його взяв)
+    function takePreloaded(id) {
+      const e = _pre.get(id); if (!e) return null;
+      _pre.delete(id); releasePre(e, true);
+      return e;
+    }
+    async function preloadTrack(t) {
+      if (!t || _pre.has(t.id) || (currentTrack && t.id === currentTrack.id)) return;
+      if (t.local && !offlineIds.has(t.id)) return;
+      const e = { url: '', blobUrl: '', warm: null, ac: null };
+      _pre.set(t.id, e);
+      const alive = () => _pre.get(t.id) === e;
+      try {
+        if (offlineIds.has(t.id)) {
+          const u = await getOfflineUrl(t.id);
+          if (!alive()) { if (u) URL.revokeObjectURL(u); return; }
+          if (u) e.blobUrl = u; else _pre.delete(t.id);
+          return;
+        }
+        let src = '';
+        if (t.source === 'audius' && t.streamId) src = getAudiusStreamUrl(t.streamId);
+        else if (t.source === 'jamendo' && t.streamId) {
+          const fmt = t._noFmt ? null : jamendoFormat();
+          const d = await jamendoFetch('/tracks/', fmt ? { id: t.streamId, audioformat: fmt } : { id: t.streamId });
+          const r = d.results && d.results[0];
+          if (r && r.audio && alive()) { src = fmt ? setJamFmt(r.audio, fmt) : r.audio; t.url = src; t._fmtApplied = !!fmt; }
+        } else if (t.source === 'youtube' && t.streamId) {
+          if (t.url && !t._forceYt && t._q === effQuality()) src = t.url;
+          else {
+            const pp = await getPipedAudioUrl(t.streamId);
+            if (pp && pp.url && alive()) {
+              src = pp.url; t.url = pp.url; t._q = effQuality();
+              if (pp.duration && !t.duration) t.duration = pp.duration;
+              if (pp.art && !t.art) t.art = pp.art;
+            }
+          }
+        } else src = t.url || '';
+        if (!alive()) return;
+        if (!src) { _pre.delete(t.id); return; }
+        e.url = src;
+
+        const conn = navigator.connection;
+        const noBlob = t.source === 'itunes' || t._plain || (conn && conn.saveData);
+        if (!noBlob) {
+          e.ac = new AbortController();
+          try {
+            const r = await fetch(src, { signal: e.ac.signal });
+            const len = +r.headers.get('content-length') || 0;
+            if (!r.ok || len > PRE_MAX_BYTES) throw new Error('skip');
+            let b = await r.blob();
+            if (!alive()) return;
+            if (!b.size || b.size > PRE_MAX_BYTES || /^(text\/|application\/(json|xml))/.test(b.type)) throw new Error('bad');
+            if (!b.type) b = new Blob([b], { type: 'audio/mpeg' });
+            e.blobUrl = URL.createObjectURL(b); e.ac = null;
+            return;
+          } catch (err) { if (!alive()) return; e.ac = null; }
+        }
+        // CORS заборонено / економія трафіку — просто прогріваємо кеш браузера
+        if (!(conn && conn.saveData)) {
+          const a = new Audio(); a.preload = 'auto'; a.src = src; a.load(); e.warm = a;
+        }
+      } catch (err) { if (alive()) _pre.delete(t.id); }
+    }
+    function preloadNeighbors() {
+      if (!currentTrack) return;
+      // не заважаємо буферизації поточного треку
+      if (isPlaying && audio.readyState < 3 && _preTries++ < 6) { schedulePreload(); return; }
+      _preTries = 0;
+      const nx = peekQueue(1), pv = peekQueue(-1);
+      const keep = new Set([nx && nx.id, pv && pv.id].filter(Boolean));
+      [..._pre.keys()].forEach(id => { if (!keep.has(id)) dropPreloaded(id); });
+      if (!nx && !pv) return;
+      (nx ? preloadTrack(nx) : Promise.resolve()).then(() => pv && preloadTrack(pv));
+    }
+    function schedulePreload() {
+      clearTimeout(_preTimer);
+      _preTimer = setTimeout(preloadNeighbors, 1500);
+    }
+    addEventListener('online', schedulePreload);
+
     function saveData() {
       const toSave = library.map(t => ({
         id: t.id,
@@ -3474,11 +3884,11 @@
     function trackHTML(t, showSave, inPlaylist) {
       const saved = library.some(l => l.id === t.id);
       return `
-        <div class="track-item ${currentTrack && currentTrack.id === t.id ? 'playing' : ''}" data-id="${t.id}">
-          <img class="track-art" src="${t.art || ART_PLACEHOLDER}" alt="" />
+        <div class="track-item ${currentTrack && currentTrack.id === t.id ? 'playing' : ''}${isPlayableOffline(t) ? ' has-off' : ''}${offBusy.has(t.id) ? ' dl-busy' : ''}" data-id="${t.id}">
+          <img class="track-art" src="${artOf(t) || ART_PLACEHOLDER}" alt="" />
           <div class="track-info">
             <div class="track-title">${escapeHtml(t.title)}</div>
-            <div class="track-artist">${escapeHtml(t.artist)}</div>
+            <div class="track-artist">${offlineIds.has(t.id) ? OFF_BADGE : ''}${escapeHtml(t.artist)}</div>
           </div>
           <span class="track-duration">${formatTime(t.duration)}</span>
           <div class="track-actions">
@@ -3571,11 +3981,14 @@
       });
     }
 
-    function toggleSave(id) {
+    function toggleSave(id, confirmed) {
       const idx = library.findIndex(t => t.id === id);
       if (idx >= 0) {
+        // зняття сердечка / видалення — спершу питаємо підтвердження
+        if (!confirmed) { confirmRemoveTrack(id).then(ok => { if (ok) toggleSave(id, true); }); return; }
         // remove from library and from all playlists
         library.splice(idx, 1);
+        if (offlineIds.has(id)) offlineDelete(id).then(() => { syncOfflineBadges(); updateMoreOffline(); });
         playlists.forEach(pl => {
           pl.trackIds = (pl.trackIds || []).filter(tid => tid !== id);
         });
@@ -3637,15 +4050,18 @@
       items.push({ icon: 'lyrics', text: 'Текст пісні / караоке', fn: () => window.gmLyrics && window.gmLyrics.open(t) });
       items.push({ icon: 'playlist_add', text: 'Додати до плейлиста', fn: () => openAddToPlaylist(id) });
       if (currentPlaylistId && inLib) {
-        items.push({ icon: 'remove_circle_outline', text: 'Прибрати з цього плейлиста', fn: () => animateRemove(id, () => removeFromCurrentPlaylist(id)) });
+        items.push({ icon: 'remove_circle_outline', text: 'Прибрати з цього плейлиста', fn: () => confirmRemoveFromPlaylist(id).then(ok => { if (ok) animateRemove(id, () => removeFromCurrentPlaylist(id, true)); }) });
       }
       items.push({ icon: 'person', text: 'Усі треки виконавця', fn: () => showArtistTracks(t.artist) });
       if (t.source === 'youtube' && t.streamId) items.push({ icon: 'open_in_new', text: 'Відкрити на YouTube', fn: () => window.open('https://www.youtube.com/watch?v=' + t.streamId, '_blank') });
       items.push({ icon: 'content_cut', text: 'Обрізати і зберегти', fn: () => openTrim(t) });
+      items.push(offlineIds.has(id)
+        ? { icon: 'cloud_done', text: 'Прибрати з офлайн-пам’яті', fn: () => toggleOffline(t) }
+        : { icon: 'cloud_download', text: 'Завантажити для офлайн', fn: () => toggleOffline(t) });
       items.push({ icon: 'download', text: 'Завантажити на пристрій', fn: () => downloadTrack(t) });
       items.push({ icon: 'share', text: 'Поділитися', fn: () => shareTrack(t) });
       items.push({ icon: 'info', text: 'Про трек', fn: () => toast(`${t.title} · ${t.artist} · ${formatTime(t.duration)}`) });
-      if (inLib) items.push({ icon: 'delete', text: 'Видалити з бібліотеки', danger: true, fn: () => animateRemove(id, () => toggleSave(id)) });
+      if (inLib) items.push({ icon: 'delete', text: 'Видалити з бібліотеки', danger: true, fn: () => confirmRemoveTrack(id).then(ok => { if (ok) animateRemove(id, () => toggleSave(id, true)); }) });
       else items.push({ icon: 'favorite_border', text: 'Зберегти в мою музику', fn: () => toggleSave(id) });
       const list = document.getElementById('tmList');
       list.innerHTML = items.map((it, i) => `<button class="${it.danger ? 'danger' : ''}" data-i="${i}"><span class="material-icons-round">${it.icon}</span>${it.text}</button>`).join('');
@@ -3780,10 +4196,11 @@
       document.getElementById('addToPlModal').classList.add('open');
     }
 
-    function removeFromCurrentPlaylist(trackId) {
+    function removeFromCurrentPlaylist(trackId, confirmed) {
       if (!currentPlaylistId) return;
       const pl = playlists.find(p => p.id === currentPlaylistId);
       if (!pl) return;
+      if (!confirmed) { confirmRemoveFromPlaylist(trackId).then(ok => { if (ok) removeFromCurrentPlaylist(trackId, true); }); return; }
       pl.trackIds = (pl.trackIds || []).filter(id => id !== trackId);
       saveData();
       toast('Прибрано з плейлиста');
@@ -3889,6 +4306,7 @@
       updatePlayerUI();
       toast('Не вдалося завантажити трек без реклами. Спробуйте пізніше');
     }
+    let _curOffUrl = null;
     async function playTrack(track, q) {
       if (!track) return;
       const resumePos = (resumeAt > 0 && resumeId === track.id) ? resumeAt : 0;
@@ -3910,10 +4328,26 @@
       }
 
       let src = track.url || track.blobUrl || '';
-      if (track.source === 'audius' && track.streamId) {
+      // Офлайн-копія має пріоритет над мережею
+      let offUrl = null, preUrl = null;
+      const pre = takePreloaded(track.id);
+      if (pre && pre.blobUrl) { offUrl = pre.blobUrl; src = offUrl; }
+      else if (pre && pre.url) { preUrl = pre.url; src = preUrl; }
+      if (!offUrl && offlineIds.has(track.id)) {
+        isLoading = true; updatePlayerUI();
+        offUrl = await getOfflineUrl(track.id);
+        if (currentTrack !== track) { if (offUrl) URL.revokeObjectURL(offUrl); return; }
+        if (offUrl) src = offUrl; else offlineIds.delete(track.id);
+      }
+      if (!offUrl && !navigator.onLine && !(track.local && track.blobUrl)) {
+        isLoading = false; updatePlayerUI();
+        toast('Немає інтернету — цей трек не завантажено для офлайн');
+        return;
+      }
+      if (!offUrl && !preUrl && track.source === 'audius' && track.streamId) {
         src = getAudiusStreamUrl(track.streamId);
       }
-      if (track.source === 'jamendo' && track.streamId) {
+      if (!offUrl && !preUrl && track.source === 'jamendo' && track.streamId) {
         isLoading = true; updatePlayerUI();
         try {
           const fmt = track._noFmt ? null : jamendoFormat();
@@ -3923,7 +4357,7 @@
         } catch (e) { console.error(e); }
         if (currentTrack !== track) return;
       }
-      if (track.source === 'youtube' && track.streamId) {
+      if (!offUrl && !preUrl && track.source === 'youtube' && track.streamId) {
         // Якщо URL вже є (з попереднього успішного Piped) — використовуємо його
         if (track.url && !track._forceYt && track._q === effQuality()) {
           src = track.url;
@@ -3961,13 +4395,15 @@
       }
 
       // выбираем элемент: iTunes без CORS — на обычный, остальное — с EQ
-      const next = (track.source === 'itunes' || track._plain) ? audioPlain : audioCors;
+      const next = ((track.source === 'itunes' || track._plain) && !offUrl) ? audioPlain : audioCors;
       if (audio !== next) { audio.pause(); }
       audio = next;
       showYtBox(false);
-      if (track.preview) toast('Превʼю 30 с (iTunes)');
+      if (track.preview && !offUrl) toast('Превʼю 30 с (iTunes)');
 
       audio.src = src;
+      if (_curOffUrl && _curOffUrl !== offUrl) { try { URL.revokeObjectURL(_curOffUrl); } catch (e) {} }
+      _curOffUrl = offUrl;
       if (resumePos > 0) {
         histPending = null;
         audio.addEventListener('loadedmetadata', () => { try { audio.currentTime = resumePos; } catch (e) {} }, { once: true });
@@ -3986,6 +4422,7 @@
       });
       document.getElementById('playerBar').classList.add('visible');
       updatePlayerUI();
+      schedulePreload();
     }
 
     function togglePlay() {
@@ -4002,20 +4439,28 @@
       }
       updatePlayerUI();
     }
+    // Крок по черзі; без інтернету пропускає треки, яких немає офлайн
+    function stepQueue(dir) {
+      const n = queue.length;
+      for (let k = 1; k <= n; k++) {
+        const i = (((currentIndex + dir * k) % n) + n) % n;
+        const t = queue[i];
+        if (navigator.onLine || isPlayableOffline(t)) { currentIndex = i; playTrack(t, 'next'); return; }
+      }
+      toast('Немає завантажених треків для офлайн');
+    }
     function nextTrack() {
       if (!queue.length) return;
-      currentIndex = (currentIndex + 1) % queue.length;
-      playTrack(queue[currentIndex], 'next');
+      stepQueue(1);
     }
     function prevTrack() {
       if (!queue.length) return;
       if (audio.currentTime > 3) { audio.currentTime = 0; return; }
-      currentIndex = (currentIndex - 1 + queue.length) % queue.length;
-      playTrack(queue[currentIndex], 'next');
+      stepQueue(-1);
     }
     function updatePlayerUI() {
       if (!currentTrack) return;
-      const art = currentTrack.art || ART_PLACEHOLDER;
+      const art = artOf(currentTrack) || ART_PLACEHOLDER;
       document.getElementById('playerArt').src = art;
       document.getElementById('playerTitle').textContent = currentTrack.title;
       document.getElementById('playerArtist').textContent = currentTrack.artist;
@@ -4052,6 +4497,7 @@
       btn.querySelector('.material-icons-round').textContent = saved ? 'favorite' : 'favorite_border';
       btn.style.color = '';
       btn.classList.toggle('saved', saved);
+      updateMoreOffline();
     }
 
     // ========== MEDIA SESSION (плеєр у шторці / на екрані блокування) ==========
@@ -4071,10 +4517,10 @@
     }
     function updateMediaSession() {
       if (!('mediaSession' in navigator) || !currentTrack || typeof MediaMetadata === 'undefined') return;
-      const t = currentTrack, key = t.id + '|' + (t.art || '') + '|' + t.title;
+      const t = currentTrack, key = t.id + '|' + artOf(t) + '|' + t.title;
       if (_msKey !== key) {
         _msKey = key;
-        const src = (t.art && /^(https?:|blob:|data:)/.test(t.art)) ? t.art : placeholderPng();
+        const ta = artOf(t), src = (ta && /^(https?:|blob:|data:)/.test(ta)) ? ta : placeholderPng();
         try {
           navigator.mediaSession.metadata = new MediaMetadata({
             title: t.title, artist: t.artist, album: 'GMusic',
@@ -4126,6 +4572,7 @@
       setTimeout(() => URL.revokeObjectURL(a.href), 60000);
     }
     async function fetchTrackBlob(t) {
+      if (offlineIds.has(t.id)) { const ob = await getOfflineBlob(t.id); if (ob) return ob; }
       const src = await resolveTrackSrc(t);
       if (!src) throw new Error('nosrc');
       const r = await fetch(src);
@@ -4692,7 +5139,7 @@
       document.getElementById('histClose').addEventListener('click', () => histModal.classList.remove('open'));
       histModal.addEventListener('click', e => { if (e.target === histModal) histModal.classList.remove('open'); });
       document.getElementById('histClear').addEventListener('click', () => {
-        if (!confirm('Очистити всю історію прослуховування?')) return;
+        if (!confirm('Очистити всю історію прослуховування та пошуку?')) return;
         playHistory = []; saveHistory(); renderHistory(); updateHistCount(); toast('Історію очищено');
       });
       document.getElementById('histList').addEventListener('click', e => {
@@ -4904,7 +5351,7 @@
       let searchTimeout = null;
 
       renderFilterChips();
-      let fieldTimer = null;
+      let fieldTimer = null, histSearchTimer = null;
       ['fArtist', 'fTitle'].forEach(id => {
         const el = document.getElementById(id);
         el.addEventListener('input', () => {
@@ -4914,8 +5361,10 @@
           renderFilterChips();
           clearTimeout(fieldTimer);
           fieldTimer = setTimeout(runSearch, 450);
+          clearTimeout(histSearchTimer);
+          histSearchTimer = setTimeout(commitSearchHistory, 1800);   // запис, коли користувач зупинився
         });
-        el.addEventListener('keydown', e => { if (e.key === 'Enter') { el.blur(); clearTimeout(fieldTimer); runSearch(); } });
+        el.addEventListener('keydown', e => { if (e.key === 'Enter') { el.blur(); clearTimeout(fieldTimer); clearTimeout(histSearchTimer); runSearch(); commitSearchHistory(); } });
       });
       document.getElementById('filterToggle').addEventListener('click', () => document.getElementById('filterPanel').classList.toggle('open'));
       document.getElementById('filterClear').addEventListener('click', () => {
@@ -5143,6 +5592,7 @@
       switchView('library');
       renderPlaylists();
       renderLibraryTracks();
+      offlineInit();
       renderDiscover();
       document.getElementById('refreshRec').addEventListener('click', (e) => {
         e.currentTarget.animate([{ transform: 'rotate(0)' }, { transform: 'rotate(360deg)' }], { duration: 500, easing: 'cubic-bezier(0.2,0.8,0.2,1)' });
