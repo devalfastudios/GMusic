@@ -149,7 +149,7 @@
       visibility: hidden;
       pointer-events: none;
       transform: translateX(100%);
-      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, visibility 0s linear 0.4s;
+      transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease, visibility 0s linear 0.55s;
       -webkit-overflow-scrolling: touch;
       overscroll-behavior: contain;
     }
@@ -656,6 +656,116 @@
       color: var(--md-sys-color-on-primary);
     }
 
+    /* АНІМАЦІЇ НИЖНЬОЇ ПАНЕЛІ */
+    .bottom-nav .nav-item, .sidebar-nav .nav-item { position: relative; }
+    .nav-spark { position: absolute; width: 5px; height: 5px; margin: -2.5px 0 0 -2.5px; border-radius: 50%; background: var(--md-sys-color-primary); pointer-events: none; z-index: 3; animation: sparkOut .6s ease-out forwards; }
+    @keyframes sparkOut { from { transform: rotate(var(--a)) translateY(-6px) scale(1); opacity: 1; } to { transform: rotate(var(--a)) translateY(-28px) scale(.2); opacity: 0; } }
+    @media (prefers-reduced-motion: no-preference) {
+      /* Моя музика — «ритм»: пульс із похитуванням */
+      .nav-item.pop[data-view="library"] .material-icons-round { animation: navBeat .75s cubic-bezier(.3,1.3,.5,1); }
+      @keyframes navBeat { 0% { transform: scale(1) rotate(0); } 20% { transform: scale(1.4) rotate(-10deg); } 40% { transform: scale(.9) rotate(8deg); } 60% { transform: scale(1.22) rotate(-5deg); } 80% { transform: scale(1) rotate(3deg); } 100% { transform: scale(1.08) rotate(0); } }
+      /* Пошук — лупа «оглядається» */
+      .nav-item.pop[data-view="search"] .material-icons-round { animation: navSearch .8s ease-in-out; }
+      @keyframes navSearch { 0% { transform: translate(0,0) rotate(0) scale(1); } 20% { transform: translate(-3px,-3px) rotate(-28deg) scale(1.2); } 45% { transform: translate(3px,-2px) rotate(22deg) scale(1.25); } 70% { transform: translate(-1px,2px) rotate(-10deg) scale(1.1); } 100% { transform: translate(0,0) rotate(0) scale(1.08); } }
+      /* Налаштування — шестерня прокручується з розгоном і «пружиною» */
+      .nav-item.pop[data-view="settings"] .material-icons-round { animation: navGear .85s cubic-bezier(.25,1,.4,1); }
+      @keyframes navGear { 0% { transform: rotate(0) scale(1); } 55% { transform: rotate(410deg) scale(1.3); } 80% { transform: rotate(350deg) scale(1.12); } 100% { transform: rotate(360deg) scale(1.08); } }
+      /* Акаунт — переворот зі «желейним» відскоком */
+      .nav-item.pop[data-view="account"] .material-icons-round { animation: navFlip .8s cubic-bezier(.3,1.2,.5,1); }
+      @keyframes navFlip { 0% { transform: perspective(160px) rotateY(0) scale(1); } 50% { transform: perspective(160px) rotateY(200deg) scale(1.3); } 75% { transform: perspective(160px) rotateY(350deg) scale(.92); } 100% { transform: perspective(160px) rotateY(360deg) scale(1.08); } }
+      /* Підпис «виїжджає» знизу */
+      .nav-item.pop span:last-child { animation: navLabel .5s cubic-bezier(.2,.9,.3,1.3); }
+      @keyframes navLabel { from { transform: translateY(7px); opacity: .2; } to { transform: none; opacity: 1; } }
+    }
+
+    /* ЕКВАЛАЙЗЕР 2.0 */
+    .eqx { display: flex; flex-direction: column; gap: 12px; }
+    .eqx-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+    .eqx-power { display: flex; align-items: center; gap: 4px; font-weight: 500; }
+    .eqx-power .switch { transform: scale(.82); transform-origin: left center; margin-right: -8px; }
+    .eqx-actions { display: flex; gap: 6px; }
+    .eqx-btn { display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px 6px 8px; border-radius: 18px; border: 1px solid var(--md-sys-color-outline-variant); background: transparent; color: var(--md-sys-color-on-surface); font: inherit; font-size: 0.8rem; cursor: pointer; }
+    .eqx-btn .material-icons-round { font-size: 18px; }
+    .eqx-btn.danger { color: var(--md-sys-color-error); border-color: color-mix(in srgb, var(--md-sys-color-error) 45%, transparent); }
+    .eqx-btn:active { transform: scale(.96); }
+    .eqx-curve { position: relative; height: 112px; border-radius: 16px; background: rgba(255,255,255,0.045); overflow: hidden; }
+    .eqx.compact .eqx-curve { height: 84px; }
+    .eqx-curve canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: ns-resize; }
+    .eqx .eq-sliders { height: auto; padding: 0; gap: 2px; }
+    .eqx .eq-band { gap: 4px; }
+    .eqx.compact .eq-band input[type="range"] { height: 84px; }
+    .eq-band .eq-db { font-size: 0.68rem; font-variant-numeric: tabular-nums; min-height: 1em; color: var(--md-sys-color-on-surface-variant); }
+    .eq-band .eq-db.nz { color: var(--md-sys-color-primary); font-weight: 600; }
+    .eqx.off .eqx-curve, .eqx.off .eq-sliders, .eqx.off .eqx-row.pre { opacity: .42; }
+    .eqx-row { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; }
+    .eqx-lbl { flex-shrink: 0; }
+    .eqx-row small { display: block; color: var(--md-sys-color-on-surface-variant); font-size: 0.72rem; margin-top: 2px; line-height: 1.3; }
+    .eqx-row.lim { justify-content: space-between; align-items: center; }
+    .eqx-row.lim .switch { flex-shrink: 0; transform: scale(.82); transform-origin: right center; }
+    .eqx-pre { flex: 1; min-width: 0; -webkit-appearance: none; appearance: none; height: 4px; border-radius: 2px; outline: none; background: rgba(255,255,255,0.2); cursor: pointer; }
+    .eqx-pre::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--md-sys-color-primary); box-shadow: 0 1px 5px rgba(0,0,0,.45); }
+    .eqx-pre::-moz-range-thumb { width: 18px; height: 18px; border: 0; border-radius: 50%; background: var(--md-sys-color-primary); }
+    .eqx-val { min-width: 52px; text-align: right; font-variant-numeric: tabular-nums; color: var(--md-sys-color-primary); }
+    .eqx .eq-presets { margin-top: 0; }
+    .eq-preset.custom { border-style: dashed; }
+    .eq-preset .x { margin-left: 6px; opacity: .65; }
+    .eqx-note { font-size: 0.74rem; color: var(--md-sys-color-on-surface-variant); text-align: center; }
+    .eqx-note:empty { display: none; }
+    .fp-eq-sheet { max-height: 64%; }
+
+    /* ГУЧНІСТЬ: відсотки */
+    .vol-pct { font-size: 0.7rem; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1; text-align: center; color: var(--md-sys-color-on-surface-variant); }
+    .vol-pct.boost { color: #ffb74d; }
+    .vol-pct.limited::after { content: '*'; }
+    .vol-panel .vol-pct { margin-bottom: 2px; color: #fff; }
+    .vol-panel .vol-pct.boost { color: #ffb74d; }
+    .vol-pct-fold { position: absolute; left: 50%; transform: translateX(-50%); top: 48px; padding: 3px 7px; border-radius: 10px; background: rgba(0,0,0,.45); color: #fff; white-space: nowrap; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+    .vol-pct-fold.boost { color: #ffb74d; }
+    .player-vol .vol-pct { width: 40px; flex-shrink: 0; text-align: right; }
+
+    /* ПЕРЕТЯГУВАННЯ ПО НИЖНІЙ ПАНЕЛІ */
+    .bottom-nav { overflow: hidden; touch-action: none; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; transition: transform .28s cubic-bezier(.2,.9,.3,1.25); }
+    .bottom-nav.grabbing { transform: scale(1.035); }
+    .nav-indicator.dragging {
+      transition: background .2s ease, box-shadow .2s ease;
+      background: color-mix(in srgb, var(--md-sys-color-primary-container) 62%, #fff 38%);
+      box-shadow: 0 0 0 1px rgba(255,255,255,.22), 0 8px 22px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.28);
+      -webkit-backdrop-filter: blur(6px) brightness(1.15); backdrop-filter: blur(6px) brightness(1.15);
+      z-index: 2;
+    }
+    .bottom-nav.grabbing .nav-item { z-index: 3; }
+    .bottom-nav.grabbing .nav-item.active:not(.drag-over) { color: var(--md-sys-color-on-surface-variant); }
+    .bottom-nav.grabbing .nav-item.drag-over { color: var(--md-sys-color-on-primary-container); }
+    .bottom-nav.grabbing .nav-item .material-icons-round { transition: transform .2s cubic-bezier(.3,1.4,.5,1); }
+    .bottom-nav.grabbing .nav-item.drag-over .material-icons-round { transform: translateY(-2px) scale(1.22); }
+    .bottom-nav.grabbing .nav-item:not(.drag-over) .material-icons-round { transform: scale(.94); }
+
+    /* ІНФО ПРО ТРЕК */
+    .info-list { display: flex; flex-direction: column; margin-top: 6px; }
+    .info-row { display: flex; justify-content: space-between; gap: 16px; padding: 11px 2px; border-bottom: 1px solid rgba(255,255,255,0.07); font-size: 0.92rem; }
+    .info-row:last-child { border-bottom: none; }
+    .info-k { color: var(--md-sys-color-on-surface-variant); flex-shrink: 0; }
+    .info-v { text-align: right; min-width: 0; overflow-wrap: anywhere; }
+    .info-v.mono { font-family: ui-monospace, Menlo, monospace; font-size: 0.78rem; opacity: 0.8; }
+    .info-note { font-size: 0.78rem; color: var(--md-sys-color-on-surface-variant); text-align: center; margin: 10px 0 4px; min-height: 1.1em; }
+
+    /* ПРОГРЕС ПІДГОТОВКИ ФАЙЛУ */
+    .dl-card { position: fixed; left: 12px; right: 12px; top: calc(env(safe-area-inset-top, 0px) + 10px); max-width: 520px; margin: 0 auto; z-index: 1000;
+      background: var(--md-sys-color-surface-container-high); color: var(--md-sys-color-on-surface); border-radius: 20px; padding: 10px 8px 14px 16px;
+      box-shadow: 0 8px 28px rgba(0,0,0,.45); transform: translateY(-170%); opacity: 0; pointer-events: none;
+      transition: transform .3s cubic-bezier(.2,.8,.2,1), opacity .2s ease; }
+    .dl-card.show { transform: none; opacity: 1; pointer-events: auto; }
+    .dl-row { display: flex; align-items: center; gap: 12px; padding-right: 4px; }
+    .dl-row > .material-icons-round { color: var(--md-sys-color-primary); }
+    .dl-txt { flex: 1; min-width: 0; }
+    .dl-title { font-size: 0.92rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .dl-sub { font-size: 0.78rem; color: var(--md-sys-color-on-surface-variant); margin-top: 1px; }
+    .dl-pct { font-size: 0.85rem; font-variant-numeric: tabular-nums; color: var(--md-sys-color-on-surface-variant); min-width: 36px; text-align: right; }
+    .dl-bar { height: 6px; border-radius: 3px; background: rgba(255,255,255,0.12); margin: 10px 8px 0 0; overflow: hidden; }
+    .dl-fill { height: 100%; width: 0; border-radius: 3px; background: var(--md-sys-color-primary); transition: width .25s ease; }
+    .dl-card.indet .dl-fill { width: 35% !important; animation: dlSlide 1.1s ease-in-out infinite; transition: none; }
+    @keyframes dlSlide { 0% { transform: translateX(-100%); } 100% { transform: translateX(300%); } }
+
     /* CONFIRM + OFFLINE */
     .btn-confirm.danger { background: var(--md-sys-color-error); color: var(--md-sys-color-on-error); }
     .confirm-text { text-align: center; font-size: 0.95rem; line-height: 1.45; color: var(--md-sys-color-on-surface-variant); margin-top: -8px; word-break: break-word; }
@@ -1116,7 +1226,8 @@
       border-radius: 26px;
       background: var(--md-sys-color-primary-container);
       transform: translateX(calc(var(--nav-idx) * 100%));
-      transition: transform 0.45s cubic-bezier(0.3, 1.15, 0.4, 1), background 0.3s;
+      transition: background 0.3s;   /* позицією керує пружинна фізика (navPhys) */
+      will-change: transform;
       z-index: 0;
       pointer-events: none;
     }
@@ -1551,11 +1662,13 @@
     .vol-vwrap .vol-slider::-moz-range-thumb { width: 20px; height: 20px; }
     .vol-slider {
       -webkit-appearance: none; appearance: none; flex: 1; min-width: 0; height: 4px; border-radius: 2px; outline: none; cursor: pointer;
-      background: linear-gradient(to right, var(--md-sys-color-primary) var(--v, 100%), rgba(255,255,255,0.22) var(--v, 100%));
+      background:
+        linear-gradient(to right, transparent calc(50% - 1px), rgba(255,255,255,0.8) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)),
+        linear-gradient(to right, var(--md-sys-color-primary) var(--v1, 50%), #ffb74d var(--v1, 50%) var(--v, 50%), rgba(255,255,255,0.22) var(--v, 50%));
     }
     .vol-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--md-sys-color-primary); border: 0; box-shadow: 0 1px 4px rgba(0,0,0,.4); }
     .vol-slider::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: var(--md-sys-color-primary); border: 0; }
-    .player-vol { display: none; align-items: center; gap: 2px; width: 140px; flex-shrink: 0; cursor: default; }
+    .player-vol { display: none; align-items: center; gap: 2px; width: 186px; flex-shrink: 0; cursor: default; }
     .player-vol .vol-btn { width: 36px; height: 36px; }
     @media (min-width: 900px) { .player-vol { display: flex; } }
 
@@ -2002,6 +2115,10 @@
     .ly-line.past { color: var(--ly-past); }
     .ly-line.on { color: var(--md-sys-color-on-surface); transform: scale(1.04); }
     .ly-line.on .ly-w { background: linear-gradient(90deg, var(--md-sys-color-primary) var(--w, 0%), var(--md-sys-color-on-surface) var(--w, 0%)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: none; }
+    /* розтягнуті букви видно одразу (як решту тексту), а під час ноти вони поступово заповнюються кольором */
+    .ly-hold { display: inline; }
+    .ly-hold i { font-style: normal; display: inline-block; color: inherit; -webkit-text-fill-color: currentColor; transition: color .2s, -webkit-text-fill-color .2s, transform .25s; }
+    .ly-line.on .ly-hold i.on { color: var(--md-sys-color-primary); -webkit-text-fill-color: var(--md-sys-color-primary); transform: scale(1.12); }
     .ly-dots { display: flex; gap: 10px; padding: 14px 22px; cursor: default; }
     .ly-d { width: 13px; height: 13px; border-radius: 50%; background: var(--ly-past); transition: background .25s, transform .25s; }
     .ly-d.on { background: var(--md-sys-color-primary); transform: scale(1.3); }
@@ -2085,7 +2202,87 @@
     .cust-preview .player-bar, .cust-preview .bottom-nav { position: relative !important; left: auto !important; right: auto !important; bottom: auto !important; margin: 0 !important; max-width: none !important; transform: none !important; opacity: 1 !important; width: 100%; }
     .cust-preview .nav-item { pointer-events: none; }
     .cust-preview-label { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--md-sys-color-on-surface-variant); margin: 0 6px -6px; }
-  </style>
+  
+    /* ===== Пружинні випадаючі меню (як у системному «Годиннику»): ростуть із кута кнопки ⋮ і згортаються назад ===== */
+    .more-menu, .lyr-menu { transform-origin: top right; }
+    .more-menu { opacity: 0; transform: scale(.32); transition: opacity .14s ease-in, transform .17s cubic-bezier(.4,0,1,1); }
+    .more-menu.open { opacity: 1; transform: scale(1); transition: opacity .16s ease-out, transform .38s cubic-bezier(.2,1.35,.35,1); }
+    .lyr-menu { display: flex; opacity: 0; visibility: hidden; pointer-events: none; transform: scale(.32);
+      transition: opacity .14s ease-in, transform .17s cubic-bezier(.4,0,1,1), visibility 0s .17s; }
+    .lyr-menu.open { opacity: 1; visibility: visible; pointer-events: auto; transform: scale(1);
+      transition: opacity .16s ease-out, transform .38s cubic-bezier(.2,1.35,.35,1), visibility 0s; }
+    @keyframes popItem { from { opacity: 0; transform: translateY(-7px) scale(.96); } to { opacity: 1; transform: none; } }
+    .more-menu.open > *, .lyr-menu.open > * { animation: popItem .3s cubic-bezier(.2,.9,.3,1) backwards; }
+    .more-menu.open > :nth-child(1), .lyr-menu.open > :nth-child(1) { animation-delay: .04s; }
+    .more-menu.open > :nth-child(2), .lyr-menu.open > :nth-child(2) { animation-delay: .07s; }
+    .more-menu.open > :nth-child(3), .lyr-menu.open > :nth-child(3) { animation-delay: .10s; }
+    .more-menu.open > :nth-child(4), .lyr-menu.open > :nth-child(4) { animation-delay: .13s; }
+    .more-menu.open > :nth-child(5), .lyr-menu.open > :nth-child(5) { animation-delay: .16s; }
+    .more-menu.open > :nth-child(n+6), .lyr-menu.open > :nth-child(n+6) { animation-delay: .19s; }
+    /* Кнопка гучності та FAB — той самий м'який «виліт» */
+    .vol-panel { transition: opacity .18s ease, transform .36s cubic-bezier(.2,1.3,.4,1); }
+    @keyframes fabPop { from { opacity: 0; transform: translateY(16px) scale(.4); } 60% { opacity: 1; transform: translateY(-2px) scale(1.06); } to { opacity: 1; transform: none; } }
+    .fab-option { animation: fabPop .38s cubic-bezier(.2,.9,.3,1) backwards; transform-origin: bottom right; }
+    @media (prefers-reduced-motion: reduce) { .more-menu, .lyr-menu, .more-menu.open, .lyr-menu.open, .more-menu.open > *, .lyr-menu.open > *, .fab-option { transition-duration: .01s !important; animation: none !important; } }
+
+    /* ===== Шапка плавно згортається при прокрутці вниз і повертається при прокрутці вгору ===== */
+    /* Шапка лежить поверх вмісту й просто від'їжджає вгору (без зміни розміру в'ю — тому без ривків) */
+    @media (max-width: 899px) {
+      .header { position: absolute; top: 0; left: 0; right: 0; will-change: transform; overflow: hidden; transition: transform .34s cubic-bezier(.2,.8,.2,1), opacity .25s ease, border-color .25s; }
+      .view { inset: 0; padding-top: calc(var(--header-height) + 14px); }
+      .main.hdr-collapsed .header { transform: translateY(-100%); opacity: 0; border-bottom-color: transparent; pointer-events: none; }
+    }
+    @media (prefers-reduced-motion: reduce) { .header { transition: none !important; } }
+
+    /* ===== Фільтри: нижня шторка поверх сторінки (не зсуває вміст) ===== */
+    .filter-panel { display: none !important; }
+    .active-filters { margin: 10px 0 0; }
+    .active-filters .chip { display: inline-flex; align-items: center; gap: 4px; padding: 6px 8px 6px 12px; font-size: .82rem; background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); border-color: transparent; animation: popItem .25s ease backwards; }
+    .active-filters .chip .material-icons-round { font-size: 16px; opacity: .75; }
+    .fs-overlay { position: fixed; inset: 0; z-index: 400; background: rgba(0,0,0,.55); opacity: 0; pointer-events: none; transition: opacity .3s ease; }
+    .fs-overlay.open { opacity: 1; pointer-events: auto; }
+    .fs-sheet { position: fixed; left: 0; right: 0; bottom: 0; margin: 0 auto; max-width: 680px; max-height: 88vh; z-index: 401; display: flex; flex-direction: column;
+      background: var(--md-sys-color-surface-container-high); border-radius: 28px 28px 0 0; box-shadow: 0 -12px 44px rgba(0,0,0,.5);
+      transform: translateY(105%); visibility: hidden; transition: transform .42s cubic-bezier(.2,.95,.3,1), visibility 0s .42s; padding-bottom: env(safe-area-inset-bottom, 0px); }
+    .fs-sheet.open { transform: none; visibility: visible; transition: transform .42s cubic-bezier(.2,.95,.3,1), visibility 0s; }
+    .fs-sheet.dragging { transition: none; }
+    .fs-grab { touch-action: none; cursor: grab; flex-shrink: 0; }
+    .fs-handle { width: 42px; height: 5px; border-radius: 3px; background: var(--md-sys-color-outline-variant, rgba(255,255,255,.3)); margin: 10px auto 2px; }
+    .fs-head { display: flex; align-items: center; justify-content: space-between; padding: 4px 12px 6px 22px; }
+    .fs-head h3 { font-size: 1.25rem; font-weight: 500; }
+    .fs-body { overflow-y: auto; overscroll-behavior: contain; padding: 0 20px 8px; flex: 1 1 auto; }
+    .fs-sec { padding: 12px 0 14px; border-bottom: 1px solid rgba(255,255,255,.06); }
+    .fs-sec:last-child { border-bottom: 0; }
+    .fs-t { display: flex; align-items: center; gap: 8px; font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; color: var(--md-sys-color-on-surface-variant); margin-bottom: 10px; }
+    .fs-t .material-icons-round { font-size: 18px; color: var(--md-sys-color-primary); }
+    .fs-sub { font-size: .78rem; color: var(--md-sys-color-on-surface-variant); margin: 10px 0 6px; opacity: .85; }
+    .fs-sub:first-child { margin-top: 0; }
+    .fs-foot { display: flex; gap: 10px; padding: 12px 20px 14px; border-top: 1px solid rgba(255,255,255,.08); flex-shrink: 0; }
+    .fs-foot .btn-filled { flex: 1; justify-content: center; }
+    .fs-foot .btn-outline { flex: 0 0 auto; }
+    .fs-sheet .chip { transition: background .2s, color .2s, border-color .2s, transform .2s cubic-bezier(.2,1.4,.4,1); }
+    .fs-sheet .chip.on { transform: scale(1.04); }
+
+    /* ===== Стрічка рекомендацій: ряди з горизонтальним прокручуванням ===== */
+    #quickMoods { margin-bottom: 4px; }
+    .quick-chip { display: inline-flex; align-items: center; gap: 6px; padding: 10px 16px; border-radius: 16px; border: 0; font: inherit; font-size: .9rem; cursor: pointer; white-space: nowrap;
+      background: var(--md-sys-color-surface-container-high); color: var(--md-sys-color-on-surface); transition: transform .15s; }
+    .quick-chip:active { transform: scale(.94); }
+    .rec-sec { margin: 6px 0 4px; animation: itemIn .4s cubic-bezier(.2,.8,.2,1) backwards; }
+    .rec-sec-head { display: flex; align-items: center; gap: 12px; margin: 14px 0 10px; }
+    .rec-sec-head .ic { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); flex-shrink: 0; }
+    .rec-sec-head .ic .material-icons-round { font-size: 22px; }
+    .rec-sec-head h3 { font-size: 1.05rem; font-weight: 500; line-height: 1.2; }
+    .rec-sec-head p { font-size: .78rem; color: var(--md-sys-color-on-surface-variant); margin-top: 1px; }
+    .rec-row { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x proximity; margin: 0 -16px; padding: 2px 16px 12px; scrollbar-width: none; }
+    .rec-row::-webkit-scrollbar { display: none; }
+    .rec-row .rec-card { flex: 0 0 142px; scroll-snap-align: start; }
+    .rec-card .rec-artist { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .rec-skel { flex: 0 0 142px; height: 196px; border-radius: var(--radius-md); background: linear-gradient(100deg, var(--md-sys-color-surface-container) 30%, var(--md-sys-color-surface-container-high) 50%, var(--md-sys-color-surface-container) 70%); background-size: 300% 100%; animation: skel 1.3s linear infinite; }
+    @keyframes skel { from { background-position: 100% 0; } to { background-position: 0 0; } }
+    .rec-note { font-size: .85rem; color: var(--md-sys-color-on-surface-variant); padding: 4px 2px 10px; }
+    .rec-empty { font-size: .85rem; color: var(--md-sys-color-on-surface-variant); padding: 14px 2px; }
+</style>
 </head>
 <body>
   <div class="app">
@@ -2200,15 +2397,7 @@
           </button>
         </div>
         <button class="filter-toggle" id="filterToggle"><span class="material-icons-round">tune</span><span id="filterToggleText">Фільтри</span></button>
-        <div class="filter-panel" id="filterPanel"><div>
-          <div class="filter-label">Стиль / жанр</div>
-          <div class="chip-row" id="genreChips"></div>
-          <div class="filter-label">Джерело</div>
-          <div class="chip-row" id="sourceChips"></div>
-          <div class="filter-label">Сортування (Jamendo)</div>
-          <div class="chip-row" id="sortChips"></div>
-          <button class="filter-clear" id="filterClear">Скинути фільтри</button>
-        </div></div>
+        <div class="chip-row active-filters" id="activeFilters"></div>
         <div id="searchResults" style="display:none;">
           <div class="section-title">Результати</div>
           <div class="track-list" id="searchList"></div>
@@ -2218,9 +2407,8 @@
             <h2>Для вас</h2>
             <button class="icon-btn" id="refreshRec" title="Оновити добірку" style="width:48px;height:48px;border-radius:16px;background:var(--md-sys-color-secondary-container);color:var(--md-sys-color-on-secondary-container);"><span class="material-icons-round">casino</span></button>
           </div>
-          <div class="rec-grid" id="recGrid"></div>
-          <div class="section-title">Популярне зараз</div>
-          <div class="track-list" id="popularList"></div>
+          <div class="chip-scroll" id="quickMoods"></div>
+          <div id="recFeed"></div>
         </div>
       </div>
 
@@ -2273,8 +2461,7 @@
             <span class="material-icons-round" id="eqArrow">expand_more</span>
           </div>
           <div class="eq-panel" id="eqPanel">
-            <div class="eq-sliders" id="eqSliders"></div>
-            <div class="eq-presets" id="eqPresets"></div>
+            <div class="eqx" id="eqxMain"></div>
           </div>
         </div>
         <div class="settings-group">
@@ -2391,7 +2578,8 @@
       </div>
       <div class="player-vol">
         <button class="icon-btn vol-btn" aria-label="Вимкнути звук"><span class="material-icons-round">volume_up</span></button>
-        <input type="range" class="vol-slider" min="0" max="100" value="100" step="1" aria-label="Гучність" />
+        <input type="range" class="vol-slider" min="0" max="200" value="100" step="1" aria-label="Гучність" />
+        <span class="vol-pct">100%</span>
       </div>
     </div>
 
@@ -2467,6 +2655,10 @@
           <span class="material-icons-round">info</span>
           Про трек
         </button>
+        <button id="moreCover" style="display:none">
+          <span class="material-icons-round">image</span>
+          Змінити обкладинку
+        </button>
         <div class="more-divider"></div>
         <button id="moreShare">
           <span class="material-icons-round">share</span>
@@ -2519,10 +2711,12 @@
       </div>
       <div class="fp-volume" id="fpVolume">
         <div class="vol-panel">
-          <div class="vol-vwrap"><input type="range" class="vol-slider" min="0" max="100" value="100" step="1" aria-label="Гучність" /></div>
+          <div class="vol-pct">100%</div>
+          <div class="vol-vwrap"><input type="range" class="vol-slider" min="0" max="200" value="100" step="1" aria-label="Гучність" /></div>
           <button class="icon-btn vol-btn" aria-label="Вимкнути звук"><span class="material-icons-round">volume_up</span></button>
         </div>
         <button class="icon-btn vol-fold" id="volFold" aria-label="Гучність"><span class="material-icons-round">volume_up</span></button>
+        <span class="vol-pct vol-pct-fold">100%</span>
       </div>
       <div class="fp-extra">
         <button class="icon-btn fp-tonal" id="fpSave"><span class="material-icons-round">favorite_border</span></button>
@@ -2540,8 +2734,7 @@
         <span class="material-icons-round" style="font-size:20px">close</span>
       </button>
       <div class="fp-eq-title">Еквалайзер</div>
-      <div class="eq-sliders" id="fpEqSliders"></div>
-      <div class="eq-presets" id="fpEqPresets"></div>
+      <div class="eqx compact" id="eqxFp"></div>
     </div>
   </div>
 
@@ -2552,7 +2745,7 @@
         <div class="logo-icon"><span class="material-icons-round">music_note</span></div>
         <div>
           <div class="about-name">GMusic</div>
-          <div class="about-ver">Версія 1.0 · веб-застосунок</div>
+          <div class="about-ver">Версія 1.1 · веб-застосунок</div>
         </div>
       </div>
       <div class="about-desc">Безкоштовний музичний плеєр без реклами: шукайте треки в кількох джерелах, збирайте плейлисти та слухайте власні файли — все в одному вікні.</div>
@@ -2682,6 +2875,48 @@
     </div>
   </div>
 
+  <!-- ІНФО ПРО ТРЕК -->
+  <div class="modal-overlay" id="infoModal">
+    <div class="modal">
+      <div class="tm-head">
+        <img id="inArt" src="" alt="" />
+        <div style="min-width:0;flex:1;">
+          <div class="tm-t" id="inTitle">—</div>
+          <div class="tm-a" id="inArtist">—</div>
+        </div>
+      </div>
+      <div class="info-list" id="inList"></div>
+      <div class="info-note" id="inNote"></div>
+      <div class="modal-actions"><button class="btn-cancel" id="inClose" style="flex:1;">Закрити</button></div>
+    </div>
+  </div>
+
+  <!-- ЗБЕРЕЖЕННЯ ПРЕСЕТУ ЕКВАЛАЙЗЕРА -->
+  <div class="modal-overlay" id="eqSaveModal">
+    <div class="modal">
+      <div class="modal-title">Зберегти пресет</div>
+      <div class="modal-field">
+        <label>Назва</label>
+        <input type="text" id="eqSaveName" placeholder="Наприклад: Мої навушники" maxlength="24" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" id="eqSaveCancel">Скасувати</button>
+        <button class="btn-confirm" id="eqSaveOk">Зберегти</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ПРОГРЕС ЗАВАНТАЖЕННЯ -->
+  <div class="dl-card" id="dlCard" role="status" aria-live="polite">
+    <div class="dl-row">
+      <span class="material-icons-round" id="dlIcon">download</span>
+      <div class="dl-txt"><div class="dl-title" id="dlTitle"></div><div class="dl-sub" id="dlSub"></div></div>
+      <span class="dl-pct" id="dlPct"></span>
+      <button class="icon-btn" id="dlCancel" aria-label="Скасувати" style="width:36px;height:36px;"><span class="material-icons-round" style="font-size:20px">close</span></button>
+    </div>
+    <div class="dl-bar"><div class="dl-fill" id="dlFill"></div></div>
+  </div>
+
   <!-- CONFIRM MODAL -->
   <div class="modal-overlay" id="confirmModal">
     <div class="modal">
@@ -2695,6 +2930,22 @@
   </div>
 
   <input type="file" id="fileInput" accept="audio/*" multiple />
+  <div class="fs-overlay" id="fsOverlay"></div>
+  <div class="fs-sheet" id="filterSheet" role="dialog" aria-label="Фільтри">
+    <div class="fs-grab" id="fsGrab"><div class="fs-handle"></div>
+      <div class="fs-head"><h3>Фільтри</h3><button class="icon-btn" id="fsClose" aria-label="Закрити"><span class="material-icons-round">close</span></button></div>
+    </div>
+    <div class="fs-body">
+      <div class="fs-sec"><div class="fs-t"><span class="material-icons-round">library_music</span>Жанр</div><div id="genreChips"></div></div>
+      <div class="fs-sec"><div class="fs-t"><span class="material-icons-round">mood</span>Настрій</div><div class="chip-row" id="moodChips"></div></div>
+      <div class="fs-sec"><div class="fs-t"><span class="material-icons-round">event</span>Епоха</div><div class="chip-row" id="eraChips"></div></div>
+      <div class="fs-sec"><div class="fs-t"><span class="material-icons-round">translate</span>Мова</div><div class="chip-row" id="langChips"></div></div>
+      <div class="fs-sec"><div class="fs-t"><span class="material-icons-round">timer</span>Тривалість</div><div class="chip-row" id="durChips"></div></div>
+      <div class="fs-sec"><div class="fs-t"><span class="material-icons-round">hub</span>Джерело</div><div class="chip-row" id="sourceChips"></div></div>
+      <div class="fs-sec"><div class="fs-t"><span class="material-icons-round">sort</span>Сортування (Jamendo)</div><div class="chip-row" id="sortChips"></div></div>
+    </div>
+    <div class="fs-foot"><button class="btn-outline" id="filterClear">Скинути</button><button class="btn-filled" id="fsApply">Показати результати</button></div>
+  </div>
   <div class="toast" id="toast"></div>
 
   <script>
@@ -2727,6 +2978,16 @@
       return res.json();
     }
 
+    // ----- допоміжне для «Про трек» -----
+    function pruneInfo(o) { const r = {}; Object.keys(o || {}).forEach(k => { const v = o[k]; if (v !== undefined && v !== null && v !== '' && !(typeof v === 'number' && isNaN(v))) r[k] = v; }); return r; }
+    function licLabel(u) {
+      if (!u) return '';
+      const m = /creativecommons\.org\/licenses\/([a-z-]+)\/([\d.]+)/i.exec(u);
+      if (m) return 'CC ' + m[1].toUpperCase() + ' ' + m[2];
+      if (/publicdomain\/zero|cc0/i.test(u)) return 'CC0 (суспільне надбання)';
+      return /^https?:/.test(u) ? u : String(u);
+    }
+
     function mapAudiusTrack(t) {
       if (!t) return null;
       const art = t.artwork?.['480x480'] || t.artwork?.['150x150'] || t.artwork?.['1000x1000'] || '';
@@ -2739,7 +3000,8 @@
         url: '', // будет заполняться при воспроизведении
         streamId: t.id,
         local: false,
-        source: 'audius'
+        source: 'audius',
+        info: pruneInfo({ genre: t.genre, mood: t.mood, date: t.release_date || t.created_at, plays: t.play_count, likes: t.favorite_count, reposts: t.repost_count, tags: t.tags, license: t.license })
       };
     }
 
@@ -2779,7 +3041,9 @@
         url: t.previewUrl || '',
         local: false,
         source: 'itunes',
-        preview: true
+        preview: true,
+        info: pruneInfo({ album: t.collectionName, date: t.releaseDate, genre: t.primaryGenreName, explicit: t.trackExplicitness === 'explicit' ? 'Explicit (18+)' : '',
+          trackNo: t.trackNumber ? t.trackNumber + (t.trackCount ? ' з ' + t.trackCount : '') : '', country: t.country })
       };
     }
     async function searchItunes(query, limit = 25) {
@@ -2821,7 +3085,8 @@
         url: t.audio || '',
         streamId: t.id,
         local: false,
-        source: 'jamendo'
+        source: 'jamendo',
+        info: pruneInfo({ album: t.album_name, date: t.releasedate, license: licLabel(t.license_ccurl) })
       };
     }
     async function searchJamendo(query, limit = 25) {
@@ -2870,11 +3135,11 @@
         const items = d.items || [];
         if (!items.length) return [];
         const vu = new URL('https://www.googleapis.com/youtube/v3/videos');
-        vu.searchParams.set('part', 'contentDetails');
+        vu.searchParams.set('part', 'contentDetails,statistics');
         vu.searchParams.set('id', items.map(i => i.id.videoId).join(','));
         vu.searchParams.set('key', YOUTUBE_API_KEY);
-        const dur = {};
-        try { const vd = await fetch(vu.toString()).then(r => r.json()); (vd.items || []).forEach(v => { dur[v.id] = parseIsoDuration(v.contentDetails.duration); }); } catch (e) {}
+        const dur = {}, stat = {};
+        try { const vd = await fetch(vu.toString()).then(r => r.json()); (vd.items || []).forEach(v => { dur[v.id] = parseIsoDuration(v.contentDetails.duration); stat[v.id] = v.statistics || {}; }); } catch (e) {}
         const out = items.map(i => {
           const sn = i.snippet || {};
           return {
@@ -2883,12 +3148,36 @@
             artist: decodeEntities((sn.channelTitle || 'YouTube').replace(/\s*-\s*Topic$/i, '')),
             duration: dur[i.id.videoId] || 0,
             art: (sn.thumbnails && (sn.thumbnails.high || sn.thumbnails.medium || sn.thumbnails.default) || {}).url || '',
-            url: '', streamId: i.id.videoId, local: false, source: 'youtube'
+            url: '', streamId: i.id.videoId, local: false, source: 'youtube',
+            info: pruneInfo({ date: sn.publishedAt, channel: decodeEntities(sn.channelTitle || ''), views: (stat[i.id.videoId] || {}).viewCount, likes: (stat[i.id.videoId] || {}).likeCount })
           };
         }).filter(t => t.duration === 0 || (t.duration >= 30 && t.duration <= 1200));
         ytCache.set(ck, out);
         return out;
       } catch (e) { console.error('YouTube search error:', e); return []; }
+    }
+
+    async function ytTrending(region, limit = 20) {
+      const ck = 'trend|' + region + '|' + limit;
+      if (ytCache.has(ck)) return ytCache.get(ck);
+      try {
+        const u = new URL('https://www.googleapis.com/youtube/v3/videos');
+        Object.entries({ part: 'snippet,contentDetails,statistics', chart: 'mostPopular', videoCategoryId: '10', regionCode: (region || 'US').toUpperCase(), maxResults: limit, key: YOUTUBE_API_KEY })
+          .forEach(([k, v]) => u.searchParams.set(k, v));
+        const res = await fetch(u.toString());
+        if (!res.ok) return [];
+        const d = await res.json();
+        const out = (d.items || []).map(v => {
+          const sn = v.snippet || {};
+          return { id: 'yt_' + v.id, title: decodeEntities(sn.title), artist: decodeEntities((sn.channelTitle || 'YouTube').replace(/\s*-\s*Topic$/i, '')),
+            duration: parseIsoDuration((v.contentDetails || {}).duration) || 0,
+            art: (sn.thumbnails && (sn.thumbnails.high || sn.thumbnails.medium || sn.thumbnails.default) || {}).url || '',
+            url: '', streamId: v.id, local: false, source: 'youtube',
+            info: pruneInfo({ date: sn.publishedAt, channel: decodeEntities(sn.channelTitle || ''), views: (v.statistics || {}).viewCount, likes: (v.statistics || {}).likeCount }) };
+        }).filter(t => t.duration === 0 || (t.duration >= 30 && t.duration <= 1200));
+        ytCache.set(ck, out);
+        return out;
+      } catch (e) { console.error('YouTube trending error:', e); return []; }
     }
 
     // ========== PIPED (YouTube без реклами, без API-ключа) ==========
@@ -2951,33 +3240,38 @@
         tasks.forEach(t => t.then(v => { if (v) resolve(v); else if (--left === 0) resolve(null); }, () => { if (--left === 0) resolve(null); }));
       });
     }
-    const pipedOne = (base, id) => fetchJson(`${base}/streams/${id}`).then(data => {
+    const pipedOne = (base, id, ms) => fetchJson(`${base}/streams/${id}`, ms).then(data => {
       const audio = pickByQuality((data.audioStreams || []).filter(s => s.url && !s.videoOnly), s => s.bitrate || 0);
       if (!audio) return null;
       console.log('[Piped] OK via', base);
-      return { url: audio.url, title: data.title || '', artist: data.uploader || '', duration: data.duration || 0, art: data.thumbnailUrl || '' };
+      return { host: base, url: audio.url, title: data.title || '', artist: data.uploader || '', duration: data.duration || 0, art: data.thumbnailUrl || '' };
     });
-    const invOne = (base, id) => fetchJson(`${base}/api/v1/videos/${id}?local=true&fields=title,author,lengthSeconds,adaptiveFormats`).then(data => {
+    const invOne = (base, id, ms) => fetchJson(`${base}/api/v1/videos/${id}?local=true&fields=title,author,lengthSeconds,adaptiveFormats`, ms).then(data => {
       const audio = pickByQuality((data.adaptiveFormats || []).filter(f => f.url && /^audio\//.test(f.type || '')), f => parseInt(f.bitrate) || 0);
       if (!audio) return null;
       const u = audio.url.startsWith('http') ? audio.url : base + audio.url;
       console.log('[Invidious] OK via', base);
-      return { url: u, title: data.title || '', artist: data.author || '', duration: data.lengthSeconds || 0, art: '' };
+      return { host: base, url: u, title: data.title || '', artist: data.author || '', duration: data.lengthSeconds || 0, art: '' };
     });
 
-    async function getPipedAudioUrl(videoId) {
+    async function getPipedAudioUrl(videoId, bad) {
       if (!videoId) return null;
-      const live = await getLiveLists();
-      const piped = uniq([...(live.piped || []), ...PIPED_INSTANCES]);
-      const inv = uniq([...(live.inv || []), ...INVIDIOUS_INSTANCES]);
-      // Паралельно пачками по 6 серверів: Piped, потім Invidious
-      for (let i = 0; i < piped.length; i += 6) {
-        const r = await firstOk(piped.slice(i, i + 6).map(b => pipedOne(b, videoId)));
-        if (r) return r;
-      }
-      for (let i = 0; i < inv.length; i += 6) {
-        const r = await firstOk(inv.slice(i, i + 6).map(b => invOne(b, videoId)));
-        if (r) return r;
+      const skip = bad instanceof Set ? bad : new Set();
+      for (let pass = 0; pass < 2; pass++) {
+        if (pass === 1) { liveListsPromise = null; try { localStorage.removeItem('gmusic_inst'); } catch (e) {} }   // 2-й прохід: свіжий список серверів
+        const ms = pass ? 12000 : 6000;
+        const live = await getLiveLists();
+        const piped = uniq([...(live.piped || []), ...PIPED_INSTANCES]).filter(b => !skip.has(b));
+        const inv = uniq([...(live.inv || []), ...INVIDIOUS_INSTANCES]).filter(b => !skip.has(b));
+        // Паралельно пачками по 8 серверів: Piped, потім Invidious
+        for (let i = 0; i < piped.length; i += 8) {
+          const r = await firstOk(piped.slice(i, i + 8).map(b => pipedOne(b, videoId, ms)));
+          if (r) return r;
+        }
+        for (let i = 0; i < inv.length; i += 8) {
+          const r = await firstOk(inv.slice(i, i + 8).map(b => invOne(b, videoId, ms)));
+          if (r) return r;
+        }
       }
       return null;
     }
@@ -3089,7 +3383,8 @@
         art: (t.images && (t.images.spectral_m || t.images.waveform_m)) || '',
         url: pv['preview-hq-mp3'] || pv['preview-lq-mp3'] || '',
         local: false,
-        source: 'freesound'
+        source: 'freesound',
+        info: pruneInfo({ date: t.created, license: licLabel(t.license), tags: Array.isArray(t.tags) ? t.tags.slice(0, 10).join(', ') : '' })
       };
     }
     async function searchFreesound(query, limit = 25, tags = []) {
@@ -3145,17 +3440,24 @@
     let audio = audioCors;
     // Гучність (спільна для всіх джерел, зберігається)
     let gVolume = 1, gMuted = false;
-    try { const sv = parseFloat(localStorage.getItem('gmusic_vol')); if (!isNaN(sv)) gVolume = Math.min(1, Math.max(0, sv)); } catch (e) {}
+    try { const sv = parseFloat(localStorage.getItem('gmusic_vol')); if (!isNaN(sv)) gVolume = Math.min(2, Math.max(0, sv)); } catch (e) {}
+    // Гучність 0…200 %. Усе, що понад 100 %, — РЕАЛЬНЕ підсилення сигналу (GainNode у Web Audio, множник до ×2 = +6 дБ),
+    // а не лише відображення. Працює для треків, що йдуть через аудіограф (усі, окрім iTunes-превʼю та YouTube-плеєра:
+    // там браузер не дозволяє обробляти звук, тому максимум 100 %).
     function applyVolume() {
       const v = gMuted ? 0 : gVolume;
-      audioCors.volume = v; audioPlain.volume = v;
-      try { if (ytPlayer && ytReady && ytPlayer.setVolume) ytPlayer.setVolume(Math.round(v * 100)); } catch (e) {}
+      if (audioCtx && gainNode) {
+        audioCors.volume = 1;
+        gainNode.gain.setTargetAtTime(v, audioCtx.currentTime, 0.015);
+      } else audioCors.volume = Math.min(1, v);
+      audioPlain.volume = Math.min(1, v);
+      try { if (ytPlayer && ytReady && ytPlayer.setVolume) ytPlayer.setVolume(Math.min(100, Math.round(v * 100))); } catch (e) {}
     }
-    applyVolume();
     let audioCtx = null;
     let eqFilters = [];
     let sourceNode = null;
     let gainNode = null;
+    applyVolume();
     let isLoading = false;
     let currentPlaylistId = null;
     let editingPlaylistId = null;
@@ -3167,6 +3469,7 @@
     // Load
     try {
       library = JSON.parse(localStorage.getItem('gmusic_library') || '[]');
+      library.forEach(t => { if (t.local && /picsum\.photos/.test(t.art || '')) t.art = ''; });   // раніше локальним файлам давали випадкове фото
       playlists = JSON.parse(localStorage.getItem('gmusic_playlists') || '[]');
     } catch(e) {}
 
@@ -3189,6 +3492,7 @@
 
     // ========== EQ ==========
     const EQ_BANDS = [60, 170, 310, 600, 1000, 3000, 6000, 12000];
+    const EQ_Q = 1.2;
     const EQ_PRESETS = {
       'Плаский': [0,0,0,0,0,0,0,0],
       'Баси': [6,5,3,1,0,-1,-2,-2],
@@ -3196,32 +3500,272 @@
       'Рок': [4,3,1,0,-1,1,3,4],
       'Електро': [3,2,0,-1,0,2,4,5],
       'Класика': [0,0,0,0,0,1,2,3],
+      'Поп': [-1,1,3,4,3,1,-1,-2],
+      'Джаз': [3,2,1,2,-1,-1,0,2],
+      'Хіп-хоп': [5,4,1,2,-1,-1,1,2],
+      'Акустика': [3,3,2,1,2,2,3,2],
+      'Яскравий': [0,0,0,0,1,3,5,6],
+      'Гучність': [5,3,0,0,0,0,2,4],
+      'Подкаст': [-6,-4,0,3,5,4,1,-3],
+      'Без баса': [-8,-6,-3,0,0,0,0,0],
+      'Нічний': [-4,-3,-1,1,2,2,0,-1]
     };
-    function initEQ() {
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        sourceNode = audioCtx.createMediaElementSource(audioCors);
-        gainNode = audioCtx.createGain();
-        eqFilters = EQ_BANDS.map((freq, i) => {
-          const f = audioCtx.createBiquadFilter();
-          f.type = i === 0 ? 'lowshelf' : i === EQ_BANDS.length - 1 ? 'highshelf' : 'peaking';
-          f.frequency.value = freq;
-          f.Q.value = 1.2;
-          f.gain.value = 0;
-          return f;
-        });
-        let prev = sourceNode;
-        eqFilters.forEach(f => { prev.connect(f); prev = f; });
-        stage = buildStereoStage(audioCtx);
-        prev.connect(stage.input);
-        stage.output.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
-        applySoundMode(true);
+    const clampDb = v => Math.max(-12, Math.min(12, Math.round((+v || 0) * 2) / 2));
+    const eqDefault = () => ({ on: true, gains: EQ_BANDS.map(() => 0), pre: 0, limiter: true });
+    let EQ = eqDefault(), eqCustom = [];
+    try {
+      const sv = JSON.parse(localStorage.getItem('gmusic_eq') || 'null');
+      if (sv && Array.isArray(sv.gains) && sv.gains.length === EQ_BANDS.length) EQ = { on: sv.on !== false, gains: sv.gains.map(clampDb), pre: clampDb(sv.pre), limiter: sv.limiter !== false };
+      const cu = JSON.parse(localStorage.getItem('gmusic_eq_presets') || '[]');
+      if (Array.isArray(cu)) eqCustom = cu.filter(c => c && typeof c.name === 'string' && Array.isArray(c.gains) && c.gains.length === EQ_BANDS.length).map(c => ({ name: c.name.slice(0, 24), gains: c.gains.map(clampDb), pre: clampDb(c.pre) }));
+    } catch (e) {}
+    function eqPersist() { try { localStorage.setItem('gmusic_eq', JSON.stringify(EQ)); localStorage.setItem('gmusic_eq_presets', JSON.stringify(eqCustom)); } catch (e) {} }
+
+    // М'який лімітер піків: лінійний до 0.8, далі плавно «стискається» до 1 (без хрипів жорсткого кліпінгу).
+    // WaveShaper приймає вхід лише в [-1;1], тому сигнал стискаємо у 4 рази до і підсилюємо у 4 рази після —
+    // це дозволяє обробляти піки до ×4 без зрізання.
+    const LIM_R = 4;
+    function limiterCurve(soft) {
+      const N = 8192, c = new Float32Array(N), T = 0.8;
+      for (let i = 0; i < N; i++) {
+        const x = (i / (N - 1) * 2 - 1) * LIM_R, a = Math.abs(x);
+        const y = soft ? (a <= T ? a : T + (1 - T) * Math.tanh((a - T) / (1 - T))) : a;
+        c[i] = Math.sign(x) * y / LIM_R;
       }
+      return c;
     }
-    function setEQGains(gains) {
-      if (!eqFilters.length) return;
-      gains.forEach((g, i) => { if (eqFilters[i]) eqFilters[i].gain.value = g; });
+    let preNode = null, limShaper = null, limCurves = null, limOutNode = null;
+    function initEQ() {
+      if (audioCtx) return;
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      sourceNode = audioCtx.createMediaElementSource(audioCors);
+      preNode = audioCtx.createGain();
+      gainNode = audioCtx.createGain();                       // гучність 0…2 (200 %)
+      eqFilters = EQ_BANDS.map((freq, i) => {
+        const f = audioCtx.createBiquadFilter();
+        f.type = i === 0 ? 'lowshelf' : i === EQ_BANDS.length - 1 ? 'highshelf' : 'peaking';
+        f.frequency.value = freq; f.Q.value = EQ_Q; f.gain.value = 0;
+        return f;
+      });
+      sourceNode.connect(preNode);
+      let prev = preNode;
+      eqFilters.forEach(f => { prev.connect(f); prev = f; });
+      stage = buildStereoStage(audioCtx);
+      prev.connect(stage.input);
+      stage.output.connect(gainNode);
+      const limIn = audioCtx.createGain(); limIn.gain.value = 1 / LIM_R;
+      limOutNode = audioCtx.createGain(); limOutNode.gain.value = LIM_R;
+      limCurves = { on: limiterCurve(true), off: limiterCurve(false) };
+      limShaper = audioCtx.createWaveShaper(); limShaper.oversample = '4x';
+      gainNode.connect(limIn); limIn.connect(limShaper); limShaper.connect(limOutNode); limOutNode.connect(audioCtx.destination);
+      applySoundMode(true);
+      applyEQ(true);
+      applyVolume();
+    }
+    function applyEQ(instant) {
+      if (!audioCtx || !eqFilters.length) return;
+      const t = audioCtx.currentTime, set = (p, v) => instant ? (p.value = v) : p.setTargetAtTime(v, t, 0.02);
+      eqFilters.forEach((f, i) => set(f.gain, EQ.on ? EQ.gains[i] : 0));
+      set(preNode.gain, EQ.on ? Math.pow(10, EQ.pre / 20) : 1);
+      const want = EQ.limiter ? limCurves.on : limCurves.off;
+      if (limShaper.curve !== want) limShaper.curve = want;
+    }
+    function setEQGains(gains) {            // сумісність зі старим API
+      EQ.gains = gains.map(clampDb); EQ.on = true;
+      applyEQ(); eqPersist(); eqRefreshUI();
+    }
+
+    // ---------- Інтерфейс еквалайзера (спільний для «Налаштувань» і повноекранного плеєра) ----------
+    const eqRoots = [];
+    function biquadDb(type, f0, gainDb, f, fs = 48000) {          // амплітудна характеристика біквадратного фільтра (RBJ)
+      const A = Math.pow(10, gainDb / 40), w0 = 2 * Math.PI * f0 / fs, cw = Math.cos(w0), sw = Math.sin(w0);
+      let b0, b1, b2, a0, a1, a2;
+      if (type === 'peaking') {
+        const al = sw / (2 * EQ_Q);
+        b0 = 1 + al * A; b1 = -2 * cw; b2 = 1 - al * A; a0 = 1 + al / A; a1 = -2 * cw; a2 = 1 - al / A;
+      } else {
+        const sA = 2 * Math.sqrt(A) * (sw / 2 * Math.SQRT2);
+        if (type === 'lowshelf') {
+          b0 = A * ((A + 1) - (A - 1) * cw + sA); b1 = 2 * A * ((A - 1) - (A + 1) * cw); b2 = A * ((A + 1) - (A - 1) * cw - sA);
+          a0 = (A + 1) + (A - 1) * cw + sA; a1 = -2 * ((A - 1) + (A + 1) * cw); a2 = (A + 1) + (A - 1) * cw - sA;
+        } else {
+          b0 = A * ((A + 1) + (A - 1) * cw + sA); b1 = -2 * A * ((A - 1) + (A + 1) * cw); b2 = A * ((A + 1) + (A - 1) * cw - sA);
+          a0 = (A + 1) - (A - 1) * cw + sA; a1 = 2 * ((A - 1) - (A + 1) * cw); a2 = (A + 1) - (A - 1) * cw - sA;
+        }
+      }
+      const w = 2 * Math.PI * f / fs, c1 = Math.cos(w), s1 = Math.sin(w), c2 = Math.cos(2 * w), s2 = Math.sin(2 * w);
+      const nr = b0 + b1 * c1 + b2 * c2, ni = -(b1 * s1 + b2 * s2), dr = a0 + a1 * c1 + a2 * c2, di = -(a1 * s1 + a2 * s2);
+      return 10 * Math.log10((nr * nr + ni * ni) / (dr * dr + di * di));
+    }
+    const eqBandType = i => i === 0 ? 'lowshelf' : i === EQ_BANDS.length - 1 ? 'highshelf' : 'peaking';
+    const eqBandX = (i, w) => Math.log10(EQ_BANDS[i] / 20) / 3 * w;
+    const fmtDb = v => (v > 0 ? '+' : '') + v;
+    function eqDrawCurve(root) {
+      const cv = root.querySelector('canvas'); if (!cv) return;
+      const w = cv.clientWidth, h = cv.clientHeight; if (!w || !h) return;
+      const dpr = Math.min(3, window.devicePixelRatio || 1);
+      if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+      const c = cv.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, w, h);
+      const cs = getComputedStyle(document.documentElement), col = (cs.getPropertyValue('--md-sys-color-primary') || '#a8c7fa').trim() || '#a8c7fa';
+      const R = 15, yOf = db => h / 2 - db / R * (h / 2 - 6);
+      c.font = '10px sans-serif'; c.textBaseline = 'middle'; c.lineWidth = 1;
+      [-12, -6, 0, 6, 12].forEach(db => {
+        c.strokeStyle = db === 0 ? 'rgba(255,255,255,0.28)' : 'rgba(255,255,255,0.08)';
+        c.beginPath(); c.moveTo(0, yOf(db) + .5); c.lineTo(w, yOf(db) + .5); c.stroke();
+        c.fillStyle = 'rgba(255,255,255,0.35)'; c.fillText(db > 0 ? '+' + db : String(db), 4, yOf(db) - 6);
+      });
+      c.strokeStyle = 'rgba(255,255,255,0.06)';
+      [100, 1000, 10000].forEach(f => { const x = Math.log10(f / 20) / 3 * w; c.beginPath(); c.moveTo(x + .5, 0); c.lineTo(x + .5, h); c.stroke(); });
+      const pts = [];
+      for (let x = 0; x <= w; x += 2) {
+        const f = 20 * Math.pow(10, x / w * 3);
+        let db = 0;
+        if (EQ.on) EQ.gains.forEach((g, i) => { if (g) db += biquadDb(eqBandType(i), EQ_BANDS[i], g, f); });
+        pts.push([x, yOf(Math.max(-R, Math.min(R, db)))]);
+      }
+      const grad = c.createLinearGradient(0, 0, 0, h); grad.addColorStop(0, col + '66'); grad.addColorStop(1, col + '05');
+      c.beginPath(); c.moveTo(0, yOf(0)); pts.forEach(p => c.lineTo(p[0], p[1])); c.lineTo(w, yOf(0)); c.closePath(); c.fillStyle = grad; c.fill();
+      c.beginPath(); pts.forEach((p, i) => i ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1]));
+      c.strokeStyle = col; c.lineWidth = 2.2; c.lineJoin = 'round'; c.stroke();
+      EQ_BANDS.forEach((_, i) => {
+        const x = eqBandX(i, w), y = yOf(EQ.on ? EQ.gains[i] : 0);
+        c.beginPath(); c.arc(x, y, 5.5, 0, Math.PI * 2); c.fillStyle = EQ.gains[i] && EQ.on ? col : 'rgba(255,255,255,0.55)'; c.fill();
+        c.lineWidth = 2; c.strokeStyle = 'rgba(0,0,0,0.45)'; c.stroke();
+      });
+    }
+    function eqMatch() {
+      const same = (a, b) => a.every((v, i) => Math.abs(v - b[i]) < 0.01);
+      const cu = eqCustom.find(c => same(c.gains, EQ.gains) && Math.abs(c.pre - EQ.pre) < 0.01);
+      if (cu) return 'c:' + cu.name;
+      const k = Object.keys(EQ_PRESETS).find(n => same(EQ_PRESETS[n], EQ.gains));
+      return k ? 'b:' + k : null;
+    }
+    function eqRefreshUI() {
+      const match = eqMatch();
+      eqRoots.forEach(root => {
+        root.classList.toggle('off', !EQ.on);
+        root.querySelectorAll('[data-band]').forEach(inp => {
+          const i = +inp.dataset.band, g = EQ.gains[i];
+          if (document.activeElement !== inp || +inp.value !== g) inp.value = g;
+          const lab = inp.parentElement.querySelector('.eq-db'); lab.textContent = fmtDb(g); lab.classList.toggle('nz', g !== 0);
+        });
+        const pre = root.querySelector('.eqx-pre'); if (document.activeElement !== pre || +pre.value !== EQ.pre) pre.value = EQ.pre;
+        root.querySelector('[data-eqv="pre"]').textContent = fmtDb(EQ.pre) + ' дБ';
+        root.querySelector('[data-eq="power"]').classList.toggle('on', EQ.on);
+        root.querySelector('[data-eq="limiter"]').classList.toggle('on', EQ.limiter);
+        const box = root.querySelector('.eq-presets'), key = eqCustom.map(c => c.name).join('|');
+        if (box._key !== key) {
+          box._key = key;
+          box.innerHTML = Object.keys(EQ_PRESETS).map(n => `<button class="eq-preset" data-b="${escapeHtml(n)}">${escapeHtml(n)}</button>`).join('') +
+            eqCustom.map((c, i) => `<button class="eq-preset custom" data-c="${i}">${escapeHtml(c.name)}<span class="x" data-del="${i}" aria-label="Видалити пресет">✕</span></button>`).join('');
+        }
+        box.querySelectorAll('.eq-preset').forEach(b => {
+          b.classList.toggle('active', b.dataset.b !== undefined ? match === 'b:' + b.dataset.b : match === 'c:' + (eqCustom[+b.dataset.c] || {}).name);
+        });
+        root.querySelector('.eqx-note').textContent = (audio === audioPlain && currentTrack) ? 'Поточний трек (iTunes-превʼю) відтворюється без обробки — еквалайзер на нього не діє.' : '';
+        eqDrawCurve(root);
+      });
+    }
+    function eqChanged(fromUser) {
+      if (fromUser) EQ.on = true;
+      applyEQ(); eqPersist(); eqRefreshUI();
+    }
+    function eqBuild(root) {
+      root.innerHTML = `
+        <div class="eqx-top">
+          <div class="eqx-power"><div class="switch on" data-eq="power" role="switch" aria-label="Увімкнути еквалайзер"></div><span>Еквалайзер</span></div>
+          <div class="eqx-actions">
+            <button class="eqx-btn" data-eq="save"><span class="material-icons-round">bookmark_add</span>Зберегти</button>
+            <button class="eqx-btn danger" data-eq="reset"><span class="material-icons-round">restart_alt</span>Скинути</button>
+          </div>
+        </div>
+        <div class="eqx-curve"><canvas></canvas></div>
+        <div class="eq-sliders">${EQ_BANDS.map((f, i) => `
+          <div class="eq-band">
+            <span class="eq-db">0</span>
+            <input type="range" min="-12" max="12" step="0.5" value="0" data-band="${i}" aria-label="${f} Гц" />
+            <span class="eq-label">${f >= 1000 ? (f / 1000) + 'k' : f}</span>
+          </div>`).join('')}
+        </div>
+        <div class="eqx-row pre"><span class="eqx-lbl">Преамп</span><input type="range" class="eqx-pre" min="-12" max="12" step="0.5" value="0" aria-label="Преамп" /><span class="eqx-val" data-eqv="pre">0 дБ</span></div>
+        <div class="eqx-row lim"><div><span class="eqx-lbl">М’яке обмеження піків</span><small>Захищає від хрипів, коли гучність понад 100% або підсилено баси</small></div><div class="switch on" data-eq="limiter" role="switch" aria-label="Обмеження піків"></div></div>
+        <div class="eq-presets"></div>
+        <div class="eqx-note"></div>`;
+      // повзунки смуг
+      root.querySelectorAll('[data-band]').forEach(inp => {
+        inp.addEventListener('input', () => { EQ.gains[+inp.dataset.band] = clampDb(inp.value); eqChanged(true); });
+        inp.addEventListener('dblclick', () => { EQ.gains[+inp.dataset.band] = 0; eqChanged(true); });     // подвійний дотик — скинути смугу
+      });
+      root.querySelector('.eqx-pre').addEventListener('input', e => { EQ.pre = clampDb(e.target.value); eqChanged(true); });
+      root.querySelector('.eqx-pre').addEventListener('dblclick', () => { EQ.pre = 0; eqChanged(true); });
+      // перемикачі, кнопки, пресети
+      root.addEventListener('click', e => {
+        const del = e.target.closest('[data-del]');
+        if (del) { e.stopPropagation(); eqDeleteCustom(+del.dataset.del); return; }
+        const pr = e.target.closest('.eq-preset');
+        if (pr) {
+          if (pr.dataset.b !== undefined) EQ.gains = EQ_PRESETS[pr.dataset.b].slice();
+          else { const c = eqCustom[+pr.dataset.c]; if (c) { EQ.gains = c.gains.slice(); EQ.pre = c.pre; } }
+          eqChanged(true); return;
+        }
+        const t = e.target.closest('[data-eq]'); if (!t) return;
+        const act = t.dataset.eq;
+        if (act === 'power') { EQ.on = !EQ.on; eqChanged(false); }
+        else if (act === 'limiter') { EQ.limiter = !EQ.limiter; eqChanged(false); }
+        else if (act === 'save') eqSaveFlow();
+        else if (act === 'reset') eqResetFlow();
+      });
+      // графік: тягни точку смуги вгору/вниз
+      const cv = root.querySelector('canvas'); let drag = -1;
+      const bandAt = e => { const r = cv.getBoundingClientRect(), x = e.clientX - r.left; let best = 0, bd = 1e9; EQ_BANDS.forEach((_, i) => { const d = Math.abs(eqBandX(i, r.width) - x); if (d < bd) { bd = d; best = i; } }); return best; };
+      const setFromY = e => { const r = cv.getBoundingClientRect(), y = e.clientY - r.top, R = 15; EQ.gains[drag] = clampDb(-(y - r.height / 2) / (r.height / 2 - 6) * R); eqChanged(true); };
+      cv.addEventListener('pointerdown', e => { drag = bandAt(e); try { cv.setPointerCapture(e.pointerId); } catch (x) {} setFromY(e); });
+      cv.addEventListener('pointermove', e => { if (drag >= 0) setFromY(e); });
+      const stop = () => { drag = -1; };
+      cv.addEventListener('pointerup', stop); cv.addEventListener('pointercancel', stop);
+      cv.addEventListener('dblclick', e => { const i = bandAt(e); EQ.gains[i] = 0; eqChanged(true); });
+    }
+    function eqUiInit() {
+      ['eqxMain', 'eqxFp'].forEach(id => { const el = document.getElementById(id); if (el) { eqBuild(el); eqRoots.push(el); } });
+      eqRefreshUI();
+      addEventListener('resize', eqRefreshUI);
+      const m = document.getElementById('eqSaveModal'), inp = document.getElementById('eqSaveName');
+      document.getElementById('eqSaveCancel').addEventListener('click', () => m.classList.remove('open'));
+      m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+      document.getElementById('eqSaveOk').addEventListener('click', eqSaveCommit);
+      inp.addEventListener('keydown', e => { if (e.key === 'Enter') eqSaveCommit(); });
+    }
+    function eqSaveFlow() {
+      if (eqCustom.length >= 12) { toast('Максимум 12 власних пресетів — видаліть зайвий'); return; }
+      const inp = document.getElementById('eqSaveName');
+      inp.value = 'Мій пресет ' + (eqCustom.length + 1);
+      document.getElementById('eqSaveModal').classList.add('open');
+      setTimeout(() => { inp.focus(); inp.select(); }, 250);
+    }
+    async function eqSaveCommit() {
+      let name = document.getElementById('eqSaveName').value.trim().slice(0, 24);
+      if (!name) { toast('Введіть назву пресету'); return; }
+      if (EQ_PRESETS[name]) name += ' (мій)';
+      const ex = eqCustom.findIndex(c => c.name.toLowerCase() === name.toLowerCase());
+      if (ex >= 0) {
+        const ok = await confirmDialog({ title: 'Замінити пресет?', text: `Пресет «${eqCustom[ex].name}» уже існує. Замінити його поточними налаштуваннями?`, ok: 'Замінити', danger: false });
+        if (!ok) return;
+        eqCustom[ex] = { name, gains: EQ.gains.slice(), pre: EQ.pre };
+      } else eqCustom.push({ name, gains: EQ.gains.slice(), pre: EQ.pre });
+      document.getElementById('eqSaveModal').classList.remove('open');
+      eqPersist(); eqRefreshUI(); toast('Пресет збережено');
+    }
+    async function eqDeleteCustom(i) {
+      const c = eqCustom[i]; if (!c) return;
+      const ok = await confirmDialog({ title: 'Видалити пресет?', text: `Пресет «${c.name}» буде видалено. Поточні налаштування еквалайзера не зміняться.`, ok: 'Видалити' });
+      if (!ok) return;
+      eqCustom.splice(i, 1); eqPersist(); eqRefreshUI();
+    }
+    async function eqResetFlow() {
+      const ok = await confirmDialog({ title: 'Скинути еквалайзер?', text: 'Усі смуги та преамп повернуться до 0 дБ, еквалайзер буде ввімкнено. Збережені власні пресети залишаться.', ok: 'Скинути' });
+      if (!ok) return;
+      const lim = EQ.limiter; EQ = eqDefault(); EQ.limiter = lim;
+      applyEQ(); eqPersist(); eqRefreshUI(); toast('Еквалайзер скинуто');
     }
 
     // ========== ЯКІСТЬ / ТИП ЗВУКУ / ІСТОРІЯ ==========
@@ -3421,6 +3965,147 @@
       t.classList.add('show');
       setTimeout(() => t.classList.remove('show'), 2200);
     }
+    // ========== ІНФОРМАЦІЯ ПРО ТРЕК ==========
+    const INFO_SRC = { itunes: 'Apple Music (iTunes), превʼю 30 с', jamendo: 'Jamendo', audius: 'Audius', youtube: 'YouTube', freesound: 'Freesound' };
+    function fmtInfoDate(v) {
+      if (!v) return '';
+      if (/^\d{4}$/.test(String(v))) return String(v);
+      const d = new Date(v); if (isNaN(d)) return String(v);
+      return d.toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' });
+    }
+    const fmtNum = n => (n === undefined || n === null || n === '' || isNaN(+n)) ? '' : Number(n).toLocaleString('uk-UA');
+    const fmtSize = b => b >= 1048576 ? (b / 1048576).toFixed(1).replace('.', ',') + ' МБ' : Math.max(1, Math.round(b / 1024)) + ' КБ';
+    function infoRows(t, offSize) {
+      const i = t.info || {}, src = t.local ? 'Файл на пристрої' : (INFO_SRC[t.source] || t.source || '');
+      const dateLabel = t.source === 'youtube' ? 'Опубліковано' : t.local ? 'Змінено' : t.source === 'audius' || t.source === 'freesound' ? 'Дата' : 'Дата випуску';
+      const rows = [
+        ['Альбом', i.album], [dateLabel, fmtInfoDate(i.date)],
+        ['Жанр', i.genre], ['Настрій', i.mood], ['Номер треку', i.trackNo],
+        ['Тривалість', t.duration ? formatTime(t.duration) + (t.preview ? ' (превʼю)' : '') : ''],
+        ['Вокал', i.vocal], ['Мова', i.lang], ['Вміст', i.explicit], ['Країна', i.country],
+        ['Ліцензія', i.license],
+        ['Прослуховування', fmtNum(i.plays)], ['Перегляди', fmtNum(i.views)], ['Вподобання', fmtNum(i.likes)], ['Репости', fmtNum(i.reposts)],
+        ['Канал', i.channel && i.channel !== t.artist ? i.channel : ''],
+        ['Теги', i.tags], ['Файл', i.fileName], ['Тип файлу', i.fileType], ['Розмір файлу', i.size ? fmtSize(i.size) : ''],
+        ['Джерело', src],
+        ['Офлайн', offlineIds.has(t.id) ? 'Так' + (offSize ? ' · ' + fmtSize(offSize) : '') : 'Ні']
+      ].filter(r => r[1]);
+      rows.push(['ID', t.id, 'mono']);
+      return rows;
+    }
+    let _infoTrack = null;
+    function renderInfo(t, offSize, note) {
+      document.getElementById('inList').innerHTML = infoRows(t, offSize).map(r =>
+        `<div class="info-row"><span class="info-k">${escapeHtml(r[0])}</span><span class="info-v ${r[2] || ''}">${escapeHtml(String(r[1]))}</span></div>`).join('');
+      document.getElementById('inNote').textContent = note || '';
+    }
+    async function enrichTrackInfo(t) {
+      if (!t || t.local || (t.info && t.info._full)) return false;
+      let add = null;
+      try {
+        if (t.source === 'itunes') {
+          const id = String(t.id).replace('itunes_', '');
+          const d = await fetch('https://itunes.apple.com/lookup?id=' + encodeURIComponent(id)).then(r => r.json());
+          const x = d.results && d.results[0]; if (x) add = mapItunesTrack(x).info;
+        } else if (t.source === 'jamendo' && t.streamId) {
+          let d;
+          try { d = await jamendoFetch('/tracks/', { id: t.streamId, include: 'musicinfo+stats+licenses' }); } catch (e) { d = await jamendoFetch('/tracks/', { id: t.streamId }); }
+          const x = d.results && d.results[0];
+          if (x) {
+            const mi = x.musicinfo || {}, tg = mi.tags || {}, st = x.stats || {};
+            add = pruneInfo({
+              ...mapJamendoTrack(x).info,
+              genre: (tg.genres || []).join(', '),
+              tags: [...(tg.instruments || []), ...(tg.vartags || [])].slice(0, 10).join(', '),
+              vocal: mi.vocalinstrumental === 'instrumental' ? 'Інструментал' : mi.vocalinstrumental === 'vocal' ? 'Є вокал' : '',
+              lang: mi.lang && mi.lang !== 'not applicable' ? mi.lang : '',
+              plays: st.rate_listened_total, likes: st.favorited
+            });
+          }
+        } else if (t.source === 'audius' && t.streamId) {
+          const d = await audiusFetch('/tracks/' + encodeURIComponent(t.streamId));
+          if (d && d.data) add = mapAudiusTrack(d.data).info;
+        } else if (t.source === 'youtube' && t.streamId) {
+          const vu = new URL('https://www.googleapis.com/youtube/v3/videos');
+          vu.searchParams.set('part', 'snippet,statistics'); vu.searchParams.set('id', t.streamId); vu.searchParams.set('key', YOUTUBE_API_KEY);
+          const d = await fetch(vu.toString()).then(r => r.json());
+          const v = d.items && d.items[0];
+          if (v) add = pruneInfo({ date: v.snippet.publishedAt, channel: decodeEntities(v.snippet.channelTitle || ''), views: v.statistics && v.statistics.viewCount, likes: v.statistics && v.statistics.likeCount,
+            tags: (v.snippet.tags || []).slice(0, 8).join(', ') });
+        }
+      } catch (e) { console.warn('info enrich', e); }
+      if (!add) return false;
+      t.info = { ...(t.info || {}), ...pruneInfo(add), _full: true };
+      const li = library.find(x => x.id === t.id);
+      if (li) { li.info = t.info; try { saveData(); } catch (e) {} }
+      return true;
+    }
+    async function openTrackInfo(t) {
+      if (!t) return;
+      _infoTrack = t;
+      document.getElementById('inArt').src = artOf(t) || ART_PLACEHOLDER;
+      document.getElementById('inTitle').textContent = t.title;
+      document.getElementById('inArtist').textContent = t.artist;
+      let offSize = 0;
+      if (offlineIds.has(t.id)) { const b = await getOfflineBlob(t.id); offSize = b ? b.size : 0; }
+      renderInfo(t, offSize, (t.local || (t.info && t.info._full)) ? '' : 'Завантажуємо додаткові дані…');
+      document.getElementById('infoModal').classList.add('open');
+      if (t.local || (t.info && t.info._full)) return;
+      const ok = await enrichTrackInfo(t);
+      if (_infoTrack === t && document.getElementById('infoModal').classList.contains('open')) renderInfo(t, offSize, ok ? '' : 'Додаткових даних для цього джерела немає');
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      const m = document.getElementById('infoModal');
+      document.getElementById('inClose').addEventListener('click', () => m.classList.remove('open'));
+      m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+    });
+
+    // ========== ПРОГРЕС-БАР ПІДГОТОВКИ ФАЙЛУ ==========
+    const dlUI = {
+      t: 0,
+      q: id => document.getElementById(id),
+      show(title, icon) {
+        clearTimeout(this.t);
+        this.q('dlTitle').textContent = title; this.q('dlIcon').textContent = icon || 'download';
+        this.q('dlCancel').style.display = '';
+        this.set(0, 'Починаємо…');
+        this.q('dlCard').classList.add('show');
+      },
+      set(p, sub) {
+        const card = this.q('dlCard');
+        card.classList.toggle('indet', p == null);
+        if (p != null) { p = Math.max(0, Math.min(100, p)); this.q('dlFill').style.width = p + '%'; this.q('dlPct').textContent = Math.round(p) + '%'; }
+        else this.q('dlPct').textContent = '';
+        if (sub != null) this.q('dlSub').textContent = sub;
+      },
+      done(msg) {
+        this.q('dlIcon').textContent = 'check_circle'; this.q('dlCancel').style.display = 'none';
+        this.set(100, msg);
+        clearTimeout(this.t); this.t = setTimeout(() => this.hide(), 1800);
+      },
+      hide() { clearTimeout(this.t); this.q('dlCard').classList.remove('show'); }
+    };
+    let dlCtl = null;   // активна підготовка файлу (одна за раз)
+    function dlBegin(title, icon) {
+      if (dlCtl) return null;
+      dlCtl = { cancelled: false, ac: new AbortController(), worker: null, onCancel: null };
+      dlUI.show(title, icon);
+      return dlCtl;
+    }
+    function dlEnd(msg) {
+      dlCtl = null;
+      if (msg) dlUI.done(msg); else dlUI.hide();
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('dlCancel').addEventListener('click', () => {
+        const c = dlCtl; if (!c) return;
+        c.cancelled = true;
+        try { c.ac.abort(); } catch (e) {}
+        try { c.worker && c.worker.terminate(); } catch (e) {}
+        if (c.onCancel) c.onCancel();
+      });
+    });
+
     // ========== ПІДТВЕРДЖЕННЯ ДІЙ ==========
     let _cfResolve = null;
     function confirmDialog({ title, text, ok = 'Видалити', danger = true }) {
@@ -3470,7 +4155,7 @@
     const offBusy = new Set();         // id треків, що зараз завантажуються
     let offBulk = false;
     const OFF_BADGE = '<span class="material-icons-round off-badge" title="Доступно офлайн">offline_pin</span>';
-    const artOf = t => (t && (offArtUrls[t.id] || t.art)) || '';
+    const artOf = t => (t && (offArtUrls[t.id] || (t.local && /picsum\.photos/.test(t.art || '') ? '' : t.art))) || '';
     const isPlayableOffline = t => !!t && (offlineIds.has(t.id) || (t.local && !!t.blobUrl));
 
     let _offDb = null;
@@ -3553,24 +4238,31 @@
       if (offlineIds.has(t.id)) { if (!quiet) toast('Вже доступний офлайн'); return true; }
       if (t.local && !t.blobUrl && !t.url) { if (!quiet) toast('Файл недоступний'); return false; }
       if (!navigator.onLine) { if (!quiet) toast('Немає інтернету'); return false; }
+      let ctl = null;
+      if (!quiet) {
+        ctl = dlBegin(`${t.title} — ${t.artist}`, 'cloud_download');
+        if (!ctl) { toast('Вже готується інший файл'); return false; }
+        dlUI.set(3, 'Пошук джерела…');
+      }
+      let ended = false;
+      const endUI = m => { if (ctl && !ended) { ended = true; dlEnd(m); } };
       offBusy.add(t.id); syncOfflineBadges();
-      if (!quiet) toast('Завантажую для офлайн…');
       try {
         const src = await resolveTrackSrc(t);
         if (!src) throw new Error('nosrc');
-        const r = await fetch(src);
+        const r = await fetch(src, ctl ? { signal: ctl.ac.signal } : undefined);
         if (!r.ok) throw new Error('HTTP ' + r.status);
         const total = +r.headers.get('content-length') || 0;
         let blob;
-        if (r.body && total && !quiet) {
-          const reader = r.body.getReader(), chunks = []; let got = 0, last = -20;
+        if (r.body && !quiet) {
+          const reader = r.body.getReader(), chunks = []; let got = 0;
           for (;;) {
             const { done, value } = await reader.read();
             if (done) break;
             chunks.push(value); got += value.length;
-            const pct = Math.min(99, Math.floor(got / total * 100));
-            if (pct >= last + 20) { last = pct; toast('Завантаження: ' + pct + '%'); }
+            dlUI.set(total ? 8 + Math.min(1, got / total) * 84 : null, 'Завантаження… ' + (got / 1048576).toFixed(1) + ' МБ');
           }
+          dlUI.set(94, 'Збереження…');
           blob = new Blob(chunks, { type: r.headers.get('content-type') || 'audio/mpeg' });
         } else blob = await r.blob();
         if (!blob.size || /^(text\/|application\/(json|xml))/.test(blob.type)) throw new Error('bad payload');
@@ -3592,12 +4284,14 @@
         } catch (e) {}
         // щоб трек був у «Моїй музиці» й відображався офлайн
         if (!library.some(x => x.id === t.id)) toggleSave(t.id, true);
-        if (!quiet) toast('Доступно офлайн ✓');
+        endUI('Доступно офлайн ✓');
         return true;
       } catch (e) {
         console.error('offline dl', e);
         await offlineDelete(t.id);
-        if (!quiet) toast(e && e.name === 'QuotaExceededError' ? 'Недостатньо місця на пристрої' : 'Не вдалося завантажити (джерело не дозволяє)');
+        const cancelled = ctl && ctl.cancelled;
+        endUI();
+        if (!quiet) toast(cancelled ? 'Скасовано' : e && e.name === 'QuotaExceededError' ? 'Недостатньо місця на пристрої' : 'Не вдалося завантажити (джерело не дозволяє)');
         return false;
       } finally {
         offBusy.delete(t.id);
@@ -3608,6 +4302,7 @@
     }
     async function toggleOffline(t) {
       if (!t) return;
+      if (t.local) { toast('Локальний файл уже збережено на пристрої'); return; }
       if (offlineIds.has(t.id)) {
         const ok = await confirmDialog({
           title: 'Прибрати з офлайн-пам’яті?',
@@ -3769,7 +4464,8 @@
         streamId: t.streamId || null,
         source: t.source || null,
         url: t.source === 'itunes' ? (t.url || '') : '',
-        preview: !!t.preview
+        preview: !!t.preview,
+        info: t.info || null
       }));
       localStorage.setItem('gmusic_library', JSON.stringify(toSave));
       localStorage.setItem('gmusic_playlists', JSON.stringify(playlists));
@@ -4042,7 +4738,7 @@
       const t = findTrackById(id);
       if (!t) return;
       const inLib = library.some(x => x.id === id);
-      document.getElementById('tmArt').src = t.art || ART_PLACEHOLDER;
+      document.getElementById('tmArt').src = artOf(t) || ART_PLACEHOLDER;
       document.getElementById('tmTitle').textContent = t.title;
       document.getElementById('tmArtist').textContent = t.artist;
       const items = [];
@@ -4053,14 +4749,17 @@
         items.push({ icon: 'remove_circle_outline', text: 'Прибрати з цього плейлиста', fn: () => confirmRemoveFromPlaylist(id).then(ok => { if (ok) animateRemove(id, () => removeFromCurrentPlaylist(id, true)); }) });
       }
       items.push({ icon: 'person', text: 'Усі треки виконавця', fn: () => showArtistTracks(t.artist) });
-      if (t.source === 'youtube' && t.streamId) items.push({ icon: 'open_in_new', text: 'Відкрити на YouTube', fn: () => window.open('https://www.youtube.com/watch?v=' + t.streamId, '_blank') });
       items.push({ icon: 'content_cut', text: 'Обрізати і зберегти', fn: () => openTrim(t) });
-      items.push(offlineIds.has(id)
+      if (t.local) {
+        items.push({ icon: 'image', text: 'Змінити обкладинку', fn: () => pickCover(t) });
+        if (offArtUrls[t.id]) items.push({ icon: 'hide_image', text: 'Прибрати обкладинку', fn: () => clearTrackCover(t) });
+      }
+      if (!t.local) items.push(offlineIds.has(id)
         ? { icon: 'cloud_done', text: 'Прибрати з офлайн-пам’яті', fn: () => toggleOffline(t) }
         : { icon: 'cloud_download', text: 'Завантажити для офлайн', fn: () => toggleOffline(t) });
       items.push({ icon: 'download', text: 'Завантажити на пристрій', fn: () => downloadTrack(t) });
       items.push({ icon: 'share', text: 'Поділитися', fn: () => shareTrack(t) });
-      items.push({ icon: 'info', text: 'Про трек', fn: () => toast(`${t.title} · ${t.artist} · ${formatTime(t.duration)}`) });
+      items.push({ icon: 'info', text: 'Про трек', fn: () => openTrackInfo(t) });
       if (inLib) items.push({ icon: 'delete', text: 'Видалити з бібліотеки', danger: true, fn: () => confirmRemoveTrack(id).then(ok => { if (ok) animateRemove(id, () => toggleSave(id, true)); }) });
       else items.push({ icon: 'favorite_border', text: 'Зберегти в мою музику', fn: () => toggleSave(id) });
       const list = document.getElementById('tmList');
@@ -4235,6 +4934,73 @@
       }
     }
 
+    // ========== ОБКЛАДИНКИ ЛОКАЛЬНИХ ТРЕКІВ ==========
+    // Вбудована обкладинка з ID3v2 (APIC), якщо вона є у файлі
+    async function extractId3Cover(file) {
+      const head = new Uint8Array(await file.slice(0, 10).arrayBuffer());
+      if (String.fromCharCode(head[0], head[1], head[2]) !== 'ID3') return null;
+      const ver = head[3], flags = head[5];
+      const tagSize = ((head[6] & 127) << 21) | ((head[7] & 127) << 14) | ((head[8] & 127) << 7) | (head[9] & 127);
+      const buf = new Uint8Array(await file.slice(10, 10 + Math.min(tagSize, 8 * 1024 * 1024)).arrayBuffer());
+      let pos = 0;
+      if (flags & 0x40 && buf.length > 4) {   // розширений заголовок
+        pos = ver === 4 ? (((buf[0] & 127) << 21) | ((buf[1] & 127) << 14) | ((buf[2] & 127) << 7) | (buf[3] & 127))
+                        : (((buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3]) + 4);
+      }
+      while (pos + 10 <= buf.length) {
+        const id = String.fromCharCode(buf[pos], buf[pos + 1], buf[pos + 2], buf[pos + 3]);
+        if (!/^[A-Z0-9]{4}$/.test(id)) break;
+        const sz = ver === 4
+          ? ((buf[pos + 4] & 127) << 21) | ((buf[pos + 5] & 127) << 14) | ((buf[pos + 6] & 127) << 7) | (buf[pos + 7] & 127)
+          : ((buf[pos + 4] << 24) | (buf[pos + 5] << 16) | (buf[pos + 6] << 8) | buf[pos + 7]) >>> 0;
+        const start = pos + 10, end = start + sz;
+        if (sz <= 0 || end > buf.length) break;
+        if (id === 'APIC') {
+          const enc = buf[start]; let i = start + 1;
+          while (i < end && buf[i] !== 0) i++;          // MIME
+          const mime = String.fromCharCode(...buf.slice(start + 1, i)) || 'image/jpeg';
+          i += 2;                                        // 0 + тип зображення
+          if (enc === 1 || enc === 2) { while (i + 1 < end && !(buf[i] === 0 && buf[i + 1] === 0)) i += 2; i += 2; }
+          else { while (i < end && buf[i] !== 0) i++; i += 1; }
+          if (i >= end) return null;
+          return new Blob([buf.slice(i, end)], { type: /^image\//.test(mime) ? mime : 'image/jpeg' });
+        }
+        pos = end;
+      }
+      return null;
+    }
+    // Зменшує зображення до 600px і зберігає як обкладинку (IndexedDB, переживає перезапуск)
+    async function setTrackCover(t, blob, quiet) {
+      let out = blob;
+      try {
+        const bmp = await createImageBitmap(blob);
+        const k = Math.min(1, 600 / Math.max(bmp.width, bmp.height));
+        const c = document.createElement('canvas'); c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+        c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+        out = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.88)) || blob;
+      } catch (e) {}
+      await offReq('art', 'readwrite', s => s.put(out, t.id));
+      if (offArtUrls[t.id]) { try { URL.revokeObjectURL(offArtUrls[t.id]); } catch (e) {} }
+      offArtUrls[t.id] = URL.createObjectURL(out);
+      refreshCoverUI(t);
+      if (!quiet) toast('Обкладинку змінено');
+    }
+    async function clearTrackCover(t) {
+      if (offArtUrls[t.id]) { try { URL.revokeObjectURL(offArtUrls[t.id]); } catch (e) {} delete offArtUrls[t.id]; }
+      try { await offReq('art', 'readwrite', s => s.delete(t.id)); } catch (e) {}
+      refreshCoverUI(t); toast('Обкладинку прибрано');
+    }
+    function refreshCoverUI(t) {
+      renderLibraryTracks(); renderPlaylists();
+      if (currentPlaylistId) openPlaylist(currentPlaylistId);
+      if (currentTrack && currentTrack.id === t.id) { updatePlayerUI(); _msKey = ''; updateMediaSession(); }
+    }
+    function pickCover(t) {
+      const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*';
+      inp.onchange = () => { const f = inp.files && inp.files[0]; if (f) setTrackCover(t, f).catch(() => toast('Не вдалося встановити обкладинку')); };
+      inp.click();
+    }
+
     // ========== UPLOAD ==========
     function handleFiles(files) {
       Array.from(files).forEach(file => {
@@ -4244,13 +5010,19 @@
         const name = file.name.replace(/\.[^/.]+$/, '');
         const track = {
           id, title: name, artist: 'Локальний файл', duration: 0,
-          art: 'https://picsum.photos/seed/' + id + '/300/300',
-          url: blobUrl, blobUrl, local: true
+          art: '',
+          url: blobUrl, blobUrl, local: true,
+          info: pruneInfo({ fileName: file.name, size: file.size, fileType: file.type, date: file.lastModified })
         };
         library.unshift(track);
+        // Зберігаємо сам файл на пристрої (IndexedDB), щоб він не зникав після перезапуску
+        offReq('audio', 'readwrite', s => s.put(file, id)).then(() => { offlineIds.add(id); syncOfflineBadges(); })
+          .catch(e => { console.warn('local save', e); toast('Не вдалося зберегти файл на пристрої — після перезапуску його доведеться додати знову'); });
+        extractId3Cover(file).then(b => { if (b) setTrackCover(track, b, true); }).catch(() => {});
         const tempAudio = new Audio(blobUrl);
         tempAudio.addEventListener('loadedmetadata', () => {
           track.duration = tempAudio.duration;
+          saveData();
           renderLibraryTracks();
           renderPlaylists();
         });
@@ -4307,11 +5079,54 @@
       toast('Не вдалося завантажити трек без реклами. Спробуйте пізніше');
     }
     let _curOffUrl = null;
+    // Хости, які не віддають CORS: запам'ятовуємо, щоб наступні треки одразу йшли без «невдалої» спроби
+    const _cb = (() => { try { return new Set(JSON.parse(sessionStorage.getItem('gm_cors_bad') || '[]')); } catch (e) { return new Set(); } })();
+    const _host = u => { try { return new URL(u, location.href).host; } catch (e) { return ''; } };
+    const corsBad = u => { const h = _host(u); return !!h && h !== location.host && _cb.has(h); };
+    function corsBadAdd(u) { const h = _host(u); if (!h || h === location.host) return; _cb.add(h); try { sessionStorage.setItem('gm_cors_bad', JSON.stringify([..._cb])); } catch (e) {} }
+    function syncProgressUI() {
+      const g = id => document.getElementById(id), d = audio.duration || (currentTrack && currentTrack.duration) || 0, p = audio.currentTime || 0;
+      const pct = d > 0 ? Math.min(100, (p / d) * 100) : 0;
+      if (g('progressLine')) g('progressLine').style.width = pct + '%';
+      if (g('fpSeek')) g('fpSeek').value = pct;
+      if (g('fpCurrent')) g('fpCurrent').textContent = formatTime(p);
+      if (g('fpDuration')) g('fpDuration').textContent = d > 0 ? formatTime(d) : '0:00';
+    }
+    function resetProgressUI(track, pos) {
+      const g = id => document.getElementById(id);
+      const pl = g('progressLine'), sk = g('fpSeek'), cu = g('fpCurrent'), du = g('fpDuration');
+      const d = (track && track.duration) || 0, p = pos || 0;
+      const pct = d > 0 ? Math.min(100, (p / d) * 100) : 0;
+      if (pl) pl.style.width = pct + '%';
+      if (sk) sk.value = pct;
+      if (cu) cu.textContent = formatTime(p);
+      if (du) du.textContent = d > 0 ? formatTime(d) : '0:00';
+    }
     async function playTrack(track, q) {
       if (!track) return;
       const resumePos = (resumeAt > 0 && resumeId === track.id) ? resumeAt : 0;
       resumeAt = 0; resumeId = null;
+      if (!track._retrying) { track._ytTries = 0; track._ytBad = null; }
+      track._retrying = false;
+      const _prevTrack = currentTrack;
+      // Знімок стану: якщо трек відкрити неможливо — повертаємо все як було (жодного «чужого» треку/звуку)
+      const _snap = { track: currentTrack, queue, idx: currentIndex, cq: customQueue, audio, playing: !audio.paused };
+      const bail = (msg) => {
+        if (currentTrack !== track) return;                       // користувач вже обрав інший трек
+        currentTrack = _snap.track; queue = _snap.queue; currentIndex = _snap.idx; customQueue = _snap.cq;
+        isLoading = false; histPending = null;
+        if (audio !== _snap.audio) audio = _snap.audio;
+        if (_snap.track && _snap.playing) { try { audio.play().catch(() => {}); } catch (e) {} }
+        isPlaying = !!_snap.track && _snap.playing;
+        try { showYtBox(false); } catch (e) {}
+        if (_snap.track) { updatePlayerUI(); syncProgressUI(); }
+        else { document.getElementById('playerBar').classList.remove('visible'); }
+        if (msg) toast(msg);
+      };
       currentTrack = track;
+      // Новий трек: одразу скидаємо смужку/таймер (інакше під час завантаження видно час попереднього треку)
+      if (_prevTrack !== track) { try { audio.pause(); } catch (e) {} }
+      resetProgressUI(track, resumePos);
       if (Array.isArray(q)) customQueue = q; else if (q !== 'next') customQueue = null;
       if (customQueue && customQueue.some(t => t.id === track.id)) {
         queue = customQueue;
@@ -4341,7 +5156,7 @@
       }
       if (!offUrl && !navigator.onLine && !(track.local && track.blobUrl)) {
         isLoading = false; updatePlayerUI();
-        toast('Немає інтернету — цей трек не завантажено для офлайн');
+        bail('Немає інтернету — цей трек не завантажено для офлайн');
         return;
       }
       if (!offUrl && !preUrl && track.source === 'audius' && track.streamId) {
@@ -4367,7 +5182,7 @@
           isLoading = true; updatePlayerUI();
           document.getElementById('playerBar').classList.add('visible');
           try {
-            const piped = await getPipedAudioUrl(track.streamId);
+            const piped = await getPipedAudioUrl(track.streamId, track._ytBad);
             if (currentTrack !== track) return; // користувач вже перемкнув трек
             if (piped && piped.url) {
               // Успіх — граємо як звичайний аудіо-потік
@@ -4376,28 +5191,34 @@
               if (piped.art && !track.art) track.art = piped.art;
               src = piped.url;
               track.url = piped.url; // кешуємо на сесію
+              track._ytHost = piped.host || '';
               track._q = effQuality();
               // далі звичайний шлях відтворення нижче
             } else {
-              failYt();
+              bail('Не вдалося завантажити трек без реклами. Спробуйте пізніше');
               return;
             }
           } catch (e) {
             console.error('Piped error:', e);
-            failYt();
+            bail('Не вдалося завантажити трек без реклами. Спробуйте пізніше');
             return;
           }
         }
       }
       if (!src) {
-        toast('Немає посилання на трек');
+        bail(track.local ? 'Файл цього треку втрачено — додайте його знову' : 'Немає посилання на трек');
         return;
       }
 
       // выбираем элемент: iTunes без CORS — на обычный, остальное — с EQ
+      if (!track._plain && !offUrl && corsBad(src)) track._plain = true;
       const next = ((track.source === 'itunes' || track._plain) && !offUrl) ? audioPlain : audioCors;
       if (audio !== next) { audio.pause(); }
       audio = next;
+      applyVolume();
+      if (window.gmRenderVol) window.gmRenderVol();
+      eqRefreshUI();
+      if (gVolume > 1 && !gMuted && next === audioPlain) toast('Для цього джерела підсилення понад 100% недоступне');
       showYtBox(false);
       if (track.preview && !offUrl) toast('Превʼю 30 с (iTunes)');
 
@@ -4413,7 +5234,11 @@
         if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
       }
       isLoading = true; updatePlayerUI();
+      const _el = audio, _src = audio.src;
       audio.play().then(() => { isPlaying = true; updatePlayerUI(); }).catch((err) => {
+        if (err && err.name === 'AbortError') return;                // перервано новим завантаженням — не помилка
+        if (_el !== audio || _el.src !== _src) return;               // уже грає інший трек/елемент
+        if (_el === audioCors && !track._plain && track.source !== 'local' && !String(_src).startsWith('blob:') && err && err.name === 'NotSupportedError') return;   // сам спрацює запасний варіант
         console.error(err);
         isPlaying = false;
         isLoading = false;
@@ -4445,7 +5270,7 @@
       for (let k = 1; k <= n; k++) {
         const i = (((currentIndex + dir * k) % n) + n) % n;
         const t = queue[i];
-        if (navigator.onLine || isPlayableOffline(t)) { currentIndex = i; playTrack(t, 'next'); return; }
+        if (navigator.onLine || isPlayableOffline(t)) { playTrack(t, 'next'); return; }
       }
       toast('Немає завантажених треків для офлайн');
     }
@@ -4571,31 +5396,146 @@
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(a.href), 60000);
     }
-    async function fetchTrackBlob(t) {
+    async function fetchTrackBlob(t, onProg, signal) {
       if (offlineIds.has(t.id)) { const ob = await getOfflineBlob(t.id); if (ob) return ob; }
       const src = await resolveTrackSrc(t);
       if (!src) throw new Error('nosrc');
-      const r = await fetch(src);
+      const r = await fetch(src, signal ? { signal } : undefined);
       if (!r.ok) throw new Error('HTTP ' + r.status);
+      if (onProg && r.body) {
+        const total = +r.headers.get('content-length') || 0, reader = r.body.getReader(), chunks = []; let got = 0;
+        for (;;) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          chunks.push(value); got += value.length;
+          onProg(total ? Math.min(1, got / total) : null, got);
+        }
+        return new Blob(chunks, { type: r.headers.get('content-type') || '' });
+      }
       return r.blob();
     }
     function extFromBlob(b) {
       const m = b.type || '';
       return /mpeg/.test(m) ? 'mp3' : /mp4|m4a|aac/.test(m) ? 'm4a' : /webm/.test(m) ? 'webm' : /ogg/.test(m) ? 'ogg' : /wav/.test(m) ? 'wav' : 'mp3';
     }
+    // ID3v2.3: назва та виконавець (UTF-16), щоб плеєри показували імʼя треку
+    function id3Parts(t) {
+      const frame = (id, text) => {
+        if (!text) return new Uint8Array(0);
+        const d = new Uint8Array(3 + text.length * 2); d[0] = 1; d[1] = 0xFF; d[2] = 0xFE;
+        for (let i = 0; i < text.length; i++) { const c = text.charCodeAt(i); d[3 + i * 2] = c & 255; d[4 + i * 2] = c >> 8; }
+        const f = new Uint8Array(10 + d.length);
+        f.set([id.charCodeAt(0), id.charCodeAt(1), id.charCodeAt(2), id.charCodeAt(3)]);
+        new DataView(f.buffer).setUint32(4, d.length);
+        f.set(d, 10); return f;
+      };
+      const fr = [frame('TIT2', t.title), frame('TPE1', t.artist)];
+      const size = fr.reduce((a, f) => a + f.length, 0);
+      const h = new Uint8Array([0x49, 0x44, 0x33, 3, 0, 0, (size >> 21) & 127, (size >> 14) & 127, (size >> 7) & 127, size & 127]);
+      return [h, ...fr];
+    }
+    // Кодування MP3 у фоновому потоці (UI не підвисає, і в фоні браузер не гальмує таймери)
+    const LAME_URL = 'https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js';
+    const MP3_WORKER_SRC = `
+self.onmessage = function (e) {
+  var d = e.data, chs = d.chs, sr = d.sr;
+  try { importScripts(d.lib); } catch (err) { self.postMessage({ err: 'lib' }); return; }
+  try {
+    var nc = chs.length, enc = new lamejs.Mp3Encoder(nc, sr, 192);
+    var i16 = function (a) { var o = new Int16Array(a.length); for (var i = 0; i < a.length; i++) { var x = Math.max(-1, Math.min(1, a[i])); o[i] = x < 0 ? x * 32768 : x * 32767; } return o; };
+    var L = i16(chs[0]), R = nc > 1 ? i16(chs[1]) : null, parts = [], B = 1152;
+    for (var i = 0, k = 0; i < L.length; i += B, k++) {
+      var out = nc > 1 ? enc.encodeBuffer(L.subarray(i, i + B), R.subarray(i, i + B)) : enc.encodeBuffer(L.subarray(i, i + B));
+      if (out.length) parts.push(new Uint8Array(out));
+      if (k % 200 === 0) self.postMessage({ p: i / L.length });
+    }
+    var end = enc.flush(); if (end.length) parts.push(new Uint8Array(end));
+    self.postMessage({ parts: parts }, parts.map(function (p) { return p.buffer; }));
+  } catch (err) { self.postMessage({ err: String(err) }); }
+};`;
+    function warmLame() { try { fetch(LAME_URL, { mode: 'no-cors' }).catch(() => {}); } catch (e) {} }   // підтягуємо кодек паралельно із завантаженням
+    function encodeMp3Worker(chs, sr, onProgress, ctl) {
+      return new Promise((res, rej) => {
+        let w, url;
+        const cleanup = () => { try { w && w.terminate(); } catch (e) {} try { url && URL.revokeObjectURL(url); } catch (e) {} if (ctl) { ctl.worker = null; ctl.onCancel = null; } };
+        try {
+          url = URL.createObjectURL(new Blob([MP3_WORKER_SRC], { type: 'application/javascript' }));
+          w = new Worker(url);
+          if (ctl) { ctl.worker = w; ctl.onCancel = () => { cleanup(); rej(new Error('cancel')); }; }
+          w.onmessage = e => {
+            const d = e.data;
+            if (d.p != null) onProgress(d.p);
+            else if (d.err) { cleanup(); rej(new Error(d.err)); }
+            else if (d.parts) { cleanup(); res(new Blob(d.parts, { type: 'audio/mpeg' })); }
+          };
+          w.onerror = () => { cleanup(); rej(new Error('worker')); };
+          const copies = chs.map(c => c.slice());
+          w.postMessage({ lib: LAME_URL, chs: copies, sr }, copies.map(c => c.buffer));
+        } catch (e) { cleanup(); rej(e); }
+      });
+    }
+    // Будь-який аудіофайл (webm/opus, m4a, ogg…) → MP3 192 kbps
+    async function convertToMp3(blob, t, onStage, ctl) {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      const ctx = new Ctx();
+      try {
+        onStage(46, 'Розпакування аудіо…');
+        let buf = await ctx.decodeAudioData(await blob.arrayBuffer());
+        if (ctl && ctl.cancelled) throw new Error('cancel');
+        const OK = [8000, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000];
+        if (!OK.includes(buf.sampleRate)) {                    // lamejs підтримує лише ці частоти
+          const oc = new OfflineAudioContext(Math.min(2, buf.numberOfChannels), Math.ceil(buf.duration * 44100), 44100);
+          const src = oc.createBufferSource(); src.buffer = buf; src.connect(oc.destination); src.start();
+          buf = await oc.startRendering();
+        }
+        const nc = Math.min(2, buf.numberOfChannels), chs = [];
+        for (let c = 0; c < nc; c++) chs.push(buf.getChannelData(c));
+        const prog = f => onStage(52 + f * 48, 'Кодування в MP3… ' + Math.round(f * 100) + '%');
+        prog(0);
+        let mp3;
+        try { mp3 = await encodeMp3Worker(chs, buf.sampleRate, prog, ctl); }
+        catch (e) { if (ctl && ctl.cancelled) throw e; console.warn('worker failed, main thread', e); mp3 = await encodeMp3(chs, buf.sampleRate, prog); }
+        return new Blob([...id3Parts(t), mp3], { type: 'audio/mpeg' });
+      } finally { try { ctx.close(); } catch (e) {} }
+    }
     async function downloadTrack(t) {
       if (!t) return;
-      toast('Готуємо файл…');
+      const ctl = dlBegin(`${t.title} — ${t.artist}`, 'download');
+      if (!ctl) { toast('Вже готується інший файл'); return; }
+      warmLame();
+      dlUI.set(3, 'Пошук джерела…');
+      let b;
       try {
-        const b = await fetchTrackBlob(t);
-        saveBlob(b, safeName(t) + '.' + extFromBlob(b));
-        toast('Збережено на пристрій');
+        b = await fetchTrackBlob(t, (f, got) => {
+          dlUI.set(f == null ? null : 8 + f * 37, 'Завантаження… ' + (got / 1048576).toFixed(1) + ' МБ');
+        }, ctl.ac.signal);
       } catch (e) {
+        dlEnd();
+        if (ctl.cancelled) { toast('Скасовано'); return; }
         console.error(e);
         const src = await resolveTrackSrc(t).catch(() => '');
         if (src) { window.open(src, '_blank'); toast('Джерело не дозволяє пряме збереження — відкриваю файл'); }
         else toast('Не вдалося завантажити цей трек');
+        return;
       }
+      const name = safeName(t);
+      if (/mpeg|mp3/.test(b.type || '')) { saveBlob(b, name + '.mp3'); dlEnd('Збережено на пристрій (MP3)'); return; }
+      // Не MP3 → конвертуємо (лімітуємо розмір, щоб не вичерпати памʼять телефону)
+      if (b.size <= 40 * 1024 * 1024) {
+        try {
+          const mp3 = await convertToMp3(b, t, (p, sub) => dlUI.set(p, sub), ctl);
+          saveBlob(mp3, name + '.mp3');
+          dlEnd('Збережено на пристрій (MP3)');
+          return;
+        } catch (e) {
+          if (ctl.cancelled) { dlEnd(); toast('Скасовано'); return; }
+          console.error('mp3 convert', e);
+        }
+      }
+      const ext = extFromBlob(b);
+      saveBlob(b, name + '.' + ext);
+      dlEnd();
+      toast('Не вдалося перетворити в MP3 — збережено як .' + ext);
     }
 
     const TR = { t: null, buf: null, peaks: [], s: 0, e: 0, fmt: 'mp3', ctx: null, node: null, raf: 0, at: 0, busy: false };
@@ -4700,7 +5640,7 @@
         sc.onload = res; sc.onerror = () => rej(new Error('lamejs')); document.head.appendChild(sc);
       });
     }
-    async function encodeMp3(chs, sr) {
+    async function encodeMp3(chs, sr, onProgress) {
       await loadLame();
       const nc = chs.length, enc = new lamejs.Mp3Encoder(nc, sr, 192);
       const i16 = a => { const o = new Int16Array(a.length); for (let i = 0; i < a.length; i++) { const x = Math.max(-1, Math.min(1, a[i])); o[i] = x < 0 ? x * 0x8000 : x * 0x7FFF; } return o; };
@@ -4708,7 +5648,7 @@
       for (let i = 0, k = 0; i < L.length; i += B, k++) {
         const out = nc > 1 ? enc.encodeBuffer(L.subarray(i, i + B), R.subarray(i, i + B)) : enc.encodeBuffer(L.subarray(i, i + B));
         if (out.length) parts.push(out);
-        if (k % 150 === 0) await new Promise(r => setTimeout(r));
+        if (k % 150 === 0) { if (onProgress) onProgress(i / L.length); await new Promise(r => setTimeout(r)); }
       }
       const end = enc.flush(); if (end.length) parts.push(end);
       return new Blob(parts, { type: 'audio/mpeg' });
@@ -4779,12 +5719,134 @@
       });
       const nav = document.getElementById('bottomNav');
       if (nav) nav.style.setProperty('--nav-idx', idx);
+      navPhys.goTo(idx);
       if (name !== 'library') {
         closePlaylistDetail();
       }
       updateFabVisibility();
       if (name === 'search' && window._lastView !== 'search' && document.getElementById('discoverSection').style.display !== 'none') renderDiscover();
+      if (window._lastView && window._lastView !== name) playNavAnim(name);
       window._lastView = name;
+    }
+    // ===== Пружинна фізика плашки нижньої панелі =====
+    // Плашка — тіло на пружині: має швидкість, інерцію, розтягується вздовж руху і «вдаряється» об краї панелі
+    // (стискається й відскакує), тому ніколи не вилітає за межі.
+    const navPhys = (() => {
+      let nav = null, ind = null, n = 4;
+      let x = 0, v = 0, target = 0, settled = 0, g = 1, gT = 1, squash = 0, raf = 0, last = 0, drag = false, ready = false;
+      const K = 420, C = 26, KD = 900, CD = 52;         // жорсткість / демпфування (звичайний рух / під пальцем)
+      const ensure = () => {
+        if (ind) return true;
+        nav = document.getElementById('bottomNav'); ind = nav && nav.querySelector('.nav-indicator');
+        if (!ind) return false; n = nav.querySelectorAll('.nav-item').length || 4; return true;
+      };
+      const W = () => ind.offsetWidth, MAX = () => W() * (n - 1);
+      function render() {
+        const vel = Math.abs(v);
+        let sx = 1 + Math.min(0.14, vel / 9000), sy = 1 - (sx - 1) * 0.7;          // розтягнення вздовж руху
+        sx -= squash * 0.14; sy += squash * 0.1;                                    // стискання при ударі об край
+        ind.style.transform = `translateX(${x.toFixed(2)}px) scale(${(sx * g).toFixed(4)}, ${(sy * g).toFixed(4)})`;
+      }
+      function done() { raf = 0; x = target; v = 0; g = gT; squash = 0; ind.style.transform = ''; }
+      function frame(t) {
+        const dt = Math.min(0.032, (t - last) / 1000 || 0.016); last = t;
+        const k = drag ? KD : K, c = drag ? CD : C, steps = Math.ceil(dt / 0.008), h = dt / steps, max = MAX();
+        for (let i = 0; i < steps; i++) {
+          v += (-k * (x - target) - c * v) * h; x += v * h;
+          if (x < 0) { squash = Math.min(1, squash + Math.abs(v) / 1400); x = 0; v = Math.abs(v) * 0.3; }
+          else if (x > max) { squash = Math.min(1, squash + Math.abs(v) / 1400); x = max; v = -Math.abs(v) * 0.3; }
+        }
+        squash *= Math.exp(-dt * 13);
+        g += (gT - g) * Math.min(1, dt * 16);
+        render();
+        if (!drag && Math.abs(x - target) < 0.15 && Math.abs(v) < 4 && squash < 0.01 && Math.abs(g - gT) < 0.002) { done(); return; }
+        raf = requestAnimationFrame(frame);
+      }
+      function kick() { if (!raf) { last = performance.now(); raf = requestAnimationFrame(frame); } }
+      function begin() { if (!raf) { x = settled * W(); v = 0; render(); } }      // старт із поточної позиції
+      return {
+        goTo(idx) {
+          if (!ensure()) return;
+          if (!ready) { ready = true; settled = idx; target = x = idx * W(); return; }   // перший виклик — без анімації
+          begin(); settled = idx; target = idx * W(); kick();
+        },
+        pos(clientX) {            // координата пальця → позиція плашки (px, у межах панелі)
+          const r = nav.getBoundingClientRect(), left = r.left + (r.width - nav.offsetWidth) / 2 + 6, w = W();
+          return Math.max(0, Math.min(MAX(), clientX - left - w / 2));
+        },
+        width() { return W(); },
+        grab(clientX) { if (!ensure()) return; begin(); drag = true; gT = 1.1; target = this.pos(clientX); kick(); },
+        move(clientX) { target = this.pos(clientX); kick(); },
+        release() { drag = false; gT = 1; kick(); },
+        current() { return settled; }
+      };
+    })();
+
+    // Затисни нижню панель і веди пальцем: плашка їде за пальцем на пружині, а при відпусканні летить на вкладку
+    document.addEventListener('DOMContentLoaded', () => {
+      const nav = document.getElementById('bottomNav'); if (!nav) return;
+      const ind = nav.querySelector('.nav-indicator'); if (!ind) return;
+      const items = [...nav.querySelectorAll('.nav-item')];
+      let st = null, holdT = 0, swallow = false;
+      const vib = m => { try { navigator.vibrate && navigator.vibrate(m); } catch (e) {} };
+      function hover(clientX) {
+        const idx = Math.max(0, Math.min(items.length - 1, Math.round(navPhys.pos(clientX) / navPhys.width())));
+        if (idx !== st.idx) { items.forEach((it, i) => it.classList.toggle('drag-over', i === idx)); if (st.idx >= 0) vib(6); st.idx = idx; }
+      }
+      function begin(clientX) {
+        if (!st || st.drag) return;
+        st.drag = true;
+        try { nav.setPointerCapture(st.id); } catch (e) {}
+        nav.classList.add('grabbing'); ind.classList.add('dragging');
+        navPhys.grab(clientX); hover(clientX); vib(10);
+      }
+      function end(commit) {
+        clearTimeout(holdT);
+        if (!st) return;
+        const s = st; st = null;
+        try { nav.releasePointerCapture(s.id); } catch (e) {}
+        if (!s.drag) return;
+        nav.classList.remove('grabbing'); ind.classList.remove('dragging');
+        items.forEach(it => it.classList.remove('drag-over'));
+        swallow = true; setTimeout(() => { swallow = false; }, 80);
+        navPhys.release();
+        if (commit && s.idx >= 0) switchView(items[s.idx].dataset.view);
+        else navPhys.goTo(navPhys.current());
+      }
+      nav.addEventListener('pointerdown', e => {
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        st = { id: e.pointerId, x0: e.clientX, lx: e.clientX, drag: false, idx: -1 };
+        clearTimeout(holdT);
+        holdT = setTimeout(() => begin(st ? st.lx : e.clientX), 220);   // «затиснув» — плашка теж береться
+      });
+      nav.addEventListener('pointermove', e => {
+        if (!st || e.pointerId !== st.id) return;
+        st.lx = e.clientX;
+        if (!st.drag && Math.abs(e.clientX - st.x0) > 8) begin(e.clientX);
+        if (!st.drag) return;
+        navPhys.move(e.clientX); hover(e.clientX);
+      });
+      nav.addEventListener('pointerup', () => end(true));
+      nav.addEventListener('pointercancel', () => end(false));
+      nav.addEventListener('click', e => { if (swallow) { e.stopPropagation(); e.preventDefault(); } }, true);
+    });
+
+    function playNavAnim(name) {
+      document.querySelectorAll('.nav-item[data-view="' + name + '"]').forEach(item => {
+        const ic = item.querySelector('.material-icons-round'); if (!ic) return;
+        item.classList.remove('pop'); void item.offsetWidth; item.classList.add('pop');
+        clearTimeout(item._popT); item._popT = setTimeout(() => item.classList.remove('pop'), 1000);
+        if ((name === 'library' || name === 'settings') && item.closest('.bottom-nav') && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          const cx = ic.offsetLeft + ic.offsetWidth / 2, cy = ic.offsetTop + ic.offsetHeight / 2;
+          for (let k = 0; k < 8; k++) {
+            const sp = document.createElement('i'); sp.className = 'nav-spark';
+            sp.style.left = cx + 'px'; sp.style.top = cy + 'px';
+            sp.style.setProperty('--a', (k * 45 + Math.random() * 20 - 10) + 'deg');
+            item.insertBefore(sp, item.firstChild);          // перед підписом, щоб :last-child не збивався
+            setTimeout(() => sp.remove(), 700);
+          }
+        }
+      });
     }
 
     // ========== ВСЕ ТРЕКИ ИСПОЛНИТЕЛЯ ==========
@@ -4813,42 +5875,97 @@
     }, true);
 
     // ========== ФИЛЬТРЫ ПОИСКА ==========
-    const GENRES = [
-      ['pop','Поп'],['rock','Рок'],['electronic','Електроніка'],['hiphop','Хіп-хоп'],['rnb','R&B'],['jazz','Джаз'],
-      ['classical','Класика'],['metal','Метал'],['punk','Панк'],['indie','Інді'],['folk','Фолк'],['country','Кантрі'],
-      ['reggae','Реггі'],['blues','Блюз'],['soul','Соул'],['funk','Фанк'],['latin','Латино'],['dance','Танцювальна'],
-      ['house','Хаус'],['techno','Техно'],['trance','Транс'],['dubstep','Дабстеп'],['ambient','Ембієнт'],['lounge','Лаунж'],
-      ['chillout','Чилаут'],['lofi','Лоу-фай'],['soundtrack','Саундтрек'],['world','Світова'],['acoustic','Акустика'],['kpop','K-pop']
+    const GENRE_GROUPS = [
+      ['Популярні', [['pop','Поп'],['rock','Рок'],['hiphop','Хіп-хоп'],['rnb','R&B'],['indie','Інді'],['kpop','K-pop'],['latin','Латино'],['dance','Танцювальна']]],
+      ['Електронна', [['electronic','Електроніка'],['house','Хаус'],['techno','Техно'],['trance','Транс'],['dubstep','Дабстеп'],['dnb','Drum & Bass'],['edm','EDM'],['synthwave','Синтвейв'],['hardstyle','Хардстайл'],['phonk','Фонк'],['trap','Трап'],['drill','Дрилл'],['hyperpop','Гіперпоп'],['vaporwave','Вейпорвейв'],['breakbeat','Брейкбіт'],['garage','Гараж']]],
+      ['Важка та альтернатива', [['metal','Метал'],['punk','Панк'],['alternative','Альтернатива'],['emo','Емо'],['hardcore','Хардкор'],['grunge','Ґрандж'],['postrock','Пост-рок'],['shoegaze','Шугейз'],['industrial','Індастріал']]],
+      ['Спокійна', [['ambient','Ембієнт'],['chillout','Чилаут'],['lofi','Лоу-фай'],['lounge','Лаунж'],['acoustic','Акустика'],['piano','Піаніно'],['downtempo','Даунтемпо'],['instrumental','Інструментал'],['newage','Нью-ейдж']]],
+      ['Класика та коріння', [['jazz','Джаз'],['blues','Блюз'],['soul','Соул'],['funk','Фанк'],['disco','Диско'],['reggae','Реггі'],['ska','Ска'],['folk','Фолк'],['country','Кантрі'],['classical','Класика'],['orchestral','Оркестрова'],['gospel','Госпел'],['soundtrack','Саундтрек'],['world','Світова'],['afrobeats','Афробітс']]]
     ];
+    const GENRES = GENRE_GROUPS.flatMap(g => g[1]);
+    const GENRE_Q = { hiphop: 'hip hop', dnb: 'drum and bass', rnb: 'r&b', lofi: 'lofi', kpop: 'k-pop', postrock: 'post rock', newage: 'new age', hardstyle: 'hardstyle', afrobeats: 'afrobeats' };
+    const JAM_TAG = { dnb: 'drumnbass', postrock: 'postrock', newage: 'newage' };
+    const MOODS = [['energetic','Енергійне','energetic'],['chill','Спокійне','chill relaxing'],['happy','Веселе','happy'],['sad','Сумне','sad'],['romantic','Романтичне','romantic'],['focus','Для фокусу','focus study'],['workout','Тренування','workout'],['party','Вечірка','party'],['sleep','Для сну','sleep calm'],['dark','Темне','dark'],['epic','Епічне','epic'],['nostalgic','Ностальгія','nostalgic']];
+    const ERAS = [['','Будь-які'],['2020','2020-ті'],['2010','2010-ті'],['2000','2000-ні'],['1990','90-ті'],['1980','80-ті'],['1970','70-ті']];
+    const LANGS = [['','Будь-яка'],['uk','Українська'],['en','English'],['es','Español'],['pt','Português'],['fr','Français'],['de','Deutsch'],['ko','한국어'],['ja','日本語'],['tr','Türkçe'],['pl','Polski']];
+    const LANG_Q = { uk: 'українська музика', es: 'música en español', pt: 'música brasileira', fr: 'chanson française', de: 'deutsche musik', ko: 'korean', ja: 'japanese', tr: 'türkçe şarkı', pl: 'polska muzyka' };
+    const JAM_LANGS = ['en', 'fr', 'de', 'es', 'pt', 'ja', 'ko', 'tr', 'pl'];
+    const DURS = [['','Будь-яка'],['s','< 3 хв'],['m','3–5 хв'],['l','> 5 хв']];
+    const DUR_RANGE = { s: [0, 180], m: [180, 300], l: [300, 3600] };
     const SOURCES = [['all','Усі'],['jamendo','Jamendo'],['audius','Audius'],['youtube','YouTube'],['freesound','Freesound']];
     const SORTS = [['popularity_month','Популярні'],['releasedate','Новинки'],['listens','За прослуховуваннями'],['relevance','За релевантністю']];
-    const searchFilters = { genres: new Set(), source: 'all', sort: 'popularity_month', artist: '', title: '' };
+    const searchFilters = { genres: new Set(), moods: new Set(), era: '', lang: '', dur: '', source: 'all', sort: 'popularity_month', artist: '', title: '' };
 
     function syncFieldClear() {
       document.getElementById('clearArtist').style.display = document.getElementById('fArtist').value ? 'grid' : 'none';
       document.getElementById('clearTitle').style.display = document.getElementById('fTitle').value ? 'grid' : 'none';
     }
-    function filtersActive() { return !!(searchFilters.artist || searchFilters.title) || searchFilters.genres.size > 0 || searchFilters.source !== 'all' || searchFilters.sort !== 'popularity_month'; }
+    function filtersActive() { return !!(searchFilters.artist || searchFilters.title) || searchFilters.genres.size > 0 || searchFilters.moods.size > 0 || !!(searchFilters.era || searchFilters.lang || searchFilters.dur) || searchFilters.source !== 'all' || searchFilters.sort !== 'popularity_month'; }
+    function filterCount() { const f = searchFilters; return f.genres.size + f.moods.size + (f.era ? 1 : 0) + (f.lang ? 1 : 0) + (f.dur ? 1 : 0) + (f.source !== 'all' ? 1 : 0); }
+    function renderActiveFilters() {
+      const f = searchFilters, items = [];
+      f.genres.forEach(k => items.push([(GENRES.find(x => x[0] === k) || [k, k])[1], () => f.genres.delete(k)]));
+      f.moods.forEach(k => items.push([(MOODS.find(x => x[0] === k) || [k, k])[1], () => f.moods.delete(k)]));
+      if (f.era) items.push([(ERAS.find(x => x[0] === f.era) || ['', f.era])[1], () => { f.era = ''; }]);
+      if (f.lang) items.push([(LANGS.find(x => x[0] === f.lang) || ['', f.lang])[1], () => { f.lang = ''; }]);
+      if (f.dur) items.push([(DURS.find(x => x[0] === f.dur) || ['', f.dur])[1], () => { f.dur = ''; }]);
+      if (f.source !== 'all') items.push([(SOURCES.find(x => x[0] === f.source) || ['', f.source])[1], () => { f.source = 'all'; }]);
+      const box = document.getElementById('activeFilters');
+      box.innerHTML = items.map(([n], i) => `<button class="chip" data-i="${i}">${escapeHtml(n)}<span class="material-icons-round">close</span></button>`).join('');
+      box.style.margin = items.length ? '10px 0 0' : '0';
+      box.querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => { items[+b.dataset.i][1](); renderFilterChips(); runSearch(); }));
+    }
     function renderFilterChips() {
       const mk = (id, items, isOn, onClick) => {
         const el = document.getElementById(id);
         el.innerHTML = items.map(([k, n]) => `<button class="chip ${isOn(k) ? 'on' : ''}" data-k="${k}">${n}</button>`).join('');
         el.querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => { onClick(b.dataset.k); renderFilterChips(); runSearch(); }));
       };
-      mk('genreChips', GENRES, k => searchFilters.genres.has(k), k => { searchFilters.genres.has(k) ? searchFilters.genres.delete(k) : searchFilters.genres.add(k); });
+      const toggle = (set, k) => { set.has(k) ? set.delete(k) : set.add(k); };
+      // жанри — групами
+      const gBox = document.getElementById('genreChips');
+      gBox.innerHTML = GENRE_GROUPS.map(([name, list], gi) => `<div class="fs-sub">${name}</div><div class="chip-row" data-g="${gi}">${list.map(([k, n]) => `<button class="chip ${searchFilters.genres.has(k) ? 'on' : ''}" data-k="${k}">${n}</button>`).join('')}</div>`).join('');
+      gBox.querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => { toggle(searchFilters.genres, b.dataset.k); renderFilterChips(); runSearch(); }));
+      mk('moodChips', MOODS, k => searchFilters.moods.has(k), k => toggle(searchFilters.moods, k));
+      mk('eraChips', ERAS, k => searchFilters.era === k, k => { searchFilters.era = k; });
+      mk('langChips', LANGS, k => searchFilters.lang === k, k => { searchFilters.lang = k; });
+      mk('durChips', DURS, k => searchFilters.dur === k, k => { searchFilters.dur = k; });
       mk('sourceChips', SOURCES, k => searchFilters.source === k, k => { searchFilters.source = k; });
       mk('sortChips', SORTS, k => searchFilters.sort === k, k => { searchFilters.sort = k; });
-      const n = searchFilters.genres.size + (searchFilters.source !== 'all' ? 1 : 0);
+      const n = filterCount();
       const tgl = document.getElementById('filterToggle');
       tgl.classList.toggle('has', n > 0 || searchFilters.sort !== 'popularity_month');
       document.getElementById('filterToggleText').textContent = n ? `Фільтри · ${n}` : 'Фільтри';
+      renderActiveFilters();
+    }
+    // ----- шторка фільтрів -----
+    function openFilters() { document.getElementById('fsOverlay').classList.add('open'); document.getElementById('filterSheet').classList.add('open'); }
+    function closeFilters() { const sh = document.getElementById('filterSheet'); sh.style.transform = ''; document.getElementById('fsOverlay').classList.remove('open'); sh.classList.remove('open'); }
+    function initFilterSheet() {
+      document.getElementById('filterToggle').addEventListener('click', openFilters);
+      document.getElementById('fsOverlay').addEventListener('click', closeFilters);
+      document.getElementById('fsClose').addEventListener('click', closeFilters);
+      document.getElementById('fsApply').addEventListener('click', closeFilters);
+      document.addEventListener('keydown', e => { if (e.key === 'Escape') closeFilters(); });
+      // потягнути вниз за «ручку», щоб закрити
+      const grab = document.getElementById('fsGrab'), sh = document.getElementById('filterSheet');
+      let y0 = null, dy = 0;
+      grab.addEventListener('pointerdown', e => { y0 = e.clientY; dy = 0; sh.classList.add('dragging'); try { grab.setPointerCapture(e.pointerId); } catch (x) {} });
+      grab.addEventListener('pointermove', e => { if (y0 == null) return; dy = Math.max(0, e.clientY - y0); sh.style.transform = `translateY(${dy}px)`; });
+      const end = () => { if (y0 == null) return; y0 = null; sh.classList.remove('dragging'); if (dy > 90) closeFilters(); else sh.style.transform = ''; };
+      grab.addEventListener('pointerup', end); grab.addEventListener('pointercancel', end);
     }
     async function jamendoFiltered(query, limit = 40) {
       try {
         const base = { limit, imagesize: 300, order: searchFilters.sort, audioformat: 'mp32' };
         if (query) base.search = query;
         if (searchFilters.artist) base.artist_name = searchFilters.artist;
-        if (searchFilters.genres.size) base.tags = [...searchFilters.genres].join('+');
+        if (searchFilters.genres.size) base.tags = [...searchFilters.genres].map(g => JAM_TAG[g] || g).join('+');
+        const mw = [...searchFilters.moods].map(m => (MOODS.find(x => x[0] === m) || [0, 0, m])[2].split(' ')[0]);
+        if (mw.length) base.search = [query, mw[0]].filter(Boolean).join(' ');
+        if (searchFilters.era) base.datebetween = `${searchFilters.era}-01-01_${+searchFilters.era + 9}-12-31`;
+        if (searchFilters.lang && JAM_LANGS.includes(searchFilters.lang)) base.lang = searchFilters.lang;
+        if (searchFilters.dur) base.durationbetween = DUR_RANGE[searchFilters.dur].join('_');
         if (!query && !searchFilters.artist && !searchFilters.title && searchFilters.sort === 'relevance') base.order = 'popularity_month';
         const t = searchFilters.title;
         // «Назва или альбом» — ищем и по названию трека, и по альбому
@@ -4862,20 +5979,25 @@
       } catch (e) { console.error(e); return []; }
     }
     async function filteredSearch(query) {
-      const src = searchFilters.source, hasGenre = searchFilters.genres.size > 0;
-      const genreWords = [...searchFilters.genres].map(g => (GENRES.find(x => x[0] === g) || [g, g])[0]);
-      const extraQ = (q) => [q, searchFilters.artist, searchFilters.title, ...(hasGenre ? genreWords.slice(0, 1) : [])].filter(Boolean).join(' ');
-      const hasText = !!(query || searchFilters.artist || searchFilters.title);
+      const f = searchFilters, src = f.source;
+      const genreWords = [...f.genres].map(g => GENRE_Q[g] || g);
+      const moodWords = [...f.moods].map(m => (MOODS.find(x => x[0] === m) || [0, 0, m])[2]);
+      const hasMeta = f.genres.size > 0 || f.moods.size > 0 || !!f.lang || !!f.era;
+      const eraWord = f.era ? `${f.era}s` : '';
+      const extraQ = (q) => [q, f.artist, f.title, genreWords[0], moodWords[0], LANG_Q[f.lang], eraWord].filter(Boolean).join(' ');
+      const hasText = !!(query || f.artist || f.title);
       const norm = x => (x || '').toLowerCase().replace(/ё/g, 'е');
-      const artistOk = t => !searchFilters.artist || norm(t.artist).includes(norm(searchFilters.artist));
+      const artistOk = t => !f.artist || norm(t.artist).includes(norm(f.artist));
+      const rg = DUR_RANGE[f.dur];
+      const durOk = t => !rg || !t.duration || t.preview || (t.duration >= rg[0] && t.duration < rg[1]);
       const jobs = [];
       if (src === 'all' || src === 'jamendo') jobs.push(jamendoFiltered(query, 40));
-      if ((src === 'all' || src === 'audius') && (hasText || hasGenre)) jobs.push(searchAudius(extraQ(query), 25).then(l => l.filter(artistOk)));
-      if ((src === 'all' || src === 'youtube') && hasText) jobs.unshift(searchYouTube(extraQ(query), 15));
-      if ((src === 'all' || src === 'freesound') && (hasText || hasGenre)) jobs.push(searchFreesound(extraQ(query).replace(/\s+/g, ' '), 20, [...searchFilters.genres]).then(l => l.filter(artistOk)));
-      const lists = await Promise.all(jobs);
+      if ((src === 'all' || src === 'audius') && (hasText || hasMeta)) jobs.push(searchAudius(extraQ(query), 25).then(l => l.filter(artistOk)));
+      if ((src === 'all' || src === 'youtube') && (hasText || hasMeta)) jobs.unshift(searchYouTube(extraQ(query) + (hasText ? '' : ' music'), 15));
+      if ((src === 'all' || src === 'freesound') && (hasText || f.genres.size)) jobs.push(searchFreesound(extraQ(query).replace(/\s+/g, ' '), 20, [...f.genres]).then(l => l.filter(artistOk)));
+      const lists = await Promise.all(jobs.map(j => Promise.resolve(j).catch(() => [])));
       const seen = new Set(), out = [];
-      interleave(...lists).forEach(t => { if (!seen.has(t.id)) { seen.add(t.id); out.push(t); } });
+      interleave(...lists).forEach(t => { if (!seen.has(t.id) && durOk(t)) { seen.add(t.id); out.push(t); } });
       return out;
     }
     let searchSeq = 0;
@@ -4883,13 +6005,15 @@
       const q = '';
       const resBox = document.getElementById('searchResults'), disc = document.getElementById('discoverSection');
       const list = document.getElementById('searchList');
-      if (!q && !filtersActive()) { resBox.style.display = 'none'; disc.style.display = 'block'; return; }
+      if (!q && !filtersActive()) { resBox.style.display = 'none'; disc.style.display = 'block'; const fa0 = document.getElementById('fsApply'); if (fa0) fa0.textContent = 'Показати результати'; return; }
       disc.style.display = 'none'; resBox.style.display = 'block';
       list.innerHTML = '<div class="empty-state" style="padding:24px"><p>Шукаємо по всіх джерелах...</p></div>';
+      const fa = document.getElementById('fsApply'); if (fa) fa.textContent = 'Шукаємо…';
       const my = ++searchSeq;
       const results = await filteredSearch(q);
       if (my !== searchSeq) return;
       lastSearchResults = results;
+      if (fa) fa.textContent = results.length ? `Показати ${results.length} ${results.length % 10 === 1 && results.length % 100 !== 11 ? 'трек' : 'треків'}` : 'Нічого не знайдено';
       list.innerHTML = results.length ? results.map(t => trackHTML(t, false)).join('')
         : '<div class="empty-state" style="padding:32px"><p>Нічого не знайдено</p></div>';
       bindTrackEvents(list);
@@ -4983,106 +6107,147 @@
       } catch (e) { console.error('Audius random error:', e); return []; }
     }
 
-    async function renderDiscover() {
-      const grid = document.getElementById('recGrid');
-      const popular = document.getElementById('popularList');
-
-      // Показываем загрузку
-      grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;padding:24px"><p>Підбираємо для вас...</p></div>';
-      popular.innerHTML = '<div class="empty-state" style="padding:24px"><p>Завантаження...</p></div>';
-
-      try {
-        const [audT, jamT, jamT2] = await Promise.all([randomAudius(10), randomJamendo(14), randomJamendo(8)]);
-        const tracks = shuffle(interleave(jamT, audT, jamT2));
-        audiusTrendingCache = tracks;
-
-        if (tracks.length === 0) {
-          // fallback на демо
-          grid.innerHTML = DEMO_TRACKS.slice(0, 6).map(t => `
-            <div class="rec-card" data-id="${t.id}">
-              <img class="rec-art" src="${t.art}" alt="" loading="lazy" />
-              <div class="rec-info">
-                <div class="rec-title">${escapeHtml(t.title)}</div>
-                <div class="rec-artist">${escapeHtml(t.artist)}</div>
-              </div>
-            </div>
-          `).join('');
-          popular.innerHTML = DEMO_TRACKS.map(t => trackHTML(t, false)).join('');
-        } else {
-          grid.innerHTML = tracks.slice(0, 8).map(t => `
-            <div class="rec-card" data-id="${t.id}">
-              <img class="rec-art" src="${t.art || ART_PLACEHOLDER}" alt="" loading="lazy" />
-              <div class="rec-info">
-                <div class="rec-title">${escapeHtml(t.title)}</div>
-                <div class="rec-artist">${escapeHtml(t.artist)}</div>
-              </div>
-            </div>
-          `).join('');
-          popular.innerHTML = tracks.map(t => trackHTML(t, false)).join('');
-        }
-
-        grid.querySelectorAll('.rec-card').forEach(card => {
-          card.addEventListener('click', () => {
-            const t = audiusTrendingCache.find(x => x.id === card.dataset.id) || DEMO_TRACKS.find(x => x.id === card.dataset.id);
-            if (t) { playTrack(t); openFullPlayer(); }
-          });
-        });
-        bindTrackEvents(popular);
-      } catch (e) {
-        console.error(e);
-        toast('Не вдалося завантажити рекомендації');
-      }
+    // ----- профіль смаків: за історією й бібліотекою -----
+    function tasteProfile() {
+      const cnt = new Map(), bad = /локальн|unknown|невідом|various/i;
+      const add = (a, w) => { a = (a || '').trim(); if (!a || bad.test(a)) return; const k = a.toLowerCase(); const o = cnt.get(k) || { name: a, n: 0 }; o.n += w; cnt.set(k, o); };
+      playHistory.slice(0, 200).forEach(h => add(h.artist, 1));
+      library.forEach(l => add(l.artist, 3));
+      return [...cnt.values()].sort((x, y) => y.n - x.n);
+    }
+    // одна добірка з кількох джерел
+    async function mixRow({ jam, aud, yt, limit = 14 }) {
+      const safe = (pr) => Promise.resolve(pr).catch(() => []);
+      const [j, a, y] = await Promise.all([
+        jam ? safe(jamendoFetch('/tracks/', { limit: 12, imagesize: 300, audioformat: 'mp32', boost: 'popularity_month', ...jam }).then(d => (d.results || []).filter(t => t.audio).map(mapJamendoTrack))) : [],
+        aud ? safe(searchAudius(aud, 14)) : [],
+        yt ? safe(Promise.all([].concat(yt).map(q => searchYouTube(q, 8))).then(ls => interleave(...ls))) : []
+      ]);
+      const seen = new Set(), out = [];
+      interleave(y, j, a).forEach(t => { if (t && !seen.has(t.id)) { seen.add(t.id); out.push(t); } });
+      return out.slice(0, limit);
+    }
+    const REC_POOL = [
+      { id: 'phonk',   i: 'directions_car', t: 'Фонк',                 sub: 'Темний бас і драйв',            load: () => mixRow({ yt: 'phonk music', aud: 'phonk' }) },
+      { id: 'lofi',    i: 'headphones',     t: 'Lo-fi для фокусу',      sub: 'Працювати, вчитися, думати',    load: () => mixRow({ jam: { tags: 'lofi' }, aud: 'lofi study', yt: 'lofi beats' }) },
+      { id: 'energy',  i: 'bolt',           t: 'Заряд енергії',         sub: 'Для тренування та руху',        load: () => mixRow({ jam: { tags: 'electronic', order: 'popularity_week' }, aud: 'workout energetic' }) },
+      { id: 'chill',   i: 'spa',            t: 'Спокійний вечір',       sub: 'Чилаут і лаунж',                load: () => mixRow({ jam: { tags: 'chillout' }, aud: 'chill' }) },
+      { id: 'rock',    i: 'electric_bolt',  t: 'Рок-ніч',               sub: 'Гітари на повну',               load: () => mixRow({ jam: { tags: 'rock' }, aud: 'rock' }) },
+      { id: 'hiphop',  i: 'mic',            t: 'Хіп-хоп',               sub: 'Біти й текст',                  load: () => mixRow({ jam: { tags: 'hiphop' }, aud: 'hip hop', yt: 'hip hop mix' }) },
+      { id: 'dance',   i: 'nightlife',      t: 'Танцпол',               sub: 'Хаус, транс, EDM',              load: () => mixRow({ jam: { tags: 'house' }, aud: 'house dance', yt: 'house music mix' }) },
+      { id: 'ambient', i: 'bedtime',        t: 'Ембієнт для сну',       sub: 'Тиша з відтінками',             load: () => mixRow({ jam: { tags: 'ambient' }, aud: 'ambient sleep' }) },
+      { id: 'metal',   i: 'whatshot',       t: 'Метал',                 sub: 'Важко і голосно',               load: () => mixRow({ jam: { tags: 'metal' }, aud: 'metal' }) },
+      { id: 'jazz',    i: 'local_cafe',     t: 'Джаз-кафе',             sub: 'Теплий вечір з кавою',          load: () => mixRow({ jam: { tags: 'jazz' }, aud: 'jazz' }) },
+      { id: 'indie',   i: 'favorite_border',t: 'Інді для душі',         sub: 'Тихіше, ближче, особистіше',    load: () => mixRow({ jam: { tags: 'indie' }, aud: 'indie' }) },
+      { id: 'synth',   i: 'album',          t: 'Синтвейв і ретро',      sub: 'Неонові вісімдесяті',           load: () => mixRow({ aud: 'synthwave', yt: 'synthwave mix' }) },
+      { id: 'dnb',     i: 'speed',          t: 'Drum & Bass',           sub: 'Швидкість без гальм',           load: () => mixRow({ aud: 'drum and bass', yt: 'drum and bass mix' }) },
+      { id: 'kpop',    i: 'stars',          t: 'K-pop',                 sub: 'Яскраво та ритмічно',           load: () => mixRow({ jam: { tags: 'kpop' }, aud: 'kpop', yt: 'kpop' }) },
+      { id: 'acoustic',i: 'piano',          t: 'Акустика і піаніно',    sub: 'Живі інструменти',              load: () => mixRow({ jam: { tags: 'acoustic' }, aud: 'acoustic piano' }) },
+      { id: 'trap',    i: 'graphic_eq',     t: 'Трап та дрилл',         sub: '808 і щільний ритм',            load: () => mixRow({ aud: 'trap', yt: 'trap music mix' }) },
+      { id: 'soul',    i: 'volunteer_activism', t: 'Соул і фанк',       sub: 'Груві та тепло',                load: () => mixRow({ jam: { tags: 'soul' }, aud: 'soul funk' }) },
+      { id: 'classic', i: 'music_note',     t: 'Класика',               sub: 'Вічні композиції',              load: () => mixRow({ jam: { tags: 'classical' }, aud: 'classical' }) }
+    ];
+    // ключові слова для визначення стилю з назв/виконавців/жанрів, і відповідність жанрів пошуку до рядів
+    const STYLE_KW = {
+      phonk: /phonk|фонк|drift/i, lofi: /lo-?fi|chillhop/i, energy: /workout|gym|bass boost|electro/i, chill: /chill|relax|lounge/i,
+      rock: /\brock\b|рок\b|alternative/i, hiphop: /hip.?hop|\brap\b|реп\b|хіп|хип/i, dance: /house|techno|trance|\bedm\b|club|dance/i,
+      ambient: /ambient|ембієнт|sleep/i, metal: /metal|метал|metalcore|deathcore|symphonic/i, jazz: /jazz|джаз|swing|blues/i, indie: /indie|інді/i,
+      synth: /synth|retrowave|vaporwave|80s/i, dnb: /drum.?(and|n|&).?bass|\bdnb\b|liquid/i, kpop: /k-?pop|blackpink|\bbts\b|twice|newjeans/i,
+      acoustic: /acoustic|piano|unplugged|акуст|піано/i, trap: /\btrap\b|drill/i, soul: /\bsoul\b|funk|r&b|\brnb\b/i, classic: /classical|symphony|orchestra|beethoven|mozart|bach|chopin/i
+    };
+    const GENRE_TO_STYLE = { phonk: 'phonk', lofi: 'lofi', rock: 'rock', hiphop: 'hiphop', house: 'dance', techno: 'dance', trance: 'dance', dance: 'dance', edm: 'dance', electronic: 'energy',
+      ambient: 'ambient', chillout: 'chill', lounge: 'chill', metal: 'metal', jazz: 'jazz', blues: 'jazz', indie: 'indie', synthwave: 'synth', vaporwave: 'synth', dnb: 'dnb', kpop: 'kpop',
+      acoustic: 'acoustic', piano: 'acoustic', trap: 'trap', drill: 'trap', soul: 'soul', funk: 'soul', rnb: 'soul', classical: 'classic', orchestral: 'classic', alternative: 'rock', punk: 'rock', grunge: 'rock', emo: 'rock' };
+    // Ваші стилі: що саме ви слухаєте, зберігаєте й шукаєте
+    function styleProfile() {
+      const sc = {}, add = (k, w) => { sc[k] = (sc[k] || 0) + w; };
+      const scan = (txt, w) => { for (const [k, re] of Object.entries(STYLE_KW)) if (re.test(txt)) add(k, w); };
+      playHistory.slice(0, 200).forEach(h => {
+        if (h.type === 'search') { (h.genres || []).forEach(g => GENRE_TO_STYLE[g] && add(GENRE_TO_STYLE[g], 4)); scan(`${h.artist || ''} ${h.title || ''}`, 2); }
+        else scan(`${h.title || ''} ${h.artist || ''}`, 1);
+      });
+      library.forEach(t => scan(`${t.title || ''} ${t.artist || ''} ${(t.info && (t.info.genre || t.info.tags)) || ''}`, 3));
+      return Object.entries(sc).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]).map(([k]) => k);
+    }
+    function buildFeedPlan() {
+      const rows = [], taste = tasteProfile();
+      const seen = new Set(), recent = [];
+      for (const h of playHistory) { if (seen.has(h.id) || h.local) continue; seen.add(h.id); recent.push(h); if (recent.length >= 12) break; }
+      if (recent.length >= 3) rows.push({ id: 'recent', i: 'history', t: 'Слухали нещодавно', sub: 'Повернутися до знайомого', load: async () => recent.map(entryToTrack) });
+      const lib = library.filter(t => !t.local);
+      if (lib.length >= 4) rows.push({ id: 'lib', i: 'favorite', t: 'З вашої бібліотеки', sub: 'Перемішано — щоразу по-новому', load: async () => shuffle(lib).slice(0, 14) });
+      const tl = [['Тому що ви слухаєте', 'person'], ['Більше від', 'queue_music'], ['Вам може сподобатися', 'auto_awesome']];
+      taste.slice(0, 3).forEach((a, k) => rows.push({ id: 'taste' + k, i: tl[k][1], t: `${tl[k][0]} ${a.name}`, sub: 'На основі вашого смаку',
+        load: () => mixRow({ jam: { search: a.name }, aud: a.name, yt: a.name, limit: 14 }) }));
+      // стилі, що вам, імовірно, подобаються
+      const favStyles = styleProfile().filter(k => REC_POOL.some(r => r.id === k)).slice(0, 3);
+      favStyles.forEach(k => { const r = REC_POOL.find(x => x.id === k); rows.push({ ...r, id: 'style_' + k, i: 'auto_awesome', t: `Ваш стиль: ${r.t}`, sub: 'Схоже на те, що ви слухаєте й зберігаєте' }); });
+      // тренди: TikTok / YouTube / Instagram (публічних API в них немає — беремо вірусні хіти через YouTube)
+      const yr = new Date().getFullYear();
+      rows.push({ id: 'tt', i: 'music_video', t: 'У тренді в TikTok', sub: 'Вірусні пісні з відео', load: () => mixRow({ yt: [`tiktok viral songs ${yr}`, `trending tiktok songs ${yr}`], limit: 16 }) });
+      rows.push({ id: 'ytt', i: 'smart_display', t: 'У тренді на YouTube', sub: 'Музичний чарт YouTube', load: async () => { const l = await ytTrending(currentCountry, 20); return l.length ? l : mixRow({ yt: `trending music ${yr}`, limit: 16 }); } });
+      rows.push({ id: 'ig', i: 'photo_camera', t: 'У тренді в Instagram', sub: 'Популярне в Reels', load: () => mixRow({ yt: [`instagram reels trending songs ${yr}`, `viral reels songs ${yr}`], limit: 16 }) });
+      rows.push({ id: 'new', i: 'new_releases', t: 'Нові релізи', sub: 'Свіжі треки Jamendo', load: () => mixRow({ jam: { order: 'releasedate', boost: undefined }, limit: 14 }) });
+      rows.push({ id: 'trend', i: 'trending_up', t: 'У тренді на Audius', sub: 'Що слухають просто зараз', load: async () => shuffle(await getAudiusTrending(30)).slice(0, 14) });
+      shuffle(REC_POOL.filter(r => !favStyles.includes(r.id))).slice(0, 6).forEach(r => rows.push(r));
+      const c = COUNTRIES.find(x => x[0] === currentCountry) || COUNTRIES[0];
+      rows.push({ id: 'chart', i: 'public', t: `Чарт: ${c[1]} ${c[2]}`, sub: '30-секундні прев’ю з iTunes', load: async () => (await fetchCountryChart(currentCountry)).slice(0, 14) });
+      return { rows, hasTaste: taste.length > 0 || recent.length > 0 };
+    }
+    const feedTracks = new Map();
+    let feedSeq = 0, feedTs = 0, feedBuilt = false;
+    function recCardHTML(t) {
+      return `<div class="rec-card" data-id="${escapeHtml(String(t.id))}"><img class="rec-art" src="${artOf(t) || ART_PLACEHOLDER}" alt="" loading="lazy" /><div class="rec-info"><div class="rec-title">${escapeHtml(t.title)}</div><div class="rec-artist">${escapeHtml(t.artist || '')}</div></div></div>`;
+    }
+    function initQuickMoods() {
+      const box = document.getElementById('quickMoods');
+      if (box.dataset.ready) return; box.dataset.ready = '1';
+      const q = [['energetic','🔥 Енергія'],['chill','😌 Спокій'],['focus','🎯 Фокус'],['sleep','🌙 Сон'],['party','🎉 Вечірка'],['sad','💔 Сум'],['workout','💪 Тренування'],['romantic','💞 Романтика']];
+      box.innerHTML = q.map(([k, n]) => `<button class="quick-chip" data-k="${k}">${n}</button>`).join('');
+      box.querySelectorAll('.quick-chip').forEach(b => b.addEventListener('click', () => { searchFilters.moods = new Set([b.dataset.k]); renderFilterChips(); runSearch(); }));
+    }
+    async function renderDiscover(force) {
+      const feed = document.getElementById('recFeed'); if (!feed) return;
+      if (!force && feedBuilt && Date.now() - feedTs < 10 * 60 * 1000) return;   // не перезавантажуємо при кожному поверненні на вкладку
+      initQuickMoods();
+      feedBuilt = true; feedTs = Date.now();
+      const my = ++feedSeq, plan = buildFeedPlan();
+      feed.innerHTML = (plan.hasTaste ? '' : '<div class="rec-note">Слухайте й додавайте треки в бібліотеку — тут зʼявляться добірки саме під ваш смак.</div>')
+        + plan.rows.map(r => `<section class="rec-sec" data-row="${r.id}"><div class="rec-sec-head"><div class="ic"><span class="material-icons-round">${r.i}</span></div><div><h3>${escapeHtml(r.t)}</h3><p>${escapeHtml(r.sub)}</p></div></div><div class="rec-row">${'<div class="rec-skel"></div>'.repeat(5)}</div></section>`).join('');
+      const fill = async (sec, r) => {
+        if (sec.dataset.loaded) return; sec.dataset.loaded = '1';
+        let tracks = [];
+        try { tracks = await r.load(); } catch (e) { console.error('row', r.id, e); }
+        if (my !== feedSeq) return;
+        const row = sec.querySelector('.rec-row');
+        tracks = (tracks || []).filter(t => t && t.title);
+        if (tracks.length < 2) { sec.remove(); return; }              // порожні ряди не показуємо
+        tracks.forEach(t => { feedTracks.set(String(t.id), t); if (!audiusTrendingCache.some(x => x.id === t.id)) audiusTrendingCache.push(t); });
+        row.innerHTML = tracks.map(recCardHTML).join('');
+        row.querySelectorAll('.rec-card').forEach(card => card.addEventListener('click', () => {
+          const t = feedTracks.get(card.dataset.id); if (t) { playTrack(t, tracks); openFullPlayer(); }
+        }));
+      };
+      const secs = [...feed.querySelectorAll('.rec-sec')];
+      const byId = Object.fromEntries(plan.rows.map(r => [r.id, r]));
+      if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver((es) => es.forEach(en => { if (en.isIntersecting) { io.unobserve(en.target); fill(en.target, byId[en.target.dataset.row]); } }),
+          { root: document.getElementById('view-search'), rootMargin: '400px 0px' });
+        secs.forEach(sec => io.observe(sec));
+      } else secs.forEach(sec => fill(sec, byId[sec.dataset.row]));
     }
 
     // ========== INIT ==========
     document.addEventListener('DOMContentLoaded', () => {
       /* тема й акцент керуються розділом «Персоналізація» (див. нижній <script>) */
 
-      // EQ helper — bind sliders + presets to a container pair
-      function bindEQControls(slidersEl, presetsEl) {
-        if (!slidersEl || !presetsEl) return;
-        slidersEl.innerHTML = EQ_BANDS.map((f, i) => `
-          <div class="eq-band">
-            <input type="range" min="-12" max="12" value="0" step="0.5" data-band="${i}" />
-            <span class="eq-label">${f >= 1000 ? (f/1000)+'k' : f}</span>
-          </div>
-        `).join('');
-        const applyFromSliders = () => {
-          const gains = Array.from(slidersEl.querySelectorAll('input')).map(i => +i.value);
-          setEQGains(gains);
-          // sync other slider set
-          document.querySelectorAll('.eq-sliders').forEach(other => {
-            if (other === slidersEl) return;
-            other.querySelectorAll('input').forEach((inp, i) => { inp.value = gains[i]; });
-          });
-        };
-        slidersEl.querySelectorAll('input').forEach(inp => {
-          inp.addEventListener('input', applyFromSliders);
-        });
-        presetsEl.innerHTML = Object.keys(EQ_PRESETS).map(name => `
-          <button class="eq-preset" data-name="${name}">${name}</button>
-        `).join('');
-        presetsEl.querySelectorAll('.eq-preset').forEach(btn => {
-          btn.addEventListener('click', () => {
-            document.querySelectorAll('.eq-preset').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            // mark same preset in other set
-            document.querySelectorAll(`.eq-preset[data-name="${btn.dataset.name}"]`).forEach(b => b.classList.add('active'));
-            const gains = EQ_PRESETS[btn.dataset.name];
-            setEQGains(gains);
-            document.querySelectorAll('.eq-sliders').forEach(box => {
-              box.querySelectorAll('input').forEach((inp, i) => { inp.value = gains[i]; });
-            });
-          });
-        });
-      }
-      bindEQControls(document.getElementById('eqSliders'), document.getElementById('eqPresets'));
-      bindEQControls(document.getElementById('fpEqSliders'), document.getElementById('fpEqPresets'));
+      eqUiInit();
 
       document.getElementById('eqToggle').addEventListener('click', () => {
         const panel = document.getElementById('eqPanel');
         panel.classList.toggle('open');
         document.getElementById('eqArrow').textContent = panel.classList.contains('open') ? 'expand_less' : 'expand_more';
+        eqRefreshUI();
       });
 
       document.getElementById('gaplessToggle').addEventListener('click', () => {
@@ -5160,7 +6325,7 @@
 
       // Nav
       document.querySelectorAll('.nav-item').forEach(btn => {
-        btn.addEventListener('click', () => switchView(btn.dataset.view));
+        btn.addEventListener('click', () => { if (window._lastView === btn.dataset.view) playNavAnim(btn.dataset.view); switchView(btn.dataset.view); });
       });
 
       // FAB
@@ -5227,6 +6392,7 @@
         eqSheet.classList.add('open');
         eqBackdrop.classList.add('open');
         initEQ();
+        setTimeout(eqRefreshUI, 40);
       }
       function closeEq() {
         eqSheet.classList.remove('open');
@@ -5240,6 +6406,7 @@
       const moreMenu = document.getElementById('moreMenu');
       document.getElementById('fpMore').addEventListener('click', (e) => {
         e.stopPropagation();
+        document.getElementById('moreCover').style.display = (currentTrack && currentTrack.local) ? '' : 'none';
         moreMenu.classList.toggle('open');
         eqSheet.classList.remove('open');
       });
@@ -5248,6 +6415,10 @@
           moreMenu.classList.remove('open');
         }
       });
+      document.getElementById('moreCover').addEventListener('click', () => {
+        moreMenu.classList.remove('open');
+        if (currentTrack && currentTrack.local) pickCover(currentTrack);
+      });
       document.getElementById('moreAddPl').addEventListener('click', () => {
         moreMenu.classList.remove('open');
         if (currentTrack) openAddToPlaylist(currentTrack.id);
@@ -5255,8 +6426,7 @@
       document.getElementById('moreInfo').addEventListener('click', () => {
         moreMenu.classList.remove('open');
         if (!currentTrack) return;
-        const d = formatTime(currentTrack.duration || audio.duration || 0);
-        toast(`${currentTrack.title} · ${currentTrack.artist} · ${d}`);
+        openTrackInfo(currentTrack);
       });
       document.getElementById('moreShare').addEventListener('click', () => {
         moreMenu.classList.remove('open');
@@ -5333,17 +6503,37 @@
         a.addEventListener('play', () => { if (a === audio) { isPlaying = true; updatePlayerUI(); } });
         a.addEventListener('pause', () => { if (a === audio) { isPlaying = false; updatePlayerUI(); } });
         a.addEventListener('error', () => {
+          if (a === audio && currentTrack && currentTrack.source === 'youtube' && currentTrack.streamId
+              && a.src && !String(a.src).startsWith('blob:') && (currentTrack._ytTries || 0) < 4) {
+            // Сервер віддав посилання, але аудіо не заграло — беремо інший Piped/Invidious сервер
+            const tr = currentTrack;
+            tr._ytTries = (tr._ytTries || 0) + 1;
+            if (!tr._ytBad) tr._ytBad = new Set();
+            if (tr._ytHost) tr._ytBad.add(tr._ytHost);
+            tr.url = ''; tr._retrying = true;
+            const pos = a.currentTime || 0;
+            if (pos > 2) { resumeAt = pos; resumeId = tr.id; }
+            playTrack(tr, 'next');
+            return;
+          }
           if (a === audio && currentTrack && currentTrack.source === 'jamendo' && currentTrack._fmtApplied && !currentTrack._noFmt) {
             currentTrack._noFmt = true;   // формат не підійшов → стандартний потік
             playTrack(currentTrack, 'next');
             return;
           }
-          if (a === audio && a === audioCors && currentTrack && (currentTrack.source === 'jamendo' || currentTrack.source === 'freesound' || currentTrack.source === 'youtube') && !currentTrack._plain) {
+          if (a === audio && a === audioCors && currentTrack && currentTrack.source !== 'local' && !String(a.src).startsWith('blob:') && !currentTrack._plain) {
             currentTrack._plain = true;   // нет CORS → играем без эквалайзера
+            try { corsBadAdd(a.src); } catch (e) {}
             playTrack(currentTrack);
             return;
           }
-          if (a === audio && a.src) { isPlaying = false; updatePlayerUI(); toast('Не вдалося завантажити трек'); }
+          if (a === audio && a.src) {
+            const t = a.src;
+            clearTimeout(window._errT);
+            window._errT = setTimeout(() => {      // якщо за мить трек усе ж заграв (повторна спроба) — помилку не показуємо
+              if (a === audio && a.src === t && (a.error || a.readyState < 2) && a.paused) { isPlaying = false; updatePlayerUI(); toast('Не вдалося завантажити трек'); }
+            }, 1200);
+          }
         });
       });
 
@@ -5366,9 +6556,10 @@
         });
         el.addEventListener('keydown', e => { if (e.key === 'Enter') { el.blur(); clearTimeout(fieldTimer); clearTimeout(histSearchTimer); runSearch(); commitSearchHistory(); } });
       });
-      document.getElementById('filterToggle').addEventListener('click', () => document.getElementById('filterPanel').classList.toggle('open'));
+      initFilterSheet();
       document.getElementById('filterClear').addEventListener('click', () => {
-        searchFilters.genres.clear(); searchFilters.source = 'all'; searchFilters.sort = 'popularity_month';
+        searchFilters.genres.clear(); searchFilters.moods.clear(); searchFilters.era = ''; searchFilters.lang = ''; searchFilters.dur = '';
+        searchFilters.source = 'all'; searchFilters.sort = 'popularity_month';
         searchFilters.artist = ''; searchFilters.title = '';
         document.getElementById('fArtist').value = ''; document.getElementById('fTitle').value = ''; syncFieldClear();
         renderFilterChips(); runSearch();
@@ -5395,15 +6586,22 @@
       function renderVol() {
         const v = gMuted ? 0 : gVolume;
         const icon = v === 0 ? 'volume_off' : v < 0.5 ? 'volume_down' : 'volume_up';
-        volSliders.forEach(sl => { sl.value = Math.round(v * 100); sl.style.setProperty('--v', sl.value + '%'); });
+        const pct = Math.round(v * 100), limited = v > 1 && !(audio === audioCors && audioCtx);
+        volSliders.forEach(sl => { sl.value = pct; sl.style.setProperty('--v', (pct / 2) + '%'); sl.style.setProperty('--v1', (Math.min(100, pct) / 2) + '%'); });
+        document.querySelectorAll('.vol-pct').forEach(el => {
+          el.textContent = pct + '%';
+          el.classList.toggle('boost', v > 1); el.classList.toggle('limited', limited);
+          el.title = limited ? 'Для цього джерела підсилення понад 100% недоступне' : (v > 1 ? 'Підсилення понад 100%' : '');
+        });
         volBtns.forEach(b => { b.querySelector('.material-icons-round').textContent = icon; });
         const fold = document.getElementById('volFold');
         if (fold) fold.querySelector('.material-icons-round').textContent = fpVol.classList.contains('open') ? 'chevron_right' : icon;
       }
       function setVol(v) {
-        gVolume = Math.min(1, Math.max(0, v));
+        gVolume = Math.min(2, Math.max(0, v));
         gMuted = false;
         applyVolume(); renderVol();
+        if (gVolume > 1 && !window._boostWarned) { window._boostWarned = true; toast('Гучність понад 100% — це підсилення сигналу. Можливі спотворення, бережіть слух'); }
         try { localStorage.setItem('gmusic_vol', String(gVolume)); } catch (e) {}
       }
       function toggleMute() {
@@ -5412,22 +6610,24 @@
         else gMuted = true;
         applyVolume(); renderVol();
       }
-      volSliders.forEach(sl => sl.addEventListener('input', () => setVol(sl.value / 100)));
+      volSliders.forEach(sl => sl.addEventListener('input', () => { let n = +sl.value; if (Math.abs(n - 100) <= 2) n = 100; setVol(n / 100); }));   // «магніт» на 100 %
       volBtns.forEach(b => b.addEventListener('click', e => { e.stopPropagation(); toggleMute(); }));
       renderVol();
+      window.gmRenderVol = renderVol;
 
-      // ===== Свайп міні-плеєра вліво/вправо (лише коли музика на паузі) =====
+      // ===== Свайп міні-плеєра вліво/вправо (на паузі або поки трек завантажується) =====
       (() => {
         const bar = document.getElementById('playerBar');
         let st = null, swallow = false;
+        const canSwipe = () => audio.paused || isLoading;
         const reset = () => { bar.style.transition = bar.style.transform = bar.style.opacity = ''; };
         bar.addEventListener('pointerdown', e => {
-          if (e.button > 0 || e.target.closest('.player-vol') || !audio.paused || !bar.classList.contains('visible')) return;
+          if (e.button > 0 || e.target.closest('.player-vol') || !canSwipe() || !bar.classList.contains('visible')) return;
           st = { x: e.clientX, y: e.clientY, t: performance.now(), dx: 0, on: false, id: e.pointerId };
         });
         bar.addEventListener('pointermove', e => {
           if (!st || e.pointerId !== st.id) return;
-          if (!audio.paused) { st = null; reset(); return; }
+          if (!canSwipe()) { st = null; reset(); return; }
           const dx = e.clientX - st.x, dy = e.clientY - st.y;
           if (!st.on) {
             if (Math.abs(dy) > 12 && Math.abs(dy) > Math.abs(dx)) { st = null; return; }
@@ -5448,6 +6648,13 @@
           if (Math.abs(dx) > w * 0.3 || (v > 0.6 && Math.abs(dx) > 40)) {
             bar.style.transform = `translateX(${dx > 0 ? w + 40 : -w - 40}px)`;
             bar.style.opacity = '0';
+            // Якщо трек ще вантажився — скасовуємо завантаження (запізнілі відповіді сервера ігноруються)
+            if (isLoading || !audio.paused) {
+              const a0 = audio;
+              currentTrack = null; isLoading = false; isPlaying = false; histPending = null;
+              try { a0.pause(); } catch (e) {}
+              try { showYtBox(false); } catch (e) {}
+            }
             setTimeout(() => { bar.classList.remove('visible'); reset(); }, 230);
           } else {
             bar.style.transform = 'translateX(0)'; bar.style.opacity = '1';
@@ -5596,7 +6803,7 @@
       renderDiscover();
       document.getElementById('refreshRec').addEventListener('click', (e) => {
         e.currentTarget.animate([{ transform: 'rotate(0)' }, { transform: 'rotate(360deg)' }], { duration: 500, easing: 'cubic-bezier(0.2,0.8,0.2,1)' });
-        renderDiscover();
+        renderDiscover(true);
       });
       updateFabVisibility();
       openSharedFromHash();
@@ -6053,7 +7260,11 @@
   function cleanTitle(s) {
     return String(s || '')
       .replace(/\[[^\]]*\]/g, ' ')
-      .replace(/\((?:[^)]*?)(official|lyric|lyrics|audio|video|music video|hd|hq|4k|remaster|visuali[sz]er|клип|кліп|аудио|аудіо|текст|премьера|прем'єра)[^)]*\)/ig, ' ')
+      .replace(/\((?:[^)]*?)(official|lyric|lyrics|audio|video|music video|hd|hq|4k|remaster|visuali[sz]er|backing track|karaoke|instrumental|клип|кліп|аудио|аудіо|текст|минус|мінус|караоке|премьера|прем'єра)[^)]*\)/ig, ' ')
+      .replace(/[\w-]+\.(?:com|net|org|ru|ua|info|fm|me|cc|su|biz)\b/ig, ' ')          // назви сайтів у іменах файлів
+      .replace(/_+/g, ' ')
+      .replace(/^\s*\d{1,3}\s*[-.)]\s+/, '')                                           // «01 - », «02. »
+      .replace(/^\s*(?:песня|пісня|песни|скачать|download|song|lyrics|текст(?:\s+песни|\s+пісні)?)\s+/i, '')
       .replace(/\s*[|｜]\s*.*$/, ' ')
       .replace(/\s+(?:ft\.?|feat\.?|featuring)\s.*$/i, ' ')
       .replace(/\s{2,}/g, ' ').trim();
@@ -6062,11 +7273,13 @@
     return String(s || '').replace(/\s*-\s*topic$/i, '').replace(/\s*(vevo|official)$/i, '').replace(/,.*$/, '').trim();
   }
   function candidates(t) {
-    const A = cleanArtist(t.artist), T = cleanTitle(t.title), out = [];
+    let A = cleanArtist(t.artist); const T = cleanTitle(t.title), out = [];
+    if (t.local && /локальн|local file|unknown/i.test(A)) A = '';      // заглушка замість виконавця у локальних файлів
     const parts = T.split(/\s+[-–—]\s+/);
     if (parts.length >= 2) {
       const L = parts[0].trim(), R = parts.slice(1).join(' - ').trim();
       out.push({ a: L, t: R });
+      if (t.local) out.push({ a: R, t: L });                          // у файлах буває «Назва - Виконавець»
       if (A && !norm(L).includes(norm(A)) && !norm(A).includes(norm(L))) out.push({ a: A, t: R });
       out.push({ a: '', t: R });
     } else {
@@ -6131,13 +7344,15 @@
     let s = 0;
     if (r.syncedLyrics) s += 2;
     if (dur && r.duration && Math.abs(r.duration - dur) <= Math.max(5, dur * .08)) s += 2;
+    if (dur && r.duration) s += Math.max(0, 1 - Math.abs(r.duration - dur) / 10);   // чим ближча тривалість — тим точніша синхронізація
     const a = norm(r.trackName), b = norm(c.t);
     if (a === b) s += 4; else if (a && b && (a.includes(b) || b.includes(a))) s += 3;
     if (c.a) { const x = norm(r.artistName), y = norm(c.a); if (x && y && (x.includes(y) || y.includes(x))) s += 2; }
     return s;
   }
   async function findLyrics(track, extra) {
-    const dur = Math.round(track.duration || 0);
+    let dur = Math.round(track.duration || 0);
+    if (!dur) { try { const a = curAudio(); if (a && curTrack() === track && isFinite(a.duration)) dur = Math.round(a.duration); } catch (e) {} }
     const list = extra ? [extra] : candidates(track);
     let n = 0;
     for (let i = 0; i < list.length && n < 5; i++) {
@@ -6149,7 +7364,10 @@
       n++;
       const arr = await jget(`${API}/search?${qs({ track_name: c.t, artist_name: c.a })}`);
       if (Array.isArray(arr) && arr.length) {
-        const ranked = arr.map(r => ({ r, s: score(r, c, dur) })).filter(x => x.s >= (c.a ? 4 : 5)).sort((x, y) => y.s - x.s);
+        const ranked = arr.map(r => ({ r, s: score(r, c, dur) })).filter(x => x.s >= (c.a ? 4 : 5))
+          // без виконавця збігу назви замало (інакше підтягується чужа «Faster») — тривалість має сходитись
+          .filter(x => c.a || extra || !dur || !x.r.duration || Math.abs(x.r.duration - dur) <= Math.max(6, dur * .03))
+          .sort((x, y) => y.s - x.s);
         for (const x of ranked) { const res = toResult(x.r); if (res && (res.synced.length || res.plain || res.instr)) return res; }
       }
     }
@@ -6208,6 +7426,50 @@
     return L;
   }
 
+  /* ---------- розтягнуті ноти: «ееее» ---------- */
+  const VOWRE = /[aeiouyаеёиоуыэюяіїє]/i;
+  const syl = w => Math.max(1, (String(w).match(/[aeiouyаеёиоуыэюяіїє]+/gi) || []).length);
+  // Темп пісні = типовий час на склад у ній самій; рядок, що тримається помітно довше, має «тягнуту» ноту в кінці
+  function planHolds(lines) {
+    const ratios = [];
+    lines.forEach(l => {
+      if (l.dots) return;
+      const ws = l.text.split(/\s+/); l.ws0 = ws;
+      l.syl = ws.reduce((a, w) => a + syl(w), 0);
+      l.D = Math.max(0.8, l.end - l.t - 0.15);
+      if (l.D < 8) ratios.push(l.D / l.syl);
+    });
+    ratios.sort((a, b) => a - b);
+    const tempo = ratios.length ? ratios[Math.floor(ratios.length * 0.4)] : 0.35;
+    lines.forEach(l => {
+      if (l.dots) return;
+      l.base = Math.max(0.5, l.syl * tempo);
+      const excess = l.D - l.base;
+      const last = l.ws0[l.ws0.length - 1];
+      let vi = -1; for (let i = last.length - 1; i >= 0; i--) { if (VOWRE.test(last[i])) { vi = i; break; } }
+      // рівень розтяжки: 0 — вимкнено, 1 — обережно (за замовчуванням), 2 — більше
+      const lv = lsGet('gmusic_lyr_hold', 1);
+      const minEx = lv >= 2 ? 1.0 : 1.5, minRatio = lv >= 2 ? 1.4 : 1.7;
+      if (lv > 0 && excess > minEx && excess <= 5.5 && l.D > l.base * minRatio && vi >= 0 && last.length >= 2) {
+        l.hold = excess; l.holdIdx = vi; l.holdCh = last[vi].toLowerCase();
+        l.holdN = lv >= 2 ? Math.max(3, Math.min(8, Math.round(excess * 2))) : Math.max(2, Math.min(5, Math.round(excess * 1.1)));
+        l.total = l.base + l.hold;
+      } else {
+        l.hold = 0; l.holdN = 0;
+        l.total = Math.max(0.8, Math.min(l.D, l.base * 1.25 + 0.4));
+      }
+    });
+  }
+  function lineHtml(l) {
+    return l.ws0.map((w, k) => {
+      if (l.holdN && k === l.ws0.length - 1) {
+        const i = l.holdIdx;
+        return `<span class="ly-w">${esc(w.slice(0, i + 1))}<span class="ly-hold">${Array(l.holdN).fill('<i>' + esc(l.holdCh) + '</i>').join('')}</span>${esc(w.slice(i + 1))}</span>`;
+      }
+      return `<span class="ly-w">${esc(w)}</span>`;
+    }).join(' ');
+  }
+
   async function load(force, extra) {
     const seq = ++S.seq, t = S.track; S.data = null; S.lines = []; S.els = []; S.idx = -1; S.mode = 'none';
     S.off = offGet(t.id);
@@ -6221,11 +7483,11 @@
     if (data.instr) { $('lyrBody').innerHTML = stateHTML('piano', 'Інструментальна композиція', 'У цьому треку немає слів.', BTN_MANUAL); return; }
     S.data = data;
     if (data.synced.length) {
-      S.mode = 'sync'; S.lines = buildLines(data.synced);
+      S.mode = 'sync'; S.lines = buildLines(data.synced); planHolds(S.lines);
       let h = '<div class="lyr-spacer"></div>';
       S.lines.forEach((l, i) => {
         if (l.dots) h += `<div class="ly-line ly-dots" data-i="${i}"><i class="ly-d"></i><i class="ly-d"></i><i class="ly-d"></i></div>`;
-        else h += `<div class="ly-line" data-i="${i}">${l.text.split(/\s+/).map(w => `<span class="ly-w">${esc(w)}</span>`).join(' ')}</div>`;
+        else h += `<div class="ly-line" data-i="${i}">${lineHtml(l)}</div>`;
       });
       h += `<div class="ly-note">${data.custom ? 'Ваш власний текст' : 'Текст: LRCLIB'} · торкніться рядка, щоб перемотати</div><div class="lyr-spacer"></div>`;
       $('lyrBody').innerHTML = h;
@@ -6233,10 +7495,12 @@
       S.lines.forEach((l, i) => {
         if (l.dots) { l.dEls = Array.from(S.els[i].querySelectorAll('.ly-d')); return; }
         l.wEls = Array.from(S.els[i].querySelectorAll('.ly-w'));
-        const lens = l.wEls.map(e => e.textContent.length + 1), tot = lens.reduce((a, b) => a + b, 0); let c = 0;
-        l.ws = lens.map(x => { const s = c / tot; c += x; return [s, c / tot]; });
-        const est = Math.max(1.5, tot * 0.075 + 1);
-        l.dur = Math.max(0.8, Math.min(l.end - l.t - 0.15, est));
+        l.hEls = Array.from(S.els[i].querySelectorAll('.ly-hold i')); l._n = -1;
+        const wt = l.ws0.map(w => syl(w) + 0.12 * w.length), W = wt.reduce((a, b) => a + b, 0);
+        const norm = l.holdN ? l.base : l.total; let c = 0;
+        l.ws = wt.map(x => { const s0 = c / l.total; c += norm * x / W; return [s0, c / l.total]; });
+        l.dur = l.total;
+        l.hs = l.holdN ? l.ws[l.ws.length - 1][1] : 1;
       });
       S.lines.forEach(l => { if (l.dots) l.dur = Math.max(1, l.end - l.t); });
     } else {
@@ -6250,6 +7514,11 @@
   function setActive(idx, snap) {
     S.idx = idx;
     S.els.forEach((el, i) => { el.classList.toggle('past', i < idx); el.classList.toggle('on', i === idx); if (i !== idx) { const w = S.lines[i].wEls; if (w && i < idx) w.forEach(x => x.style.removeProperty('--w')); } });
+    S.lines.forEach((l, i) => {
+      if (!l.holdN || i === idx) return;
+      const n = i < idx ? l.holdN : 0;
+      if (l._n !== n) { l._n = n; l.hEls.forEach((e, k) => e.classList.toggle('on', k < n)); }
+    });
     if (idx >= 0 && performance.now() > S.userUntil) {
       const el = S.els[idx], b = $('lyrBody');
       b.scrollTo({ top: Math.max(0, el.offsetTop - b.clientHeight * 0.36 + el.offsetHeight / 2), behavior: snap ? 'auto' : 'smooth' });
@@ -6282,6 +7551,10 @@
         const l = S.lines[idx], p = Math.max(0, Math.min(1, (t - l.t) / l.dur));
         if (l.dots) l.dEls.forEach((d, k) => d.classList.toggle('on', p > k / 3));
         else l.wEls.forEach((w, k) => { const f = Math.max(0, Math.min(1, (p - l.ws[k][0]) / (l.ws[k][1] - l.ws[k][0]))); const v = (f * 100).toFixed(0) + '%'; if (w._v !== v) { w._v = v; w.style.setProperty('--w', v); } });
+        if (l.holdN) {
+          const hp = p <= l.hs ? 0 : Math.min(1, (p - l.hs) / (1 - l.hs)), n = hp <= 0 ? 0 : Math.min(l.holdN, Math.ceil(hp * l.holdN));
+          if (l._n !== n) { l._n = n; l.hEls.forEach((e, k) => e.classList.toggle('on', k < n)); }
+        }
       }
     } else if (S.mode === 'plain' && now > S.userUntil) {
       const b = $('lyrBody'), d = a.duration || S.track.duration || 0;
@@ -6307,6 +7580,7 @@
     const off = S.off;
     $('lyrMenu').innerHTML = `
       <div class="lyr-off"><span>Зсув тексту</span><div><button data-ly="offm">−0.5</button><b id="lyrOffV">${off > 0 ? '+' : ''}${off.toFixed(1)} с</b><button data-ly="offp">+0.5</button></div></div>
+      <div class="lyr-off"><span>Розтяжка літер</span><div><button data-ly="holdm">−</button><b id="lyrHoldV">${['вимк', 'мало', 'більше'][lsGet('gmusic_lyr_hold', 1)] || 'мало'}</b><button data-ly="holdp">+</button></div></div>
       <button data-ly="manual"><span class="material-icons-round">search</span>Шукати вручну</button>
       <button data-ly="own"><span class="material-icons-round">edit_note</span>Свій текст або LRC</button>
       <button data-ly="retry"><span class="material-icons-round">refresh</span>Оновити з інтернету</button>
@@ -6343,6 +7617,10 @@
         const v = $('lyrOffV'); if (v) v.textContent = (S.off > 0 ? '+' : '') + S.off.toFixed(1) + ' с';
         return;
       }
+      if (act === 'holdm' || act === 'holdp') {
+        const lv = Math.max(0, Math.min(2, lsGet('gmusic_lyr_hold', 1) + (act === 'holdp' ? 1 : -1)));
+        lsSet('gmusic_lyr_hold', lv); load(false); return;
+      }
       closeMenu();
       if (act === 'retry') load(false);
       else if (act === 'manual') manualForm();
@@ -6378,6 +7656,27 @@
 
   window.gmLyrics = { open, close };
 })();
+
+  // ===== Згортання шапки при прокрутці =====
+  (function () {
+    const main = document.querySelector('.main'); if (!main) return;
+    const last = new WeakMap(); let acc = 0, lockUntil = 0;
+    const set = (c) => { if (main.classList.contains('hdr-collapsed') !== c) { main.classList.toggle('hdr-collapsed', c); lockUntil = 0; acc = 0; } };
+    main.addEventListener('scroll', (e) => {
+      const el = e.target;
+      if (!el.classList || !el.classList.contains('view') || !el.classList.contains('active')) return;
+      const y = el.scrollTop, prev = last.has(el) ? last.get(el) : y; last.set(el, y);
+      if (performance.now() < lockUntil) return;          // поки йде анімація, розмір в'ю змінюється — ігноруємо
+      const dy = y - prev; if (!dy) return;
+      if (y < 24) { set(false); return; }
+      acc = (acc * dy > 0) ? acc + dy : dy;
+      if (acc > 14) set(true); else if (acc < -14) set(false);
+    }, true);
+    // при зміні вкладки шапка знову видима
+    new MutationObserver((ml) => {
+      for (const m of ml) { const t = m.target; if (t.classList && t.classList.contains('view') && t.classList.contains('active')) { set(false); break; } }
+    }).observe(main, { subtree: true, attributes: true, attributeFilter: ['class'] });
+  })();
 </script>
 </body>
 </html>
