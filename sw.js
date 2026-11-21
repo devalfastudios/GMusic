@@ -1,5 +1,5 @@
 // GMusic service worker: кешує оболонку застосунку, щоб він відкривався офлайн.
-const VERSION = 'gmusic-v4';
+const VERSION = 'gmusic-v9';
 const SHELL = ['./', './index.html', './manifest.webmanifest',
   './icon-192.png', './icon-512.png', './icon-maskable-512.png', './apple-touch-icon.png'];
 const FONT_HOSTS = ['fonts.googleapis.com', 'fonts.gstatic.com'];

@@ -905,6 +905,16 @@
     .theme-swatch.active { border-color: white; transform: scale(1.1); }
     .theme-swatch:hover { transform: scale(1.08); }
 
+    /* ПІДКАЗКИ ПОШУКУ */
+    .sug-box { position: absolute; left: 16px; right: 16px; z-index: 40; display: none; max-height: min(340px, 50vh); overflow-y: auto; background: var(--md-sys-color-surface-container-high); border-radius: 16px; box-shadow: 0 8px 28px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.06); }
+    .sug-box.open { display: block; }
+    .sug-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; cursor: pointer; }
+    .sug-item:hover, .sug-item:active { background: rgba(255,255,255,0.07); }
+    .sug-item .material-icons-round { font-size: 20px; color: var(--md-sys-color-on-surface-variant); flex-shrink: 0; }
+    .sug-txt { min-width: 0; }
+    .sug-main { font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sug-sub { font-size: 0.78rem; color: var(--md-sys-color-on-surface-variant); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
     /* PLAYER BAR */
     .player-bar {
       position: absolute;
@@ -2382,6 +2392,7 @@
 
       <!-- SEARCH VIEW -->
       <div class="view" id="view-search">
+        <div class="sug-box" id="sugBox"></div>
         <div class="search-bar">
           <span class="material-icons-round" style="color:var(--md-sys-color-on-surface-variant)">person</span>
           <input type="text" id="fArtist" placeholder="Виконавець" autocomplete="off" enterkeyhint="search" />
@@ -2488,6 +2499,25 @@
           </div>
           <div class="opt-row" id="soundChips"></div>
           <div class="opt-hint" id="soundHint"></div>
+          <div class="opt-sep"></div>
+          <div class="settings-item" id="customInstItem">
+            <div class="settings-item-left">
+              <span class="material-icons-round">dns</span>
+              <div>
+                <div class="settings-item-title">Свій сервер YouTube</div>
+                <div class="settings-item-sub" id="customInstSub">Piped або Invidious — резервний, якщо публічні не працюють</div>
+              </div>
+            </div>
+          </div>
+          <div class="settings-item" id="checkInstItem">
+            <div class="settings-item-left">
+              <span class="material-icons-round">network_check</span>
+              <div>
+                <div class="settings-item-title">Перевірити сервери YouTube</div>
+                <div class="settings-item-sub">Скільки Piped/Invidious зараз відповідає</div>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="settings-group">
           <div class="settings-item" id="histOpenItem">
@@ -2552,7 +2582,7 @@
     <div class="fab-menu" id="fabMenu">
       <button class="fab-option" id="fabUpload">
         <span class="material-icons-round">upload</span>
-        Завантажити музику
+        Завантажити музику або відео
       </button>
       <button class="fab-option" id="fabCreatePl">
         <span class="material-icons-round">playlist_add</span>
@@ -2745,7 +2775,7 @@
         <div class="logo-icon"><span class="material-icons-round">music_note</span></div>
         <div>
           <div class="about-name">GMusic</div>
-          <div class="about-ver">Версія 1.1 · веб-застосунок</div>
+          <div class="about-ver">Версія 1.2 · веб-застосунок</div>
         </div>
       </div>
       <div class="about-desc">Безкоштовний музичний плеєр без реклами: шукайте треки в кількох джерелах, збирайте плейлисти та слухайте власні файли — все в одному вікні.</div>
@@ -2766,6 +2796,7 @@
         <span class="about-chip">Jamendo</span>
         <span class="about-chip">iTunes (прев'ю)</span>
         <span class="about-chip">YouTube (через Piped)</span>
+        <span class="about-chip">Internet Archive</span>
       </div>
 
       <div class="about-keys-wrap">
@@ -2929,7 +2960,7 @@
     </div>
   </div>
 
-  <input type="file" id="fileInput" accept="audio/*" multiple />
+  <input type="file" id="fileInput" accept="audio/*,video/*" multiple />
   <div class="fs-overlay" id="fsOverlay"></div>
   <div class="fs-sheet" id="filterSheet" role="dialog" aria-label="Фільтри">
     <div class="fs-grab" id="fsGrab"><div class="fs-handle"></div>
@@ -3107,80 +3138,122 @@
       return out;
     }
 
-    // ========== YOUTUBE (поиск через Data API, воспроизведение через встроенный плеер) ==========
-    const YOUTUBE_API_KEY = 'AIzaSyByxFinxzUyb1DRygDyD9yvEaHMjdeB5Og';
-    const ytCache = new Map();
+    // ========== INTERNET ARCHIVE (без ключів і без YouTube): звичайні треки + довгі збірники до 10 год ==========
+    const IA_MIN_LONG = 1800, IA_MAX_LONG = 36060;   // збірник = від 30 хв до 10 год
+    const iaCache = new Map(), iaMetaCache = new Map();
     function decodeEntities(str) { const t = document.createElement('textarea'); t.innerHTML = str || ''; return t.value; }
-    function parseIsoDuration(iso) {
-      const m = /^P(?:\d+D)?T?(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?$/.exec(iso || '');
-      return m ? (+(m[1] || 0)) * 3600 + (+(m[2] || 0)) * 60 + (+(m[3] || 0)) : 0;
+    // fetch з таймаутом. Деякі вбудовані переглядачі не вміють передавати AbortSignal (DataCloneError) — тоді працюємо без нього
+    async function fetchT(url, ms) {
+      let c = null, tm;
+      try { c = new AbortController(); } catch (e) {}
+      const timeout = new Promise((_, rej) => { tm = setTimeout(() => { try { c && c.abort(); } catch (e) {} rej(new Error('timeout')); }, ms); });
+      const run = async () => {
+        try { return await fetch(url, c ? { signal: c.signal } : undefined); }
+        catch (e) { if (e && (e.name === 'DataCloneError' || /could not be cloned/i.test(e.message || ''))) return await fetch(url); throw e; }
+      };
+      try { return await Promise.race([run(), timeout]); } finally { clearTimeout(tm); }
     }
-    async function searchYouTube(query, limit = 15) {
+    async function fetchJson(url, ms = 8000) {
+      const r = await fetchT(url, ms); if (!r.ok) throw new Error(r.status); return await r.json();
+    }
+    const uniq = a => [...new Set(a)];
+    function iaLen(v) {
+      if (v == null) return 0;
+      if (typeof v === 'number') return v;
+      const x = String(v);
+      return x.includes(':') ? x.split(':').reduce((acc, p) => acc * 60 + (parseFloat(p) || 0), 0) : (parseFloat(x) || 0);
+    }
+    // streamId для Archive = "identifier/файл.mp3"
+    function iaFileUrl(sid) {
+      const i = String(sid).indexOf('/');
+      if (i < 0) return '';
+      return 'https://archive.org/download/' + encodeURIComponent(sid.slice(0, i)) + '/' + sid.slice(i + 1).split('/').map(encodeURIComponent).join('/');
+    }
+    async function iaDocs(query, long, rows) {
+      const q = long
+        ? `(${query || 'music'}) AND mediatype:audio AND (mix OR set OR compilation OR "full album" OR radio OR podcast OR live OR hours)`
+        : `(${query}) AND mediatype:audio`;
+      const u = 'https://archive.org/advancedsearch.php?q=' + encodeURIComponent(q)
+        + '&fl[]=identifier&fl[]=title&fl[]=creator&sort[]=downloads+desc&rows=' + rows + '&page=1&output=json';
+      const j = await fetchJson(u, 9000);
+      return (j.response && j.response.docs) || [];
+    }
+    async function iaMeta(id) {
+      if (iaMetaCache.has(id)) return iaMetaCache.get(id);
+      const p = fetchJson('https://archive.org/metadata/' + encodeURIComponent(id), 12000).then(j => {
+        // лише формати, що грає браузер (без WAV/FLAC — вони величезні)
+        const files = (j.files || []).filter(f => /mp3|ogg vorbis|opus|aac|m4a/i.test(f.format || '') && f.source !== 'metadata')
+          .map(f => ({ name: f.name, title: f.title, duration: iaLen(f.length), format: f.format || '', size: +f.size || 0 }))
+          .filter(f => f.duration > 0)
+          .sort((x, y) => (/mp3/i.test(y.format) ? 1 : 0) - (/mp3/i.test(x.format) ? 1 : 0));
+        const seen = new Set(), uniqFiles = [];
+        files.forEach(f => { const k = Math.round(f.duration / 2); if (!seen.has(k)) { seen.add(k); uniqFiles.push(f); } });   // mp3 + ogg одного запису — лише один
+        return uniqFiles;
+      });
+      p.catch(() => iaMetaCache.delete(id));
+      iaMetaCache.set(id, p);
+      return p;
+    }
+    function mapArchiveTrack(doc, f, multi) {
+      const base = (f.title || f.name.replace(/\.[^.]+$/, '')).trim();
+      const itemTitle = Array.isArray(doc.title) ? doc.title[0] : (doc.title || doc.identifier);
+      const creator = Array.isArray(doc.creator) ? doc.creator[0] : doc.creator;
+      return {
+        id: 'ia_' + doc.identifier + '/' + f.name,
+        title: decodeEntities(multi && base && base !== itemTitle ? `${itemTitle} — ${base}` : itemTitle),
+        artist: decodeEntities(creator || 'Internet Archive'),
+        duration: Math.round(f.duration),
+        art: 'https://archive.org/services/img/' + encodeURIComponent(doc.identifier),
+        url: iaFileUrl(doc.identifier + '/' + f.name),
+        streamId: doc.identifier + '/' + f.name,
+        local: false, source: 'archive',
+        info: pruneInfo({ album: decodeEntities(itemTitle), format: f.format, size: f.size ? fmtSize(f.size) : '' })
+      };
+    }
+    async function iaCollect(docs, pick, perItem) {
+      const out = [];
+      await Promise.all(docs.map(async d => {
+        try {
+          const files = await iaMeta(d.identifier);
+          const sel = files.filter(pick).slice(0, perItem);
+          sel.forEach(f => out.push(mapArchiveTrack(d, f, files.length > 1)));
+        } catch (e) { /* пропускаємо недоступний запис */ }
+      }));
+      return out;
+    }
+    // Звичайні треки (30 с – 30 хв)
+    async function searchArchive(query, limit = 15) {
       query = (query || '').trim();
       if (!query) return [];
-      const ck = query.toLowerCase() + '|' + limit;
-      if (ytCache.has(ck)) return ytCache.get(ck);
+      const ck = 's|' + query.toLowerCase() + '|' + limit;
+      if (iaCache.has(ck)) return iaCache.get(ck);
       try {
-        const u = new URL('https://www.googleapis.com/youtube/v3/search');
-        Object.entries({ part: 'snippet', type: 'video', videoCategoryId: '10', videoEmbeddable: 'true', maxResults: limit, q: query, key: YOUTUBE_API_KEY })
-          .forEach(([k, v]) => u.searchParams.set(k, v));
-        const res = await fetch(u.toString());
-        if (!res.ok) {
-          const e = await res.json().catch(() => ({}));
-          console.error('YouTube API:', res.status, e.error && e.error.message);
-          if (res.status === 403) toast('YouTube: ліміт запитів вичерпано або ключ обмежено');
-          return [];
-        }
-        const d = await res.json();
-        const items = d.items || [];
-        if (!items.length) return [];
-        const vu = new URL('https://www.googleapis.com/youtube/v3/videos');
-        vu.searchParams.set('part', 'contentDetails,statistics');
-        vu.searchParams.set('id', items.map(i => i.id.videoId).join(','));
-        vu.searchParams.set('key', YOUTUBE_API_KEY);
-        const dur = {}, stat = {};
-        try { const vd = await fetch(vu.toString()).then(r => r.json()); (vd.items || []).forEach(v => { dur[v.id] = parseIsoDuration(v.contentDetails.duration); stat[v.id] = v.statistics || {}; }); } catch (e) {}
-        const out = items.map(i => {
-          const sn = i.snippet || {};
-          return {
-            id: 'yt_' + i.id.videoId,
-            title: decodeEntities(sn.title),
-            artist: decodeEntities((sn.channelTitle || 'YouTube').replace(/\s*-\s*Topic$/i, '')),
-            duration: dur[i.id.videoId] || 0,
-            art: (sn.thumbnails && (sn.thumbnails.high || sn.thumbnails.medium || sn.thumbnails.default) || {}).url || '',
-            url: '', streamId: i.id.videoId, local: false, source: 'youtube',
-            info: pruneInfo({ date: sn.publishedAt, channel: decodeEntities(sn.channelTitle || ''), views: (stat[i.id.videoId] || {}).viewCount, likes: (stat[i.id.videoId] || {}).likeCount })
-          };
-        }).filter(t => t.duration === 0 || (t.duration >= 30 && t.duration <= 1200));
-        ytCache.set(ck, out);
+        const docs = await iaDocs(query, false, 8);
+        const out = (await iaCollect(docs, f => f.duration >= 30 && f.duration < IA_MIN_LONG, 3)).slice(0, limit);
+        if (out.length) iaCache.set(ck, out);
         return out;
-      } catch (e) { console.error('YouTube search error:', e); return []; }
+      } catch (e) { console.error('Archive search error:', e); return []; }
+    }
+    // Збірники / сети / міксы: 30 хв … 10 год
+    async function searchLongMixes(query, limit = 20) {
+      query = (query || '').trim();
+      const ck = 'l|' + query.toLowerCase() + '|' + limit;
+      if (iaCache.has(ck)) return iaCache.get(ck);
+      try {
+        const docs = await iaDocs(query, true, 24);
+        const out = (await iaCollect(docs, f => f.duration >= IA_MIN_LONG && f.duration <= IA_MAX_LONG, 2))
+          .sort((x, y) => y.duration - x.duration).slice(0, limit);
+        if (out.length) iaCache.set(ck, out);
+        return out;
+      } catch (e) { console.error('Archive long search error:', e); return []; }
+    }
+    async function searchLongAudius(query, limit = 25) {
+      const l = await searchAudius(((query || '') + ' mix').trim(), limit);
+      return l.filter(t => t.duration >= IA_MIN_LONG && t.duration <= IA_MAX_LONG);
     }
 
-    async function ytTrending(region, limit = 20) {
-      const ck = 'trend|' + region + '|' + limit;
-      if (ytCache.has(ck)) return ytCache.get(ck);
-      try {
-        const u = new URL('https://www.googleapis.com/youtube/v3/videos');
-        Object.entries({ part: 'snippet,contentDetails,statistics', chart: 'mostPopular', videoCategoryId: '10', regionCode: (region || 'US').toUpperCase(), maxResults: limit, key: YOUTUBE_API_KEY })
-          .forEach(([k, v]) => u.searchParams.set(k, v));
-        const res = await fetch(u.toString());
-        if (!res.ok) return [];
-        const d = await res.json();
-        const out = (d.items || []).map(v => {
-          const sn = v.snippet || {};
-          return { id: 'yt_' + v.id, title: decodeEntities(sn.title), artist: decodeEntities((sn.channelTitle || 'YouTube').replace(/\s*-\s*Topic$/i, '')),
-            duration: parseIsoDuration((v.contentDetails || {}).duration) || 0,
-            art: (sn.thumbnails && (sn.thumbnails.high || sn.thumbnails.medium || sn.thumbnails.default) || {}).url || '',
-            url: '', streamId: v.id, local: false, source: 'youtube',
-            info: pruneInfo({ date: sn.publishedAt, channel: decodeEntities(sn.channelTitle || ''), views: (v.statistics || {}).viewCount, likes: (v.statistics || {}).likeCount }) };
-        }).filter(t => t.duration === 0 || (t.duration >= 30 && t.duration <= 1200));
-        ytCache.set(ck, out);
-        return out;
-      } catch (e) { console.error('YouTube trending error:', e); return []; }
-    }
-
-    // ========== PIPED (YouTube без реклами, без API-ключа) ==========
+    // ========== YOUTUBE без Data API: пошук і потоки через Piped / Invidious (без реклами, без ключа) ==========
+    const ytCache = new Map();
     const PIPED_INSTANCES = [
       'https://api.piped.private.coffee',
       'https://pipedapi.adminforge.de',
@@ -3202,11 +3275,20 @@
       'https://invidious.privacyredirect.com',
       'https://iv.melmac.space'
     ];
+    // Власний сервер (Piped API або Invidious) — найнадійніший запасний варіант
+    function getCustomInst() { try { return (localStorage.getItem('gmusic_custom_inst') || '').trim().replace(/\/+$/, ''); } catch (e) { return ''; } }
+    function setCustomInst(v) {
+      v = (v || '').trim().replace(/\/+$/, '');
+      try { v ? localStorage.setItem('gmusic_custom_inst', v) : localStorage.removeItem('gmusic_custom_inst'); } catch (e) {}
+      ytGood.piped = ytGood.inv = ''; ytBadHosts.clear(); ytCache.clear();
+    }
+    const ytGood = { piped: '', inv: '' };      // останній робочий сервер — пробуємо першим
+    const ytBadHosts = new Map();               // сервер → до якого часу його пропускаємо
+    const markBad = b => { ytBadHosts.set(b, Date.now() + 3 * 60e3); if (ytGood.piped === b) ytGood.piped = ''; if (ytGood.inv === b) ytGood.inv = ''; };
+    const isBad = b => (ytBadHosts.get(b) || 0) > Date.now();
 
-    async function fetchJson(url, ms = 6000) {
-      const c = new AbortController(); const t = setTimeout(() => c.abort(), ms);
-      try { const r = await fetch(url, { signal: c.signal }); if (!r.ok) throw new Error(r.status); return await r.json(); }
-      finally { clearTimeout(t); }
+    async function fetchText(url, ms = 5000) {
+      const r = await fetchT(url, ms); if (!r.ok) throw new Error(r.status); return await r.text();
     }
     // Актуальні списки живих серверів (кеш на 6 годин), статичний список — запасний
     let liveListsPromise = null;
@@ -3214,25 +3296,49 @@
       if (liveListsPromise) return liveListsPromise;
       liveListsPromise = (async () => {
         try {
-          const c = JSON.parse(localStorage.getItem('gmusic_inst') || 'null');
-          if (c && Date.now() - c.t < 6 * 3600e3) return c;
+          const c = JSON.parse(localStorage.getItem('gmusic_inst3') || 'null');
+          if (c && Date.now() - c.t < 6 * 3600e3 && ((c.piped || []).length || (c.inv || []).length)) return c;
         } catch (e) {}
         const out = { t: Date.now(), piped: [], inv: [] };
         await Promise.allSettled([
           fetchJson('https://piped-instances.kavin.rocks/', 5000).then(j => {
-            out.piped = (j || []).filter(x => x && x.api_url).map(x => x.api_url.replace(/\/$/, ''));
+            (j || []).filter(x => x && x.api_url).forEach(x => out.piped.push(x.api_url.replace(/\/$/, '')));
+          }),
+          // офіційний список з вікі Piped (так радить документація: "dynamically parse it")
+          fetchText('https://raw.githubusercontent.com/wiki/TeamPiped/Piped/Instances.md', 6000).then(t => {
+            t.split('\n').forEach(line => {
+              const urls = line.split('|').map(c => c.trim()).filter(c => /^https:\/\/[^\s\/|]+\/?$/.test(c));
+              if (!urls.length) return;
+              urls.forEach((u, i) => { if (i === 0 || /\/\/(api\.|pipedapi|piped-api)/i.test(u)) out.piped.push(u.replace(/\/$/, '')); });   // перший URL у рядку — API
+            });
           }),
           fetchJson('https://api.invidious.io/instances.json?sort_by=health', 5000).then(j => {
-            out.inv = (j || []).filter(x => x[1] && x[1].api && x[1].type === 'https').map(x => x[1].uri.replace(/\/$/, ''));
+            // у списку мало серверів з API: беремо api/cors = true першими, а «невідомо» (null) — після них; явні false пропускаємо
+            const sc = x => (x[1].api ? 2 : 0) + (x[1].cors ? 1 : 0);
+            (j || []).filter(x => x[1] && x[1].uri && x[1].type === 'https' && x[1].api !== false && x[1].cors !== false)
+              .sort((p, q) => sc(q) - sc(p)).forEach(x => out.inv.push(x[1].uri.replace(/\/$/, '')));
           })
         ]);
-        if (out.piped.length || out.inv.length) { try { localStorage.setItem('gmusic_inst', JSON.stringify(out)); } catch (e) {} }
+        out.piped = uniq(out.piped); out.inv = uniq(out.inv);
+        if (out.piped.length || out.inv.length) { try { localStorage.setItem('gmusic_inst3', JSON.stringify(out)); } catch (e) {} }
         return out;
       })();
       return liveListsPromise;
     }
-    const uniq = a => [...new Set(a)];
-
+    // Порядок: свій сервер → останній робочий → решта → ті, що нещодавно падали
+    async function ytHosts() {
+      const live = await Promise.race([getLiveLists(), new Promise(r => setTimeout(() => r({ piped: [], inv: [] }), 1200))]);   // не блокуємось на завантаженні списків
+      const cu = getCustomInst();
+      const order = (arr, good) => {
+        const a = uniq(arr.filter(Boolean));
+        const ok = a.filter(b => !isBad(b) && b !== good && b !== cu), bad = a.filter(b => isBad(b) && b !== cu);
+        return [...(cu ? [cu] : []), ...(good && !isBad(good) && good !== cu ? [good] : []), ...ok, ...bad];
+      };
+      return {
+        piped: order([...(live.piped || []), ...PIPED_INSTANCES], ytGood.piped),
+        inv: order([...(live.inv || []), ...INVIDIOUS_INSTANCES], ytGood.inv)
+      };
+    }
     // Перший успішний відповів — решта ігнорується
     function firstOk(tasks) {
       return new Promise(resolve => {
@@ -3241,133 +3347,236 @@
       });
     }
     const pipedOne = (base, id, ms) => fetchJson(`${base}/streams/${id}`, ms).then(data => {
-      const audio = pickByQuality((data.audioStreams || []).filter(s => s.url && !s.videoOnly), s => s.bitrate || 0);
+      let audio = pickByQuality((data.audioStreams || []).filter(s => s.url && !s.videoOnly), s => s.bitrate || 0);
+      if (!audio) {   // запас 1: змішаний потік (відео+звук) найнижчої якості — <audio> зіграє звук
+        audio = (data.videoStreams || []).filter(v => v.url && !v.videoOnly).sort((x, y) => (x.height || 0) - (y.height || 0))[0];
+      }
+      if (!audio && data.hls) audio = { url: data.hls };   // запас 2: HLS (Chrome на Android грає нативно)
       if (!audio) return null;
+      ytGood.piped = base;
       console.log('[Piped] OK via', base);
       return { host: base, url: audio.url, title: data.title || '', artist: data.uploader || '', duration: data.duration || 0, art: data.thumbnailUrl || '' };
-    });
+    }).catch(e => { markBad(base); throw e; });
     const invOne = (base, id, ms) => fetchJson(`${base}/api/v1/videos/${id}?local=true&fields=title,author,lengthSeconds,adaptiveFormats`, ms).then(data => {
       const audio = pickByQuality((data.adaptiveFormats || []).filter(f => f.url && /^audio\//.test(f.type || '')), f => parseInt(f.bitrate) || 0);
       if (!audio) return null;
       const u = audio.url.startsWith('http') ? audio.url : base + audio.url;
+      ytGood.inv = base;
       console.log('[Invidious] OK via', base);
       return { host: base, url: u, title: data.title || '', artist: data.author || '', duration: data.lengthSeconds || 0, art: '' };
-    });
+    }).catch(e => { markBad(base); throw e; });
 
+    // Хвилями: перші 6 серверів одразу, наступні — через 1.5 с (або відразу, якщо всі попередні вже відмовили)
+    function staggerRace(jobs, wave = 6, gap = 1500) {
+      return new Promise(resolve => {
+        const total = jobs.length;
+        if (!total) return resolve(null);
+        let started = 0, done = 0, finished = false, timer = null;
+        const finish = v => { if (finished) return; finished = true; clearTimeout(timer); resolve(v); };
+        const next = () => { clearTimeout(timer); if (!finished && done === started && started < total) startWave(); };
+        const startWave = () => {
+          if (finished) return;
+          const end = Math.min(total, started + wave);
+          for (; started < end; started++) {
+            jobs[started]().then(v => { done++; if (v) finish(v); else if (done === total) finish(null); else next(); },
+                                 () => { done++; if (done === total) finish(null); else next(); });
+          }
+          if (started < total) timer = setTimeout(startWave, gap);
+        };
+        startWave();
+      });
+    }
+    const ytUrlCache = new Map();   // videoId|якість → посилання на потік (діє ~25 хв)
     async function getPipedAudioUrl(videoId, bad) {
       if (!videoId) return null;
       const skip = bad instanceof Set ? bad : new Set();
+      const ck = videoId + '|' + (typeof effQuality === 'function' ? effQuality() : '');
+      const hit = ytUrlCache.get(ck);
+      if (hit && Date.now() - hit.t < 25 * 60e3 && !skip.has(hit.res.host)) return hit.res;
       for (let pass = 0; pass < 2; pass++) {
-        if (pass === 1) { liveListsPromise = null; try { localStorage.removeItem('gmusic_inst'); } catch (e) {} }   // 2-й прохід: свіжий список серверів
-        const ms = pass ? 12000 : 6000;
-        const live = await getLiveLists();
-        const piped = uniq([...(live.piped || []), ...PIPED_INSTANCES]).filter(b => !skip.has(b));
-        const inv = uniq([...(live.inv || []), ...INVIDIOUS_INSTANCES]).filter(b => !skip.has(b));
-        // Паралельно пачками по 8 серверів: Piped, потім Invidious
-        for (let i = 0; i < piped.length; i += 8) {
-          const r = await firstOk(piped.slice(i, i + 8).map(b => pipedOne(b, videoId, ms)));
-          if (r) return r;
+        if (pass === 1) { liveListsPromise = null; ytBadHosts.clear(); try { localStorage.removeItem('gmusic_inst3'); } catch (e) {} }   // 2-й прохід: свіжий список серверів
+        const ms = pass ? 9000 : 5000;
+        const h = await ytHosts();
+        const piped = h.piped.filter(b => !skip.has(b)), inv = h.inv.filter(b => !skip.has(b));
+        // Piped і Invidious — разом, а не по черзі: 6 Piped, 2 Invidious, 6 Piped, 2 Invidious …
+        const jobs = [];
+        for (let i = 0, j = 0; i < piped.length || j < inv.length;) {
+          for (let k = 0; k < 6 && i < piped.length; k++, i++) { const b = piped[i]; jobs.push(() => pipedOne(b, videoId, ms)); }
+          for (let k = 0; k < 2 && j < inv.length; k++, j++) { const b = inv[j]; jobs.push(() => invOne(b, videoId, ms)); }
         }
-        for (let i = 0; i < inv.length; i += 8) {
-          const r = await firstOk(inv.slice(i, i + 8).map(b => invOne(b, videoId, ms)));
-          if (r) return r;
-        }
+        const r = await staggerRace(jobs, 6, 1500);
+        if (r) { ytUrlCache.set(ck, { t: Date.now(), res: r }); return r; }
       }
       return null;
     }
 
-    // Адаптер: ведёт себя как <audio>, чтобы остальной плеер работал без изменений
-    const ytAudio = new EventTarget();
-    let ytState = -2, ytAd = false, ytPlayer = null, ytReady = false, ytPaused = true, ytDuration = 0, ytCurrentId = '', ytTimer = null, ytApiPromise = null;
-    Object.defineProperties(ytAudio, {
-      currentTime: {
-        get() { try { return ytPlayer && ytReady ? ytPlayer.getCurrentTime() : 0; } catch (e) { return 0; } },
-        set(v) { try { if (ytPlayer && ytReady) ytPlayer.seekTo(v, true); } catch (e) {} }
-      },
-      duration: { get() { return ytDuration; } },
-      paused: { get() { return ytPaused; } },
-      src: { get() { return ytCurrentId; }, set(v) {} }
-    });
-    ytAudio.play = () => { try { if (ytPlayer && ytReady) ytPlayer.playVideo(); } catch (e) {} return Promise.resolve(); };
-    ytAudio.pause = () => { try { if (ytPlayer && ytReady) ytPlayer.pauseVideo(); } catch (e) {} };
-    const ytEmit = (n) => ytAudio.dispatchEvent(new Event(n));
-
-    function ensureYtApi() {
-      if (window.YT && window.YT.Player) return Promise.resolve();
-      if (ytApiPromise) return ytApiPromise;
-      ytApiPromise = new Promise((resolve, reject) => {
-        const prev = window.onYouTubeIframeAPIReady;
-        window.onYouTubeIframeAPIReady = () => { if (prev) prev(); resolve(); };
-        const sc = document.createElement('script');
-        sc.src = 'https://www.youtube.com/iframe_api';
-        sc.onerror = () => { ytApiPromise = null; reject(new Error('YT API blocked')); };
-        document.head.appendChild(sc);
-      });
-      return ytApiPromise;
+    // ----- пошук YouTube через Piped / Invidious (без Data API) -----
+    const ytIdFrom = u => { const m = /[?&]v=([\w-]{11})/.exec(u || ''); return m ? m[1] : ''; };
+    function mkYtTrack(id, title, artist, duration, extra) {
+      return {
+        id: 'yt_' + id, title: decodeEntities(title || ''),
+        artist: decodeEntities((artist || 'YouTube').replace(/\s*-\s*Topic$/i, '')),
+        duration: Math.round(duration || 0),
+        art: 'https://i.ytimg.com/vi/' + id + '/hqdefault.jpg',
+        url: '', streamId: id, local: false, source: 'youtube', info: pruneInfo(extra || {})
+      };
     }
-    // Плеєр YouTube неактивний для дотиків — керуємо лише нашими кнопками.
-    // Інтерактивним він стає тільки під час реклами (щоб можна було її пропустити)
-    // або якщо відтворення не стартувало саме (потрібен дотик до плеєра).
-    function detectYtAd() {
+    function pipedItemsToTracks(items) {
+      return (items || []).filter(i => i && ytIdFrom(i.url) && !(i.duration < 0) && !i.isShort)
+        .map(i => mkYtTrack(ytIdFrom(i.url), i.title, i.uploaderName, i.duration, { views: i.views, date: i.uploadedDate, channel: i.uploaderName }));
+    }
+    function invItemsToTracks(items) {
+      return (Array.isArray(items) ? items : []).filter(i => i && i.videoId && !i.liveNow && i.lengthSeconds >= 0)
+        .map(i => mkYtTrack(i.videoId, i.title, i.author, i.lengthSeconds, { views: i.viewCount, channel: i.author }));
+    }
+    async function ytSearchRaw(query, filter) {
+      const h = await ytHosts(), q = encodeURIComponent(query);
+      const piped = h.piped.slice(0, 18), inv = h.inv.slice(0, 12);
+      for (let i = 0; i < piped.length; i += 6) {
+        const r = await firstOk(piped.slice(i, i + 6).map(b => fetchJson(`${b}/search?q=${q}&filter=${filter}`, 7000).then(j => {
+          const l = pipedItemsToTracks(j && j.items); if (!l.length) return null; ytGood.piped = b; return l;
+        }).catch(e => { markBad(b); throw e; })));
+        if (r) return r;
+      }
+      for (let i = 0; i < inv.length; i += 6) {
+        const r = await firstOk(inv.slice(i, i + 6).map(b => fetchJson(`${b}/api/v1/search?q=${q}&type=video&fields=type,title,videoId,author,lengthSeconds,viewCount,liveNow`, 7000).then(j => {
+          const l = invItemsToTracks(j); if (!l.length) return null; ytGood.inv = b; return l;
+        }).catch(e => { markBad(b); throw e; })));
+        if (r) return r;
+      }
+      return [];
+    }
+    // opts.long = збірники 30 хв – 10 год
+    async function ytSearchPiped(query, limit = 15, opts = {}) {
+      query = (query || '').trim();
+      if (!query) return [];
+      const long = !!opts.long;
+      const ck = (long ? 'PL|' : 'PS|') + query.toLowerCase() + '|' + limit;
+      if (ytCache.has(ck)) return ytCache.get(ck);
       try {
-        if (!ytPlayer || !ytReady) return false;
-        if (typeof ytPlayer.getAdState === 'function' && ytPlayer.getAdState() === 1) return true;
-        const vd = ytPlayer.getVideoData && ytPlayer.getVideoData();
-        if (vd && vd.video_id && ytCurrentId && vd.video_id !== ytCurrentId) return true;
-        const exp = currentTrack && currentTrack.duration;
-        const d = ytPlayer.getDuration();
-        if (exp > 40 && d > 0 && Math.abs(d - exp) > 6) return true;
-      } catch (e) {}
-      return false;
-    }
-    function updateYtInteractive() {
-      const box = document.getElementById('ytBox');
-      if (!box) return;
-      ytAd = detectYtAd();
-      const stuck = ytState === -1 || ytState === 5 || ytState === -2;
-      box.classList.toggle('ad', ytAd);
-      box.classList.toggle('live', ytAd || stuck);
-    }
-    function startYtTimer() {
-      clearInterval(ytTimer);
-      ytTimer = setInterval(() => {
-        if (!ytPlayer || !ytReady) return;
-        updateYtInteractive();
-        try { const d = ytPlayer.getDuration(); if (d > 0 && !ytAd) ytDuration = d; } catch (e) {}
-        ytEmit('timeupdate');
-      }, 500);
-    }
-    function showYtBox(on) {
-      const wrap = document.querySelector('.fp-art-wrap');
-      if (wrap) wrap.classList.toggle('yt', !!on);
-      if (!on) clearInterval(ytTimer);
-    }
-    async function ytLoad(videoId) {
-      ytCurrentId = videoId; ytPaused = false; ytState = -2; ytAd = false; updateYtInteractive(); ytEmit('loadstart');
-      try { await ensureYtApi(); } catch (e) { ytCurrentId = ''; ytEmit('error'); toast('Не вдалося завантажити плеєр YouTube'); return; }
-      if (ytPlayer && ytReady) { ytPlayer.loadVideoById(videoId); startYtTimer(); return; }
-      if (ytPlayer) return; // ещё создаётся — onReady подхватит ytCurrentId
-      ytPlayer = new YT.Player('ytPlayerDiv', {
-        width: '100%', height: '100%', videoId,
-        playerVars: { playsinline: 1, autoplay: 1, rel: 0, modestbranding: 1, origin: location.origin && location.origin !== 'null' ? location.origin : undefined },
-        events: {
-          onReady: () => { ytReady = true; applyVolume(); try { ytPlayer.loadVideoById(ytCurrentId); ytPlayer.playVideo(); } catch (e) {} startYtTimer(); },
-          onStateChange: (ev) => {
-            const st = ev.data; ytState = st;
-            if (st === 1) { ytPaused = false; updateYtInteractive(); try { const d = ytPlayer.getDuration(); if (d > 0 && !ytAd) ytDuration = d; } catch (e) {} ytEmit('playing'); ytEmit('play'); }
-            else if (st === 2) { ytPaused = true; ytEmit('pause'); }
-            else if (st === 3) { ytPaused = false; ytEmit('waiting'); }
-            else if (st === 0) { ytPaused = true; ytEmit('ended'); }
-          },
-          onError: (ev) => {
-            const bad = ytCurrentId; ytCurrentId = ''; ytPaused = true; ytState = -1; updateYtInteractive();
-            ytEmit('error'); ytEmit('pause');
-            toast([101, 150, 153].includes(ev.data) ? 'YouTube не дозволяє відтворити це відео тут' : 'Помилка YouTube-плеєра (' + ev.data + ')');
-            console.error('YT player error', ev.data, bad);
-          }
+        let list;
+        if (long) {
+          const rs = await Promise.all([ytSearchRaw(query + ' mix', 'videos'), ytSearchRaw(query + ' 10 hours', 'videos')].map(p => p.catch(() => [])));
+          list = interleave(rs[0], rs[1]);
+        } else {
+          list = await ytSearchRaw(query, 'music_songs').catch(() => []);
+          if (list.length < 3) list = list.concat(await ytSearchRaw(query, 'music_videos').catch(() => []));
+          if (list.length < 3) list = list.concat(await ytSearchRaw(query + ' audio', 'videos').catch(() => []));
         }
-      });
+        const seen = new Set();
+        const out = list.filter(t => {
+          if (seen.has(t.id)) return false; seen.add(t.id);
+          return long ? (t.duration >= IA_MIN_LONG && t.duration <= IA_MAX_LONG) : (t.duration === 0 || (t.duration >= 30 && t.duration <= 1200));
+        }).slice(0, limit);
+        if (out.length) ytCache.set(ck, out);
+        return out;
+      } catch (e) { console.error('YouTube search error:', e); return []; }
     }
+    // ----- YouTube Data API (основний пошук); якщо квота вичерпана — автоматично Piped/Invidious -----
+    const YOUTUBE_API_KEY = 'AIzaSyByxFinxzUyb1DRygDyD9yvEaHMjdeB5Og';
+    let ytApiBlockedUntil = 0, ytApiWarned = false;
+    function parseIsoDuration(iso) {
+      const m = /^P(?:\d+D)?T?(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?$/.exec(iso || '');
+      return m ? (+(m[1] || 0)) * 3600 + (+(m[2] || 0)) * 60 + (+(m[3] || 0)) : 0;
+    }
+    async function ytApiGet(path, params) {
+      const u = new URL('https://www.googleapis.com/youtube/v3/' + path);
+      Object.entries({ ...params, key: YOUTUBE_API_KEY }).forEach(([k, v]) => { if (v !== undefined && v !== '') u.searchParams.set(k, v); });
+      const res = await fetch(u.toString());
+      if (!res.ok) {
+        const e = await res.json().catch(() => ({}));
+        console.error('YouTube API:', res.status, e.error && e.error.message);
+        if (res.status === 403 || res.status === 429) {
+          ytApiBlockedUntil = Date.now() + 10 * 60e3;   // квота/ключ — на 10 хв переходимо на Piped
+          if (!ytApiWarned) { ytApiWarned = true; try { toast('YouTube API: ліміт вичерпано — шукаю через Piped'); } catch (x) {} }
+        }
+        throw new Error('yt api ' + res.status);
+      }
+      return res.json();
+    }
+    function apiItemToTrack(id, sn, dur, st) {
+      const t = mkYtTrack(id, sn.title, sn.channelTitle, dur, { date: sn.publishedAt, channel: decodeEntities(sn.channelTitle || ''), views: (st || {}).viewCount, likes: (st || {}).likeCount });
+      const th = sn.thumbnails && (sn.thumbnails.high || sn.thumbnails.medium || sn.thumbnails.default);
+      if (th && th.url) t.art = th.url;
+      return t;
+    }
+    async function ytSearchApi(query, limit, opts) {
+      if (Date.now() < ytApiBlockedUntil) return [];
+      const long = !!opts.long;
+      try {
+        const base = { part: 'snippet', type: 'video', maxResults: Math.min(50, long ? Math.max(limit, 25) : limit), q: long ? query + ' mix' : query };
+        let d;
+        if (long) d = await ytApiGet('search', { ...base, videoDuration: 'long' });      // понад 20 хв
+        else {
+          d = await ytApiGet('search', { ...base, videoCategoryId: '10' });
+          if ((d.items || []).length < 5) d = await ytApiGet('search', base);               // не лише «музичну» категорію — більше треків
+        }
+        const items = (d.items || []).filter(i => i.id && i.id.videoId);
+        if (!items.length) return [];
+        const vd = await ytApiGet('videos', { part: 'contentDetails,statistics', id: items.map(i => i.id.videoId).join(',') }).catch(() => ({ items: [] }));
+        const dur = {}, stat = {};
+        (vd.items || []).forEach(v => { dur[v.id] = parseIsoDuration(v.contentDetails.duration); stat[v.id] = v.statistics || {}; });
+        return items.map(i => apiItemToTrack(i.id.videoId, i.snippet || {}, dur[i.id.videoId] || 0, stat[i.id.videoId]));
+      } catch (e) { return []; }
+    }
+    async function searchYouTube(query, limit = 15, opts = {}) {
+      query = (query || '').trim();
+      if (!query) return [];
+      const long = !!opts.long;
+      const ck = (long ? 'AL|' : 'AS|') + query.toLowerCase() + '|' + limit;
+      if (ytCache.has(ck)) return ytCache.get(ck);
+      const keep = t => long ? (t.duration >= IA_MIN_LONG && t.duration <= IA_MAX_LONG) : (t.duration === 0 || (t.duration >= 30 && t.duration <= 1200));
+      let out = (await ytSearchApi(query, limit, opts)).filter(keep).slice(0, limit);
+      if (out.length < Math.min(3, limit)) {                       // API нічого не дало / вичерпано — запасний шлях
+        const more = await ytSearchPiped(query, limit, opts);
+        const seen = new Set(out.map(t => t.id));
+        out = out.concat(more.filter(t => !seen.has(t.id))).slice(0, limit);
+      }
+      if (out.length) ytCache.set(ck, out);
+      return out;
+    }
+    async function ytTrendingPiped(region, limit) {
+      const h = await ytHosts();
+      const r = await firstOk(h.piped.slice(0, 8).map(b => fetchJson(`${b}/trending?region=${encodeURIComponent((region || 'US').toUpperCase())}`, 6000).then(j => {
+        const l = pipedItemsToTracks(j).filter(t => t.duration >= 60 && t.duration <= 600); return l.length ? l : null;
+      }).catch(e => { markBad(b); throw e; })));
+      return (r || []).slice(0, limit);
+    }
+    async function ytTrending(region, limit = 20) {
+      const l = await ytTrendingApi(region, limit);
+      if (l.length) return l;
+      const ck = 'ptrend|' + region + '|' + limit;
+      if (ytCache.has(ck)) return ytCache.get(ck);
+      const p = await ytTrendingPiped(region, limit).catch(() => []);
+      if (p.length) ytCache.set(ck, p);
+      return p;
+    }
+    async function ytTrendingApi(region, limit = 20) {
+      const ck = 'trend|' + region + '|' + limit;
+      if (ytCache.has(ck)) return ytCache.get(ck);
+      if (Date.now() < ytApiBlockedUntil) return [];
+      try {
+        const d = await ytApiGet('videos', { part: 'snippet,contentDetails,statistics', chart: 'mostPopular', videoCategoryId: '10', regionCode: (region || 'US').toUpperCase(), maxResults: limit });
+        const out = (d.items || []).map(v => apiItemToTrack(v.id, v.snippet || {}, parseIsoDuration((v.contentDetails || {}).duration), v.statistics))
+          .filter(t => t.duration === 0 || (t.duration >= 30 && t.duration <= 1200));
+        if (out.length) ytCache.set(ck, out);
+        return out;
+      } catch (e) { return []; }
+    }
+
+    async function ytDiagnose() {
+      try { toast('Перевіряю сервери…'); } catch (e) {}
+      liveListsPromise = null; ytBadHosts.clear();
+      const h = await ytHosts(), id = 'dQw4w9WgXcQ';
+      const pr = await Promise.all(h.piped.slice(0, 24).map(b => pipedOne(b, id, 7000).then(r => !!r, () => false)));
+      const ir = await Promise.all(h.inv.slice(0, 10).map(b => invOne(b, id, 7000).then(r => !!r, () => false)));
+      const a = pr.filter(Boolean).length, c = ir.filter(Boolean).length;
+      alert('Piped: працює ' + a + ' з ' + pr.length + '\nInvidious: працює ' + c + ' з ' + ir.length + (a + c ? '' : '\n\nЖоден сервер не відповідає. Вкажіть свій у налаштуваннях (Свій сервер YouTube).'));
+    }
+    // Заглушки: старий iframe-плеєр прибрано (залишені для сумісності з рештою плеєра)
+    const ytAudio = new EventTarget();
+    let ytPlayer = null, ytReady = false;
+    function showYtBox() {}
 
     // ========== FREESOUND (музыка, лупы, ambient; CC) ==========
     // На скриншоте символ после "9" похож и на I, и на l — пробуем оба варианта
@@ -3863,7 +4072,7 @@
       if (document.getElementById('historyModal')?.classList.contains('open')) renderHistory();
     }
     // --- історія пошуку ---
-    const SRC_NAMES = { all: 'Усі джерела', jamendo: 'Jamendo', audius: 'Audius', youtube: 'YouTube', freesound: 'Freesound' };
+    const SRC_NAMES = { all: 'Усі джерела', jamendo: 'Jamendo', audius: 'Audius', youtube: 'YouTube', archive: 'Internet Archive', mixes: 'Збірники до 10 год', freesound: 'Freesound' };
     const searchKey = e => [e.artist || '', e.title || '', (e.genres || []).slice().sort().join(','), e.source || 'all'].join('|').toLowerCase();
     function commitSearchHistory() {
       if (!histOn) return;
@@ -3955,9 +4164,10 @@
     // ========== UTILS ==========
     function formatTime(s) {
       if (!s || isNaN(s)) return '0:00';
-      const m = Math.floor(s / 60);
+      const h = Math.floor(s / 3600);
+      const m = Math.floor((s % 3600) / 60);
       const sec = Math.floor(s % 60);
-      return `${m}:${sec.toString().padStart(2, '0')}`;
+      return h > 0 ? `${h}:${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}` : `${m}:${sec.toString().padStart(2, '0')}`;
     }
     function toast(msg) {
       const t = document.getElementById('toast');
@@ -3966,7 +4176,7 @@
       setTimeout(() => t.classList.remove('show'), 2200);
     }
     // ========== ІНФОРМАЦІЯ ПРО ТРЕК ==========
-    const INFO_SRC = { itunes: 'Apple Music (iTunes), превʼю 30 с', jamendo: 'Jamendo', audius: 'Audius', youtube: 'YouTube', freesound: 'Freesound' };
+    const INFO_SRC = { itunes: 'Apple Music (iTunes), превʼю 30 с', jamendo: 'Jamendo', audius: 'Audius', youtube: 'YouTube', archive: 'Internet Archive', freesound: 'Freesound' };
     function fmtInfoDate(v) {
       if (!v) return '';
       if (/^\d{4}$/.test(String(v))) return String(v);
@@ -4026,9 +4236,7 @@
           const d = await audiusFetch('/tracks/' + encodeURIComponent(t.streamId));
           if (d && d.data) add = mapAudiusTrack(d.data).info;
         } else if (t.source === 'youtube' && t.streamId) {
-          const vu = new URL('https://www.googleapis.com/youtube/v3/videos');
-          vu.searchParams.set('part', 'snippet,statistics'); vu.searchParams.set('id', t.streamId); vu.searchParams.set('key', YOUTUBE_API_KEY);
-          const d = await fetch(vu.toString()).then(r => r.json());
+          const d = await ytApiGet('videos', { part: 'snippet,statistics', id: t.streamId });
           const v = d.items && d.items[0];
           if (v) add = pruneInfo({ date: v.snippet.publishedAt, channel: decodeEntities(v.snippet.channelTitle || ''), views: v.statistics && v.statistics.viewCount, likes: v.statistics && v.statistics.likeCount,
             tags: (v.snippet.tags || []).slice(0, 8).join(', ') });
@@ -4399,6 +4607,8 @@
           const d = await jamendoFetch('/tracks/', fmt ? { id: t.streamId, audioformat: fmt } : { id: t.streamId });
           const r = d.results && d.results[0];
           if (r && r.audio && alive()) { src = fmt ? setJamFmt(r.audio, fmt) : r.audio; t.url = src; t._fmtApplied = !!fmt; }
+        } else if (t.source === 'youtube' && t.duration > IA_MIN_LONG) {
+          _pre.delete(t.id); return;
         } else if (t.source === 'youtube' && t.streamId) {
           if (t.url && !t._forceYt && t._q === effQuality()) src = t.url;
           else {
@@ -4409,7 +4619,9 @@
               if (pp.art && !t.art) t.art = pp.art;
             }
           }
-        } else src = t.url || '';
+        } else if (t.source === 'archive' && t.duration > IA_MIN_LONG) {
+          _pre.delete(t.id); return;   // довгі збірники не підвантажуємо наперед
+        } else src = t.url || (t.source === 'archive' && t.streamId ? iaFileUrl(t.streamId) : '');
         if (!alive()) return;
         if (!src) { _pre.delete(t.id); return; }
         e.url = src;
@@ -5001,36 +5213,195 @@
       inp.click();
     }
 
-    // ========== UPLOAD ==========
-    function handleFiles(files) {
-      Array.from(files).forEach(file => {
-        if (!file.type.startsWith('audio/')) return;
-        const id = 'local_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
-        const blobUrl = URL.createObjectURL(file);
-        const name = file.name.replace(/\.[^/.]+$/, '');
-        const track = {
-          id, title: name, artist: 'Локальний файл', duration: 0,
-          art: '',
-          url: blobUrl, blobUrl, local: true,
-          info: pruneInfo({ fileName: file.name, size: file.size, fileType: file.type, date: file.lastModified })
+    // ========== ЗВУК З ВІДЕО → ЛОКАЛЬНА МУЗИКА ==========
+    // MP4/MOV/M4V/3GP: аудіодоріжка вирізається без перекодування (якість не падає) і пакується в .m4a — відео в сховище не потрапляє.
+    // Інші формати (WebM/MKV…): декодуємо звук і зберігаємо як WAV. Якщо не вийшло — додається саме відео (грає лише звук).
+    const VIDEO_EXT = /\.(mp4|m4v|mov|3gp|3g2|webm|mkv|avi|ogv)$/i;
+    const _u32 = (b, o) => ((b[o] << 24) | (b[o + 1] << 16) | (b[o + 2] << 8) | b[o + 3]) >>> 0;
+    const _u64 = (b, o) => _u32(b, o) * 4294967296 + _u32(b, o + 4);
+    const _tag = (b, o) => String.fromCharCode(b[o], b[o + 1], b[o + 2], b[o + 3]);
+    function _w32(b, o, v) { b[o] = (v >>> 24) & 255; b[o + 1] = (v >>> 16) & 255; b[o + 2] = (v >>> 8) & 255; b[o + 3] = v & 255; }
+    function _w64(b, o, v) { _w32(b, o, Math.floor(v / 4294967296)); _w32(b, o + 4, v % 4294967296); }
+    const _rd = async (f, a, b) => new Uint8Array(await f.slice(a, b).arrayBuffer());
+    function _boxes(b, s, e) {
+      const out = []; let p = s;
+      while (p + 8 <= e) {
+        let size = _u32(b, p), hdr = 8; const t = _tag(b, p + 4);
+        if (size === 1) { size = _u64(b, p + 8); hdr = 16; } else if (size === 0) size = e - p;
+        if (size < hdr || p + size > e) break;
+        out.push({ t, s: p, e: p + size, h: hdr }); p += size;
+      }
+      return out;
+    }
+    const _child = (b, box, t) => _boxes(b, box.s + box.h, box.e).find(x => x.t === t);
+    async function _topBoxes(file) {
+      const out = []; let p = 0;
+      while (p + 8 <= file.size && out.length < 64) {
+        const h = await _rd(file, p, Math.min(p + 16, file.size));
+        let size = _u32(h, 0), hdr = 8; const t = _tag(h, 4);
+        if (size === 1) { size = _u64(h, 8); hdr = 16; } else if (size === 0) size = file.size - p;
+        if (size < hdr) break;
+        out.push({ t, s: p, e: p + size, h: hdr }); p += size;
+      }
+      return out;
+    }
+    async function demuxMp4Audio(file) {
+      const top = await _topBoxes(file);
+      if (top.some(x => x.t === 'moof')) throw new Error('fragmented mp4');
+      const mv = top.find(x => x.t === 'moov');
+      if (!mv) throw new Error('no moov');
+      if (mv.e - mv.s > 256 * 1024 * 1024) throw new Error('moov too big');
+      const moov = await _rd(file, mv.s, mv.e);
+      const mvhd = _child(moov, { s: 0, e: moov.length, h: mv.h }, 'mvhd');
+      if (!mvhd) throw new Error('no mvhd');
+      let trak = null, stbl = null;
+      for (const tk of _boxes(moov, mv.h, moov.length).filter(x => x.t === 'trak')) {
+        const mdia = _child(moov, tk, 'mdia'); if (!mdia) continue;
+        const hdlr = _child(moov, mdia, 'hdlr'); if (!hdlr || _tag(moov, hdlr.s + hdlr.h + 8) !== 'soun') continue;
+        const minf = _child(moov, mdia, 'minf'); const st = minf && _child(moov, minf, 'stbl');
+        if (st) { trak = tk; stbl = st; break; }
+      }
+      if (!trak) throw new Error('no audio track');
+      const stsd = _child(moov, stbl, 'stsd'), stsz = _child(moov, stbl, 'stsz'), stsc = _child(moov, stbl, 'stsc');
+      const stco = _child(moov, stbl, 'stco'), co64 = _child(moov, stbl, 'co64');
+      const co = stco || co64;
+      if (!stsd || !stsz || !stsc || !co) throw new Error('bad stbl');
+      if (_tag(moov, stsd.s + stsd.h + 12) !== 'mp4a') throw new Error('codec ' + _tag(moov, stsd.s + stsd.h + 12));   // AAC; інше браузер може не зіграти
+      const nCh = _u32(moov, co.s + co.h + 4);
+      if (!nCh) throw new Error('no chunks');
+      // розміри чанків = сума розмірів їхніх семплів
+      const fixed = _u32(moov, stsz.s + stsz.h + 4), nS = _u32(moov, stsz.s + stsz.h + 8), szOff = stsz.s + stsz.h + 12;
+      const nRuns = _u32(moov, stsc.s + stsc.h + 4), scOff = stsc.s + stsc.h + 8;
+      const runs = []; for (let i = 0; i < nRuns; i++) runs.push([_u32(moov, scOff + i * 12), _u32(moov, scOff + i * 12 + 4)]);
+      const chunks = []; let si = 0, ri = 0;
+      for (let c = 1; c <= nCh; c++) {
+        while (ri + 1 < runs.length && runs[ri + 1][0] <= c) ri++;
+        let sum = 0;
+        for (let k = 0; k < runs[ri][1]; k++, si++) { if (si >= nS) throw new Error('stsz overflow'); sum += fixed || _u32(moov, szOff + si * 4); }
+        const off = stco ? _u32(moov, co.s + co.h + 8 + (c - 1) * 4) : _u64(moov, co.s + co.h + 8 + (c - 1) * 8);
+        if (off + sum > file.size) throw new Error('chunk out of range');
+        chunks.push([off, sum]);
+      }
+      // нова ftyp + moov (лише mvhd і аудіо-trak) + mdat з аудіо-чанків
+      const ftyp = new Uint8Array(28); _w32(ftyp, 0, 28); ftyp.set([102, 116, 121, 112], 4);   // 'ftyp'
+      ftyp.set([77, 52, 65, 32], 8);                                                            // 'M4A '
+      ftyp.set([77, 52, 65, 32, 109, 112, 52, 50, 105, 115, 111, 109], 16);                      // M4A  mp42 isom
+      const mvhdB = moov.slice(mvhd.s, mvhd.e), trakB = moov.slice(trak.s, trak.e);
+      const moovSize = 8 + mvhdB.length + trakB.length;
+      const hdr = new Uint8Array(8); _w32(hdr, 0, moovSize); hdr.set([109, 111, 111, 118], 4);   // 'moov'
+      let pos = ftyp.length + moovSize + 8;
+      const coPos = (stco || co64).s - trak.s + co.h + 8;
+      for (let i = 0; i < chunks.length; i++) {
+        if (stco) { if (pos >= 4294967296) throw new Error('too big'); _w32(trakB, coPos + i * 4, pos); } else _w64(trakB, coPos + i * 8, pos);
+        pos += chunks[i][1];
+      }
+      const dataLen = pos - (ftyp.length + moovSize + 8);
+      if (dataLen + 8 >= 4294967296) throw new Error('too big');
+      const mdatH = new Uint8Array(8); _w32(mdatH, 0, dataLen + 8); mdatH.set([109, 100, 97, 116], 4);   // 'mdat'
+      const parts = [ftyp, hdr, mvhdB, trakB, mdatH];
+      for (const [off, sz] of chunks) parts.push(file.slice(off, off + sz));
+      return new Blob(parts, { type: 'audio/mp4' });
+    }
+    async function decodeToWav(file, base) {
+      if (file.size > 400 * 1024 * 1024) throw new Error('file too big to decode');
+      const AC = window.AudioContext || window.webkitAudioContext;
+      const ac = new AC();
+      try {
+        const buf = await ac.decodeAudioData(await file.arrayBuffer());
+        const ch = Math.min(2, buf.numberOfChannels), frames = buf.length, sr = buf.sampleRate;
+        if (frames * ch * 2 > 500 * 1024 * 1024) throw new Error('audio too long for wav');
+        const dv = new DataView(new ArrayBuffer(44 + frames * ch * 2));
+        const ws = (o, t) => { for (let i = 0; i < t.length; i++) dv.setUint8(o + i, t.charCodeAt(i)); };
+        ws(0, 'RIFF'); dv.setUint32(4, 36 + frames * ch * 2, true); ws(8, 'WAVEfmt '); dv.setUint32(16, 16, true); dv.setUint16(20, 1, true);
+        dv.setUint16(22, ch, true); dv.setUint32(24, sr, true); dv.setUint32(28, sr * ch * 2, true); dv.setUint16(32, ch * 2, true); dv.setUint16(34, 16, true);
+        ws(36, 'data'); dv.setUint32(40, frames * ch * 2, true);
+        const data = []; for (let c = 0; c < ch; c++) data.push(buf.getChannelData(c));
+        let o = 44;
+        for (let i = 0; i < frames; i++) for (let c = 0; c < ch; c++) { const v = Math.max(-1, Math.min(1, data[c][i])); dv.setInt16(o, v < 0 ? v * 32768 : v * 32767, true); o += 2; }
+        return new File([dv.buffer], base + '.wav', { type: 'audio/wav' });
+      } finally { try { ac.close(); } catch (e) {} }
+    }
+    // Повертає File зі звуком, null (звук не видобувся — додаємо саме відео) або false (у відео немає звуку)
+    async function extractAudioFromVideo(file) {
+      const base = file.name.replace(/\.[^/.]+$/, '');
+      let noTrack = false;
+      try {
+        const head = await _rd(file, 0, Math.min(file.size, 12));
+        if (head.length >= 8 && _tag(head, 4) === 'ftyp') return new File([await demuxMp4Audio(file)], base + '.m4a', { type: 'audio/mp4' });
+      } catch (e) { console.warn('mp4 demux:', e.message); noTrack = e.message === 'no audio track'; }
+      if (noTrack) return false;   // у відео взагалі немає звуку
+      try { return await decodeToWav(file, base); } catch (e) { console.warn('decode audio:', e.message); }
+      return null;
+    }
+    // Кадр з відео як обкладинка
+    function videoFrameCover(file) {
+      return new Promise(resolve => {
+        const url = URL.createObjectURL(file), v = document.createElement('video');
+        let done = false;
+        const fin = b => { if (done) return; done = true; clearTimeout(to); try { URL.revokeObjectURL(url); } catch (e) {} v.removeAttribute('src'); resolve(b); };
+        const to = setTimeout(() => fin(null), 8000);
+        v.muted = true; v.preload = 'metadata'; v.playsInline = true;
+        v.onerror = () => fin(null);
+        v.onloadedmetadata = () => { try { v.currentTime = Math.min(Math.max(v.duration * 0.1, 0.5), 10); } catch (e) { fin(null); } };
+        v.onseeked = () => {
+          try {
+            const k = Math.min(1, 600 / Math.max(v.videoWidth, v.videoHeight, 1));
+            const c = document.createElement('canvas'); c.width = Math.max(1, Math.round(v.videoWidth * k)); c.height = Math.max(1, Math.round(v.videoHeight * k));
+            c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+            c.toBlob(b => fin(b), 'image/jpeg', 0.85);
+          } catch (e) { fin(null); }
         };
-        library.unshift(track);
-        // Зберігаємо сам файл на пристрої (IndexedDB), щоб він не зникав після перезапуску
-        offReq('audio', 'readwrite', s => s.put(file, id)).then(() => { offlineIds.add(id); syncOfflineBadges(); })
-          .catch(e => { console.warn('local save', e); toast('Не вдалося зберегти файл на пристрої — після перезапуску його доведеться додати знову'); });
-        extractId3Cover(file).then(b => { if (b) setTrackCover(track, b, true); }).catch(() => {});
-        const tempAudio = new Audio(blobUrl);
-        tempAudio.addEventListener('loadedmetadata', () => {
-          track.duration = tempAudio.duration;
-          saveData();
-          renderLibraryTracks();
-          renderPlaylists();
-        });
+        v.src = url;
       });
+    }
+
+    // ========== UPLOAD ==========
+    function addLocalTrack(blob, origName, srcFile) {
+      const id = 'local_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+      const blobUrl = URL.createObjectURL(blob);
+      const name = origName.replace(/\.[^/.]+$/, '');
+      const track = {
+        id, title: name, artist: 'Локальний файл', duration: 0,
+        art: '',
+        url: blobUrl, blobUrl, local: true,
+        info: pruneInfo({ fileName: origName, size: blob.size, fileType: blob.type, date: (srcFile || blob).lastModified })
+      };
+      library.unshift(track);
+      // Зберігаємо сам файл на пристрої (IndexedDB), щоб він не зникав після перезапуску
+      offReq('audio', 'readwrite', s => s.put(blob, id)).then(() => { offlineIds.add(id); syncOfflineBadges(); })
+        .catch(e => { console.warn('local save', e); toast('Не вдалося зберегти файл на пристрої — після перезапуску його доведеться додати знову'); });
+      const isVid = srcFile && !/^audio\//.test(srcFile.type || '') && (/^video\//.test(srcFile.type || '') || VIDEO_EXT.test(srcFile.name));
+      if (isVid) videoFrameCover(srcFile).then(b => { if (b) setTrackCover(track, b, true); }).catch(() => {});
+      else extractId3Cover(blob).then(b => { if (b) setTrackCover(track, b, true); }).catch(() => {});
+      const tempAudio = new Audio(blobUrl);
+      tempAudio.addEventListener('loadedmetadata', () => {
+        track.duration = tempAudio.duration;
+        saveData();
+        renderLibraryTracks();
+        renderPlaylists();
+      });
+      return track;
+    }
+    async function handleFiles(files) {
+      const list = Array.from(files);   // копіюємо одразу: input очищується після change
+      let added = 0, fromVideo = 0, asIs = 0, silent = 0;
+      for (const file of list) {
+        const isAudio = (file.type || '').startsWith('audio/');
+        const isVideo = !isAudio && (/^video\//.test(file.type || '') || VIDEO_EXT.test(file.name));
+        if (!isAudio && !isVideo) continue;
+        if (isAudio) { addLocalTrack(file, file.name, file); added++; continue; }
+        toast('Видобуваю звук з відео…');
+        const audioFile = await extractAudioFromVideo(file).catch(() => null);
+        if (audioFile === false) { silent++; continue; }
+        if (audioFile) { addLocalTrack(audioFile, file.name, file); fromVideo++; }
+        else { addLocalTrack(file, file.name, file); asIs++; }
+        added++;
+      }
       saveData();
       renderLibraryTracks();
       renderPlaylists();
-      toast(`Додано: ${files.length} трек(ів)`);
+      if (!added) { toast(silent ? 'У цьому відео немає звуку' : 'Підтримуються аудіо та відео файли'); return; }
+      toast(`Додано: ${added} трек(ів)` + (fromVideo ? ` · звук з відео: ${fromVideo}` : '') + (asIs ? ` · як є (звук окремо не видобувся): ${asIs}` : '') + (silent ? ` · без звуку пропущено: ${silent}` : ''));
     }
 
     // ===== Поділитися: посилання відкриває плеєр цього застосунку =====
@@ -5052,10 +5423,10 @@
       else toast(text);
     }
     function trackFromShare(o) {
-      const pre = { audius: 'audius_', itunes: 'itunes_', jamendo: 'jamendo_', youtube: 'yt_' }[o.s];
+      const pre = { audius: 'audius_', itunes: 'itunes_', jamendo: 'jamendo_', youtube: 'yt_', archive: 'ia_' }[o.s];
       if (!pre) return null;
       return { id: pre + (o.i || ('x' + Date.now())), title: o.t || 'Unknown', artist: o.a || '', duration: o.d || 0, art: o.r || '',
-        url: o.s === 'itunes' ? (o.u || '') : '', streamId: o.i || undefined, local: false, source: o.s, preview: o.s === 'itunes' };
+        url: o.s === 'itunes' ? (o.u || '') : (o.s === 'archive' && o.i ? iaFileUrl(o.i) : ''), streamId: o.i || undefined, local: false, source: o.s, preview: o.s === 'itunes' };
     }
     function openSharedFromHash() {
       const m = /^#play=([\w-]+)/.exec(location.hash);
@@ -5195,16 +5566,17 @@
               track._q = effQuality();
               // далі звичайний шлях відтворення нижче
             } else {
-              bail('Не вдалося завантажити трек без реклами. Спробуйте пізніше');
+              bail('Не вдалося завантажити трек без реклами. Спробуйте ще раз або вкажіть свій сервер у налаштуваннях');
               return;
             }
           } catch (e) {
             console.error('Piped error:', e);
-            bail('Не вдалося завантажити трек без реклами. Спробуйте пізніше');
+            bail('Не вдалося завантажити трек без реклами. Спробуйте ще раз або вкажіть свій сервер у налаштуваннях');
             return;
           }
         }
       }
+      if (!src && track.source === 'archive' && track.streamId) { src = iaFileUrl(track.streamId); track.url = src; }
       if (!src) {
         bail(track.local ? 'Файл цього треку втрачено — додайте його знову' : 'Немає посилання на трек');
         return;
@@ -5246,6 +5618,19 @@
         toast('Помилка відтворення');
       });
       document.getElementById('playerBar').classList.add('visible');
+      if (track.source === 'youtube' && !offUrl && !preUrl && !String(src).startsWith('blob:')) {
+        const _wEl = audio;
+        setTimeout(() => {
+          if (currentTrack !== track || audio !== _wEl || !isLoading || _wEl.readyState >= 3) return;
+          if ((track._ytTries || 0) >= 4) return;
+          track._ytTries = (track._ytTries || 0) + 1;
+          if (!track._ytBad) track._ytBad = new Set();
+          if (track._ytHost) { track._ytBad.add(track._ytHost); markBad(track._ytHost); }
+          track.url = ''; track._retrying = true;
+          toast('Сервер не відповідає, пробую інший…');
+          playTrack(track, 'next');
+        }, 12000);
+      }
       updatePlayerUI();
       schedulePreload();
     }
@@ -5382,6 +5767,7 @@
       if (t.source === 'jamendo' && t.streamId && !t.url) {
         try { const d = await jamendoFetch('/tracks/', { id: t.streamId }); const r = d.results && d.results[0]; if (r && r.audio) { t.url = r.audio; return r.audio; } } catch (e) {}
       }
+      if (t.source === 'archive' && t.streamId && !t.url) return iaFileUrl(t.streamId);
       if (t.source === 'youtube' && t.streamId && !t.url) {
         const p = await getPipedAudioUrl(t.streamId).catch(() => null);
         if (p && p.url) { t.url = p.url; return p.url; }
@@ -5890,9 +6276,9 @@ self.onmessage = function (e) {
     const LANGS = [['','Будь-яка'],['uk','Українська'],['en','English'],['es','Español'],['pt','Português'],['fr','Français'],['de','Deutsch'],['ko','한국어'],['ja','日本語'],['tr','Türkçe'],['pl','Polski']];
     const LANG_Q = { uk: 'українська музика', es: 'música en español', pt: 'música brasileira', fr: 'chanson française', de: 'deutsche musik', ko: 'korean', ja: 'japanese', tr: 'türkçe şarkı', pl: 'polska muzyka' };
     const JAM_LANGS = ['en', 'fr', 'de', 'es', 'pt', 'ja', 'ko', 'tr', 'pl'];
-    const DURS = [['','Будь-яка'],['s','< 3 хв'],['m','3–5 хв'],['l','> 5 хв']];
-    const DUR_RANGE = { s: [0, 180], m: [180, 300], l: [300, 3600] };
-    const SOURCES = [['all','Усі'],['jamendo','Jamendo'],['audius','Audius'],['youtube','YouTube'],['freesound','Freesound']];
+    const DURS = [['','Будь-яка'],['s','< 3 хв'],['m','3–5 хв'],['l','> 5 хв'],['xl','Збірники 30 хв – 10 год']];
+    const DUR_RANGE = { s: [0, 180], m: [180, 300], l: [300, 1800], xl: [1800, 36061] };
+    const SOURCES = [['all','Усі'],['jamendo','Jamendo'],['audius','Audius'],['youtube','YouTube'],['archive','Internet Archive'],['mixes','Збірники до 10 год'],['freesound','Freesound']];
     const SORTS = [['popularity_month','Популярні'],['releasedate','Новинки'],['listens','За прослуховуваннями'],['relevance','За релевантністю']];
     const searchFilters = { genres: new Set(), moods: new Set(), era: '', lang: '', dur: '', source: 'all', sort: 'popularity_month', artist: '', title: '' };
 
@@ -5991,14 +6377,100 @@ self.onmessage = function (e) {
       const rg = DUR_RANGE[f.dur];
       const durOk = t => !rg || !t.duration || t.preview || (t.duration >= rg[0] && t.duration < rg[1]);
       const jobs = [];
-      if (src === 'all' || src === 'jamendo') jobs.push(jamendoFiltered(query, 40));
-      if ((src === 'all' || src === 'audius') && (hasText || hasMeta)) jobs.push(searchAudius(extraQ(query), 25).then(l => l.filter(artistOk)));
-      if ((src === 'all' || src === 'youtube') && (hasText || hasMeta)) jobs.unshift(searchYouTube(extraQ(query) + (hasText ? '' : ' music'), 15));
-      if ((src === 'all' || src === 'freesound') && (hasText || f.genres.size)) jobs.push(searchFreesound(extraQ(query).replace(/\s+/g, ' '), 20, [...f.genres]).then(l => l.filter(artistOk)));
+      const wantLong = src === 'mixes' || f.dur === 'xl';   // довгі збірники 30 хв – 10 год
+      const useSrc = (name) => !wantLong && (src === 'all' || src === name);
+      if (wantLong) {
+        const lq = extraQ(query) || 'music';
+        jobs.push(searchYouTube(lq, 25, { long: true }));
+        jobs.push(searchLongMixes(lq, 20));
+        jobs.push(searchLongAudius(lq, 25).then(l => l.filter(artistOk)));
+      }
+      if (useSrc('jamendo')) jobs.push(jamendoFiltered(query, 40));
+      if (useSrc('audius') && (hasText || hasMeta)) jobs.push(searchAudius(extraQ(query), 25).then(l => l.filter(artistOk)));
+      if (useSrc('youtube') && (hasText || hasMeta)) jobs.unshift(searchYouTube(extraQ(query) + (hasText ? '' : ' music'), 15));
+      if (useSrc('archive') && (hasText || hasMeta)) jobs.push(searchArchive(extraQ(query), 15).then(l => l.filter(artistOk)));
+      if (useSrc('freesound') && (hasText || f.genres.size)) jobs.push(searchFreesound(extraQ(query).replace(/\s+/g, ' '), 20, [...f.genres]).then(l => l.filter(artistOk)));
       const lists = await Promise.all(jobs.map(j => Promise.resolve(j).catch(() => [])));
       const seen = new Set(), out = [];
       interleave(...lists).forEach(t => { if (!seen.has(t.id) && durOk(t)) { seen.add(t.id); out.push(t); } });
       return out;
+    }
+    // ========== ПІДКАЗКИ ПРИ ПОШУКУ (виконавці, пісні, альбоми) ==========
+    const sugCache = new Map();
+    async function pipedSuggest(q) {
+      const h = await ytHosts();
+      const r = await firstOk(h.piped.slice(0, 5).map(b => fetchJson(`${b}/suggestions?query=${encodeURIComponent(q)}`, 2000).then(j => (Array.isArray(j) && j.length ? j : null))));
+      return (r || []).slice(0, 4);
+    }
+    async function fetchSuggestions(kind, text, artistCtx) {
+      const key = kind + '|' + text.toLowerCase() + '|' + (artistCtx || '').toLowerCase();
+      if (sugCache.has(key)) return sugCache.get(key);
+      const safe = p => Promise.resolve(p).catch(() => []);
+      const low = text.toLowerCase(), enc = encodeURIComponent;
+      let out = [];
+      if (kind === 'artist') {
+        const hist = [], seenH = new Set();
+        [...playHistory, ...library].forEach(t => {
+          const a = (t.artist || '').trim(), k = a.toLowerCase();
+          if (a && k.includes(low) && !seenH.has(k) && !/локальн|unknown|невідом|various/i.test(a)) { seenH.add(k); hist.push({ type: 'artist', icon: 'history', main: a, sub: 'З вашої історії', artist: a }); }
+        });
+        const [it, au, ja] = await Promise.all([
+          safe(fetchJson('https://itunes.apple.com/search?media=music&entity=musicArtist&limit=6&term=' + enc(text), 4000).then(j => (j.results || []).filter(r => r.artistName).map(r => ({ type: 'artist', icon: 'person', main: r.artistName, sub: r.primaryGenreName || 'Виконавець', artist: r.artistName })))),
+          safe(audiusFetch('/users/search', { query: text, limit: 4 }).then(j => (j.data || []).filter(u => u.name).map(u => ({ type: 'artist', icon: 'person', main: u.name, sub: 'Audius', artist: u.name })))),
+          safe(jamendoFetch('/artists/', { namesearch: text, limit: 4 }).then(j => (j.results || []).filter(a => a.name).map(a => ({ type: 'artist', icon: 'person', main: a.name, sub: 'Jamendo', artist: a.name }))))
+        ]);
+        out = [...hist.slice(0, 3), ...it, ...au, ...ja];
+      } else {
+        const term = (artistCtx ? artistCtx + ' ' : '') + text;
+        const artOk = r => !artistCtx || (r.artistName || '').toLowerCase().includes(artistCtx.toLowerCase());
+        const [songs, albums, qs] = await Promise.all([
+          safe(fetchJson('https://itunes.apple.com/search?media=music&entity=song&limit=10&term=' + enc(term), 4000).then(j => (j.results || []).filter(r => r.trackName && artOk(r)).map(r => ({ type: 'song', icon: 'music_note', main: r.trackName, sub: r.artistName, title: r.trackName, artist: r.artistName })))),
+          safe(fetchJson('https://itunes.apple.com/search?media=music&entity=album&limit=4&term=' + enc(term), 4000).then(j => (j.results || []).filter(r => r.collectionName && artOk(r)).map(r => ({ type: 'album', icon: 'album', main: r.collectionName, sub: 'Альбом · ' + r.artistName, title: r.collectionName, artist: r.artistName })))),
+          safe(pipedSuggest(term).then(l => l.map(q => ({ type: 'query', icon: 'search', main: q, sub: 'Підказка YouTube', title: q, artist: '' }))))
+        ]);
+        out = [...songs.slice(0, 5), ...albums.slice(0, 2), ...qs.slice(0, 3)];
+      }
+      const seen = new Set();
+      out = out.filter(x => { const k = (x.main + '|' + x.sub).toLowerCase(); if (seen.has(k)) return false; seen.add(k); return true; }).slice(0, 8);
+      if (out.length) sugCache.set(key, out);
+      return out;
+    }
+    function initSuggest() {
+      const box = document.getElementById('sugBox');
+      if (!box) return;
+      const fa = document.getElementById('fArtist'), ft = document.getElementById('fTitle');
+      let seq = 0, timer = null;
+      const hide = () => { box.classList.remove('open'); box.innerHTML = ''; };
+      const pick = (s) => {
+        if (s.type === 'artist') fa.value = s.artist;
+        else { ft.value = s.title; if (!fa.value.trim() && s.artist) fa.value = s.artist; }
+        searchFilters.artist = fa.value.trim(); searchFilters.title = ft.value.trim();
+        seq++; hide(); try { document.activeElement.blur(); } catch (e) {}
+        syncFieldClear(); renderFilterChips(); runSearch(); commitSearchHistory();
+      };
+      const show = async (input) => {
+        const kind = input === fa ? 'artist' : 'title';
+        const text = input.value.trim();
+        if (text.length < 2) { seq++; return hide(); }
+        const my = ++seq;
+        const list = await fetchSuggestions(kind, text, kind === 'title' ? fa.value.trim() : '');
+        if (my !== seq || document.activeElement !== input) return;
+        if (!list.length) return hide();
+        const bar = input.closest('.search-bar');
+        box.style.top = (bar.offsetTop + bar.offsetHeight + 4) + 'px';
+        box.innerHTML = list.map((x, i) => `<div class="sug-item" data-i="${i}"><span class="material-icons-round">${x.icon}</span><div class="sug-txt"><div class="sug-main">${escapeHtml(x.main)}</div>${x.sub ? `<div class="sug-sub">${escapeHtml(x.sub)}</div>` : ''}</div></div>`).join('');
+        box.classList.add('open');
+        box.querySelectorAll('.sug-item').forEach(el => {
+          el.addEventListener('pointerdown', e => e.preventDefault());
+          el.addEventListener('click', () => pick(list[+el.dataset.i]));
+        });
+      };
+      [fa, ft].forEach(el => {
+        el.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(() => show(el), 220); });
+        el.addEventListener('focus', () => { if (el.value.trim().length >= 2) { clearTimeout(timer); timer = setTimeout(() => show(el), 120); } });
+        el.addEventListener('blur', () => setTimeout(() => { if (document.activeElement !== fa && document.activeElement !== ft) { seq++; hide(); } }, 200));
+        el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === 'Escape') { seq++; hide(); } });
+      });
     }
     let searchSeq = 0;
     async function runSearch() {
@@ -6186,6 +6658,7 @@ self.onmessage = function (e) {
       const yr = new Date().getFullYear();
       rows.push({ id: 'tt', i: 'music_video', t: 'У тренді в TikTok', sub: 'Вірусні пісні з відео', load: () => mixRow({ yt: [`tiktok viral songs ${yr}`, `trending tiktok songs ${yr}`], limit: 16 }) });
       rows.push({ id: 'ytt', i: 'smart_display', t: 'У тренді на YouTube', sub: 'Музичний чарт YouTube', load: async () => { const l = await ytTrending(currentCountry, 20); return l.length ? l : mixRow({ yt: `trending music ${yr}`, limit: 16 }); } });
+      rows.push({ id: 'longmix', i: 'all_inclusive', t: 'Довгі збірники', sub: 'Сети й міксы від 30 хв до 10 год', load: async () => { const q = shuffle(['lofi', 'chill', 'ambient', 'jazz', 'deep house', 'study', 'piano', 'phonk'])[0]; const l = await searchYouTube(q, 14, { long: true }); return l.length ? l : searchLongMixes(q + ' mix', 14); } });
       rows.push({ id: 'ig', i: 'photo_camera', t: 'У тренді в Instagram', sub: 'Популярне в Reels', load: () => mixRow({ yt: [`instagram reels trending songs ${yr}`, `viral reels songs ${yr}`], limit: 16 }) });
       rows.push({ id: 'new', i: 'new_releases', t: 'Нові релізи', sub: 'Свіжі треки Jamendo', load: () => mixRow({ jam: { order: 'releasedate', boost: undefined }, limit: 14 }) });
       rows.push({ id: 'trend', i: 'trending_up', t: 'У тренді на Audius', sub: 'Що слухають просто зараз', load: async () => shuffle(await getAudiusTrending(30)).slice(0, 14) });
@@ -6268,6 +6741,15 @@ self.onmessage = function (e) {
         document.getElementById('soundHint').textContent = SOUND_MODES[gSound].hint + ' Не діє на iTunes-превʼю та треки без CORS.';
       };
       renderQuality(); renderSound();
+      const ciSub = document.getElementById('customInstSub'), ciDef = ciSub.textContent;
+      const showCi = () => { ciSub.textContent = getCustomInst() || ciDef; };
+      showCi();
+      document.getElementById('checkInstItem').addEventListener('click', () => { ytDiagnose(); });
+      document.getElementById('customInstItem').addEventListener('click', () => {
+        const v = prompt('Адреса вашого Piped API або Invidious, напр. https://pipedapi.example.com\nПорожньо — вимкнути.', getCustomInst());
+        if (v === null) return;
+        setCustomInst(v); showCi(); toast(v.trim() ? 'Сервер збережено' : 'Свій сервер вимкнено');
+      });
       qChips.addEventListener('click', e => {
         const b = e.target.closest('.chip'); if (!b) return;
         const before = effQuality();
@@ -6509,7 +6991,7 @@ self.onmessage = function (e) {
             const tr = currentTrack;
             tr._ytTries = (tr._ytTries || 0) + 1;
             if (!tr._ytBad) tr._ytBad = new Set();
-            if (tr._ytHost) tr._ytBad.add(tr._ytHost);
+            if (tr._ytHost) { tr._ytBad.add(tr._ytHost); markBad(tr._ytHost); }
             tr.url = ''; tr._retrying = true;
             const pos = a.currentTime || 0;
             if (pos > 2) { resumeAt = pos; resumeId = tr.id; }
@@ -6557,6 +7039,7 @@ self.onmessage = function (e) {
         el.addEventListener('keydown', e => { if (e.key === 'Enter') { el.blur(); clearTimeout(fieldTimer); clearTimeout(histSearchTimer); runSearch(); commitSearchHistory(); } });
       });
       initFilterSheet();
+      initSuggest();
       document.getElementById('filterClear').addEventListener('click', () => {
         searchFilters.genres.clear(); searchFilters.moods.clear(); searchFilters.era = ''; searchFilters.lang = ''; searchFilters.dur = '';
         searchFilters.source = 'all'; searchFilters.sort = 'popularity_month';
@@ -7324,13 +7807,10 @@ self.onmessage = function (e) {
 
   /* ---------- пошук у LRCLIB ---------- */
   async function jget(url, ms) {
-    const c = new AbortController(), to = setTimeout(() => c.abort(), ms || 9000);
-    try {
-      const r = await fetch(url, { signal: c.signal });
-      if (r.status === 404) return null;
-      if (!r.ok) throw new Error('http ' + r.status);
-      return await r.json();
-    } finally { clearTimeout(to); }
+    const r = await fetchT(url, ms || 9000);
+    if (r.status === 404) return null;
+    if (!r.ok) throw new Error('http ' + r.status);
+    return await r.json();
   }
   const qs = o => Object.keys(o).filter(k => o[k] !== '' && o[k] != null).map(k => k + '=' + encodeURIComponent(o[k])).join('&');
   function toResult(r) {
@@ -7392,7 +7872,7 @@ self.onmessage = function (e) {
 
   function curAudio() { try { return typeof audio !== 'undefined' ? audio : null; } catch (e) { return null; } }
   function curTrack() { try { return typeof currentTrack !== 'undefined' ? currentTrack : null; } catch (e) { return null; } }
-  const fmt = s => { s = Math.max(0, Math.floor(s || 0)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+  const fmt = s => { s = Math.max(0, Math.floor(s || 0)); const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60); return h ? h + ':' + String(m).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0') : m + ':' + String(s % 60).padStart(2, '0'); };
 
   function setHeader() {
     $('lyrTitle').textContent = S.track.title || '—';
